@@ -407,6 +407,17 @@
   .save-note.show{opacity:1;}
 
   .export-bar{display:flex;justify-content:flex-end;gap:8px;margin:-14px 0 22px;flex-wrap:wrap;}
+  .import-export-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .search-input{
+    width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 14px;margin-bottom:14px;
+    font-size:13.5px;font-family:var(--font-body);background:var(--cream);
+  }
+  .search-input:focus{background:var(--white);}
+  .import-preview-section{margin-bottom:14px;}
+  .import-preview-label{font-size:11px;font-weight:700;color:var(--sage-dark);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:6px;}
+  .import-preview-list{font-size:12.5px;color:var(--ink);line-height:1.7;}
+  .import-preview-list .matched{color:var(--ink-soft);}
+  .import-preview-list .new-item{color:var(--sage-dark);font-weight:600;}
 
   #printArea{display:none;}
 
@@ -433,7 +444,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v3.0</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v3.2</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -543,6 +554,12 @@
   <section class="panel" id="panel-recipes">
     <h2 class="section-title" data-i18n="recipes_title">Le mie ricette</h2>
     <p class="section-sub" data-i18n="recipes_sub">Crea, modifica ed elimina le tue ricette con ingredienti e valori nutrizionali.</p>
+    <div class="import-export-bar no-print">
+      <button class="btn btn-ghost btn-sm" id="exportRecipesBtn" data-i18n="btn_export_recipes">⬇ Esporta ricette (JSON)</button>
+      <button class="btn btn-ghost btn-sm" id="importRecipesBtn" data-i18n="btn_import_recipes">⬆ Importa ricette (JSON)</button>
+      <input type="file" id="importRecipesFile" accept="application/json" style="display:none;">
+    </div>
+    <input autocomplete="off" type="text" id="recipeSearchInput" class="search-input no-print" data-i18n-ph="search_recipes_ph" placeholder="Cerca ricetta…">
     <div class="recipe-grid" id="recipeGrid"></div>
   </section>
 
@@ -657,6 +674,11 @@
 
     <div class="card foods-db">
       <h2 class="section-title" style="font-size:17px;" data-i18n="db_title">Database alimenti (per 100 g)</h2>
+      <div class="import-export-bar no-print">
+        <button class="btn btn-ghost btn-sm" id="exportFoodsBtn" data-i18n="btn_export_foods">⬇ Esporta alimenti (JSON)</button>
+        <button class="btn btn-ghost btn-sm" id="importFoodsBtn" data-i18n="btn_import_foods">⬆ Importa alimenti (JSON)</button>
+        <input type="file" id="importFoodsFile" accept="application/json" style="display:none;">
+      </div>
       <div class="add-item-row no-print" style="margin-top:10px;">
         <input autocomplete="off" type="text" class="name" id="newFoodNameIt" data-i18n-ph="food_name_it_ph" placeholder="Nome (IT)">
         <input autocomplete="off" type="text" class="name" id="newFoodNameFr" data-i18n-ph="food_name_fr_ph" placeholder="Nom (FR)">
@@ -668,6 +690,7 @@
         <input autocomplete="off" type="text" inputmode="decimal" class="qty numeric-clean" id="newFoodSalt" data-i18n-ph="food_salt_ph" placeholder="Sale g">
         <button class="btn btn-primary" id="addFoodBtn" data-i18n="btn_add_food">+ Aggiungi</button>
       </div>
+      <input autocomplete="off" type="text" id="foodSearchInput" class="search-input no-print" data-i18n-ph="search_foods_ph" placeholder="Cerca alimento…">
       <div style="overflow-x:auto;">
         <table class="db-table" id="foodsTable"></table>
       </div>
@@ -719,6 +742,17 @@
         <button class="btn btn-ghost" id="catCancel" data-i18n="btn_cancel">Annulla</button>
         <button class="btn btn-primary" id="catSave" data-i18n="btn_save">Salva</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="importPreviewOverlay">
+  <div class="modal">
+    <h3 id="importPreviewTitle" data-i18n="import_preview_title">Anteprima importazione</h3>
+    <div id="importPreviewBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="importPreviewCancel" data-i18n="btn_cancel">Annulla</button>
+      <button class="btn btn-primary" id="importPreviewConfirm" data-i18n="btn_confirm_import">Conferma importazione</button>
     </div>
   </div>
 </div>
@@ -855,6 +889,17 @@ const I18N = {
     no_recipe_option:"— nessuna ricetta —",
     recipes_title:"Le mie ricette", recipes_sub:"Crea, modifica ed elimina le tue ricette con ingredienti e valori nutrizionali.",
     new_recipe_tile:"+ Nuova ricetta",
+    btn_export_recipes:"⬇ Esporta ricette (JSON)", btn_import_recipes:"⬆ Importa ricette (JSON)",
+    btn_export_foods:"⬇ Esporta alimenti (JSON)", btn_import_foods:"⬆ Importa alimenti (JSON)",
+    alert_nothing_to_export:"Non c'è ancora nulla da esportare.",
+    alert_import_invalid:"Il file selezionato non sembra un file valido esportato da Zenplicité.",
+    alert_import_success:(n)=>`${n} ${n===1?'ricetta importata':'ricette importate'} con successo.`,
+    alert_import_foods_success:(added,skipped)=>`${added} ${added===1?'alimento aggiunto':'alimenti aggiunti'}${skipped?`, ${skipped} già presenti (saltati)`:''}.`,
+    confirm_duplicate_food:(name)=>`Esiste già un alimento simile: "${name}". Vuoi aggiungerlo comunque?`,
+    search_recipes_ph:"Cerca ricetta…", search_foods_ph:"Cerca alimento…",
+    import_preview_title:"Anteprima importazione", import_preview_title_recipes:"Anteprima importazione ricette", import_preview_title_foods:"Anteprima importazione alimenti",
+    btn_confirm_import:"Conferma importazione",
+    preview_recipes_label:"Ricette da importare", preview_new_foods_label:"Nuovi alimenti (verranno aggiunti)", preview_matched_foods_label:"Alimenti già presenti (verranno collegati)",
     servings_word:"porz.",
     meal_colazione:"Colazione", meal_pranzo:"Pranzo", meal_spuntino:"Spuntino", meal_cena:"Cena",
     macro_kcal_label:"Kcal", macro_protein_label:"Prot.", macro_carbs_label:"Carb.", macro_fat_label:"Grassi",
@@ -948,6 +993,17 @@ const I18N = {
     no_recipe_option:"— aucune recette —",
     recipes_title:"Mes recettes", recipes_sub:"Crée, modifie et supprime tes recettes avec les ingrédients et les valeurs nutritionnelles.",
     new_recipe_tile:"+ Nouvelle recette",
+    btn_export_recipes:"⬇ Exporter les recettes (JSON)", btn_import_recipes:"⬆ Importer des recettes (JSON)",
+    btn_export_foods:"⬇ Exporter les aliments (JSON)", btn_import_foods:"⬆ Importer des aliments (JSON)",
+    alert_nothing_to_export:"Il n'y a encore rien à exporter.",
+    alert_import_invalid:"Le fichier sélectionné ne semble pas être un fichier valide exporté depuis Zenplicité.",
+    alert_import_success:(n)=>`${n} recette${n===1?'':'s'} importée${n===1?'':'s'} avec succès.`,
+    alert_import_foods_success:(added,skipped)=>`${added} aliment${added===1?'':'s'} ajouté${added===1?'':'s'}${skipped?`, ${skipped} déjà présent${skipped===1?'':'s'} (ignoré${skipped===1?'':'s'})`:''}.`,
+    confirm_duplicate_food:(name)=>`Un aliment similaire existe déjà : « ${name} ». Veux-tu l'ajouter quand même ?`,
+    search_recipes_ph:"Rechercher une recette…", search_foods_ph:"Rechercher un aliment…",
+    import_preview_title:"Aperçu de l'importation", import_preview_title_recipes:"Aperçu de l'importation des recettes", import_preview_title_foods:"Aperçu de l'importation des aliments",
+    btn_confirm_import:"Confirmer l'importation",
+    preview_recipes_label:"Recettes à importer", preview_new_foods_label:"Nouveaux aliments (seront ajoutés)", preview_matched_foods_label:"Aliments déjà présents (seront liés)",
     servings_word:"pers.",
     meal_colazione:"Petit-déjeuner", meal_pranzo:"Déjeuner", meal_spuntino:"Collation", meal_cena:"Dîner",
     macro_kcal_label:"Kcal", macro_protein_label:"Prot.", macro_carbs_label:"Gluc.", macro_fat_label:"Lip.",
@@ -1830,7 +1886,10 @@ document.getElementById('addItemBtn').addEventListener('click', ()=>{
 /* ---------- RECIPES ---------- */
 function renderRecipes(){
   const grid = document.getElementById('recipeGrid');
-  let html = state.recipes.map(r=>{
+  const filtered = recipeSearchQuery
+    ? state.recipes.filter(r => (r.name||'').toLowerCase().includes(recipeSearchQuery))
+    : state.recipes;
+  let html = filtered.map(r=>{
     const m = r.macros || {};
     const linkBtn = r.link ? `<a href="${escapeAttr(r.link)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:8px;display:inline-block;" onclick="event.stopPropagation()">🔗 ${escapeHtml(r.link.length>26?r.link.slice(0,26)+'…':r.link)}</a>` : '';
     return `<div class="recipe-card" data-id="${r.id}">
@@ -2166,6 +2225,173 @@ document.getElementById('deleteRecipeBtn').addEventListener('click', ()=>{
   renderShoppingList();
 });
 
+/* ---------- RECIPES IMPORT / EXPORT ---------- */
+function downloadJSON(obj, filename){
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function matchFoodsForImport(incomingFoods){
+  const matches = [];
+  const newFoods = [];
+  incomingFoods.forEach(f=>{
+    const existing = state.foodsDB.find(x =>
+      (f.name_it && x.name_it && x.name_it.toLowerCase()===f.name_it.toLowerCase()) ||
+      (f.name_fr && x.name_fr && x.name_fr.toLowerCase()===f.name_fr.toLowerCase())
+    );
+    if(existing) matches.push({incoming:f, existingId:existing.id, existingName:foodName(existing)});
+    else newFoods.push(f);
+  });
+  return {matches, newFoods};
+}
+function applyFoodMatches(matchResult){
+  const foodIdMap = {};
+  matchResult.matches.forEach(m=>{ foodIdMap[m.incoming.id] = m.existingId; });
+  matchResult.newFoods.forEach(f=>{
+    const newId = uid();
+    state.foodsDB.push({id:newId, name_it:f.name_it||f.name_fr||'', name_fr:f.name_fr||f.name_it||'',
+      kcal:Number(f.kcal)||0, protein:Number(f.protein)||0, carbs:Number(f.carbs)||0, fat:Number(f.fat)||0,
+      fiber:Number(f.fiber)||0, salt:Number(f.salt)||0});
+    foodIdMap[f.id] = newId;
+  });
+  return foodIdMap;
+}
+
+let pendingImport = null;
+function closeImportPreview(){
+  pendingImport = null;
+  document.getElementById('importPreviewOverlay').classList.remove('show');
+}
+document.getElementById('importPreviewCancel').addEventListener('click', closeImportPreview);
+document.getElementById('importPreviewConfirm').addEventListener('click', ()=>{
+  if(!pendingImport) return;
+  if(pendingImport.kind === 'recipes'){
+    const matchResult = matchFoodsForImport(pendingImport.foods);
+    const foodIdMap = applyFoodMatches(matchResult);
+    pendingImport.recipes.forEach(r=>{
+      const newIngredients = (r.ingredients||[]).map(i=>({
+        name:i.name||'', qty:i.qty||'', unit:i.unit||'',
+        foodRef: i.foodRef && foodIdMap[i.foodRef] ? foodIdMap[i.foodRef] : ''
+      }));
+      state.recipes.push({
+        id:uid(), name:r.name||t('recipe_modal_new'), category:r.category||'', servings:Number(r.servings)||1,
+        ingredients:newIngredients, macros: r.macros||{}, instructions:r.instructions||'', link:r.link||''
+      });
+    });
+    persist();
+    renderRecipes();
+    renderEquiv();
+  } else if(pendingImport.kind === 'foods'){
+    const matchResult = matchFoodsForImport(pendingImport.foods);
+    matchResult.newFoods.forEach(f=>{
+      state.foodsDB.push({id:uid(), name_it:f.name_it||f.name_fr||'', name_fr:f.name_fr||f.name_it||'',
+        kcal:Number(f.kcal)||0, protein:Number(f.protein)||0, carbs:Number(f.carbs)||0, fat:Number(f.fat)||0,
+        fiber:Number(f.fiber)||0, salt:Number(f.salt)||0});
+    });
+    persist();
+    renderEquiv();
+  }
+  closeImportPreview();
+});
+
+function showImportPreview(kind, incomingRecipes, incomingFoods){
+  const matchResult = matchFoodsForImport(incomingFoods);
+  pendingImport = {kind, recipes: incomingRecipes||[], foods: incomingFoods||[]};
+  const body = document.getElementById('importPreviewBody');
+  let html = '';
+  if(kind === 'recipes'){
+    html += `<div class="import-preview-section"><div class="import-preview-label">${t('preview_recipes_label')} (${incomingRecipes.length})</div>
+      <div class="import-preview-list">${incomingRecipes.map(r=>escapeHtml(r.name||'—')).join('<br>')}</div></div>`;
+  }
+  if(matchResult.newFoods.length){
+    html += `<div class="import-preview-section"><div class="import-preview-label">${t('preview_new_foods_label')} (${matchResult.newFoods.length})</div>
+      <div class="import-preview-list">${matchResult.newFoods.map(f=>`<span class="new-item">+ ${escapeHtml(f.name_it||f.name_fr||'')}</span>`).join('<br>')}</div></div>`;
+  }
+  if(matchResult.matches.length){
+    html += `<div class="import-preview-section"><div class="import-preview-label">${t('preview_matched_foods_label')} (${matchResult.matches.length})</div>
+      <div class="import-preview-list">${matchResult.matches.map(m=>`<span class="matched">${escapeHtml(m.existingName)}</span>`).join('<br>')}</div></div>`;
+  }
+  if(!html) html = `<p style="font-size:13px;color:var(--ink-soft);">${t('alert_import_invalid')}</p>`;
+  body.innerHTML = html;
+  document.getElementById('importPreviewTitle').textContent = kind==='recipes' ? t('import_preview_title_recipes') : t('import_preview_title_foods');
+  document.getElementById('importPreviewOverlay').classList.add('show');
+}
+
+document.getElementById('exportRecipesBtn').addEventListener('click', ()=>{
+  if(!state.recipes.length){ alert(t('alert_nothing_to_export')); return; }
+  const usedFoodIds = new Set();
+  state.recipes.forEach(r=> (r.ingredients||[]).forEach(i=>{ if(i.foodRef) usedFoodIds.add(i.foodRef); }));
+  const foods = state.foodsDB.filter(f=>usedFoodIds.has(f.id));
+  downloadJSON({type:'zenplicite-recipes', version:1, recipes: state.recipes, foods}, 'zenplicite-ricette.json');
+});
+
+document.getElementById('importRecipesBtn').addEventListener('click', ()=>{
+  document.getElementById('importRecipesFile').click();
+});
+document.getElementById('importRecipesFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      const incomingRecipes = Array.isArray(data.recipes) ? data.recipes : (Array.isArray(data) ? data : []);
+      const incomingFoods = Array.isArray(data.foods) ? data.foods : [];
+      if(!incomingRecipes.length){ alert(t('alert_import_invalid')); return; }
+      showImportPreview('recipes', incomingRecipes, incomingFoods);
+    }catch(err){
+      alert(t('alert_import_invalid'));
+    }
+    document.getElementById('importRecipesFile').value = '';
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('exportFoodsBtn').addEventListener('click', ()=>{
+  if(!state.foodsDB.length){ alert(t('alert_nothing_to_export')); return; }
+  downloadJSON({type:'zenplicite-foods', version:1, foods: state.foodsDB}, 'zenplicite-alimenti.json');
+});
+
+document.getElementById('importFoodsBtn').addEventListener('click', ()=>{
+  document.getElementById('importFoodsFile').click();
+});
+document.getElementById('importFoodsFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      const incoming = Array.isArray(data.foods) ? data.foods : (Array.isArray(data) ? data : []);
+      if(!incoming.length){ alert(t('alert_import_invalid')); return; }
+      showImportPreview('foods', [], incoming);
+    }catch(err){
+      alert(t('alert_import_invalid'));
+    }
+    document.getElementById('importFoodsFile').value = '';
+  };
+  reader.readAsText(file);
+});
+
+/* ---------- SEARCH FILTERS ---------- */
+let recipeSearchQuery = '';
+let foodSearchQuery = '';
+document.getElementById('recipeSearchInput').addEventListener('input', (e)=>{
+  recipeSearchQuery = e.target.value.trim().toLowerCase();
+  renderRecipes();
+});
+document.getElementById('foodSearchInput').addEventListener('input', (e)=>{
+  foodSearchQuery = e.target.value.trim().toLowerCase();
+  renderFoodsTable();
+});
+
 /* ---------- EQUIVALENCES ---------- */
 function renderEquiv(){
   const selA = document.getElementById('equivFoodA');
@@ -2207,6 +2433,7 @@ function renderFoodsTable(){
   const table = document.getElementById('foodsTable');
   let html = `<tr><th>${t('food_name_it_ph')}</th><th>${t('food_name_fr_ph')}</th><th>Kcal</th><th>${t('macro_protein_label')}</th><th>${t('macro_carbs_label')}</th><th>${t('macro_fat_label')}</th><th>${t('macro_fiber_label')}</th><th>${t('macro_salt_label')}</th><th></th></tr>`;
   state.foodsDB.forEach((f,i)=>{
+    if(foodSearchQuery && !foodName(f).toLowerCase().includes(foodSearchQuery)) return;
     html += `<tr data-idx="${i}">
       <td><input type="text" class="db-edit" data-field="name_it" value="${escapeAttr(f.name_it)}"></td>
       <td><input type="text" class="db-edit" data-field="name_fr" value="${escapeAttr(f.name_fr)}"></td>
@@ -2287,6 +2514,11 @@ document.getElementById('addFoodBtn').addEventListener('click', ()=>{
   const fiber = parseNum(fiberRaw);
   const salt = parseNum(saltRaw);
   if(!nameIt && !nameFr){ alert(t('alert_food_name_needed')); return; }
+  const dupFood = state.foodsDB.find(x =>
+    (nameIt && x.name_it && x.name_it.toLowerCase()===nameIt.toLowerCase()) ||
+    (nameFr && x.name_fr && x.name_fr.toLowerCase()===nameFr.toLowerCase())
+  );
+  if(dupFood && !confirm(t('confirm_duplicate_food')(foodName(dupFood)))) return;
   const allEmpty = !kcalRaw.trim() && !proteinRaw.trim() && !carbsRaw.trim() && !fatRaw.trim() && !fiberRaw.trim() && !saltRaw.trim();
   if(allEmpty && !confirm(t('confirm_zero_macros'))) return;
   state.foodsDB.push({id:uid(), name_it:nameIt||nameFr, name_fr:nameFr||nameIt, kcal, protein, carbs, fat, fiber, salt});
