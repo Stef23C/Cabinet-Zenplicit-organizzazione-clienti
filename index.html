@@ -368,6 +368,37 @@
   }
   .audio-item audio{flex:2;min-width:200px;}
 
+  /* BOOKS */
+  .book-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:16px;}
+  .book-tabs button{
+    border:1px solid var(--line);background:var(--white);border-radius:100px;padding:9px 16px;
+    font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;white-space:nowrap;font-family:var(--font-body);
+  }
+  .book-tabs button.active{background:var(--sage-dark);border-color:var(--sage-dark);color:var(--white);}
+  .book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+  .book-card{
+    background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px;
+    box-shadow:var(--shadow);cursor:pointer;transition:transform .15s ease;position:relative;
+  }
+  .book-card:hover{transform:translateY(-2px);}
+  .book-card h4{font-family:var(--font-display);margin:0 0 3px;color:var(--sage-dark);font-size:16px;line-height:1.3;}
+  .book-author{font-size:12px;color:var(--ink-soft);margin-bottom:8px;}
+  .book-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+  .book-badge{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:100px;text-transform:uppercase;letter-spacing:0.3px;}
+  .book-badge.liked{background:var(--sage-pale);color:var(--sage-dark);}
+  .book-badge.disliked{background:#F3DEDA;color:#B65B4F;}
+  .book-notes-preview{font-size:12px;color:var(--ink-soft);margin-top:6px;line-height:1.4;max-height:2.8em;overflow:hidden;}
+  .book-quick-btn{
+    position:absolute;top:12px;right:12px;background:var(--sage-pale);border:none;border-radius:100px;
+    padding:5px 10px;font-size:11px;font-weight:700;color:var(--sage-dark);cursor:pointer;
+  }
+  .book-quick-btn:hover{background:var(--sage-light);}
+  .new-book-tile{
+    border:2px dashed var(--sage-light);border-radius:14px;display:flex;align-items:center;justify-content:center;
+    color:var(--sage-dark);font-weight:600;font-size:14px;cursor:pointer;min-height:120px;background:var(--sage-pale);
+  }
+  .new-book-tile:hover{background:var(--beige-deep);}
+
   select, input, textarea{outline:none;}
   select:focus, input:focus, textarea:focus{border-color:var(--sage);box-shadow:0 0 0 3px var(--sage-pale);}
   ::placeholder{color:#B7AF9C;}
@@ -402,7 +433,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v2.4</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v3.0</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -417,6 +448,7 @@
     <button data-tab="recipes" data-i18n="tab_recipes">Ricette</button>
     <button data-tab="medit" data-i18n="tab_medit">Meditazione</button>
     <button data-tab="equiv" data-i18n="tab_equiv">Equivalenze</button>
+    <button data-tab="books" data-i18n="tab_books">Libri</button>
   </nav>
 
   <div class="export-bar no-print">
@@ -441,7 +473,6 @@
 
     <div class="card">
       <div class="cat-manager no-print">
-        <input autocomplete="off" type="text" id="newCatInput" data-i18n-ph="cat_placeholder" placeholder="Nuova categoria (es. Letture, Idratazione…)">
         <button class="btn btn-primary" id="addCatBtn" data-i18n="btn_add_cat">+ Aggiungi categoria</button>
       </div>
       <div style="overflow-x:auto;">
@@ -613,6 +644,8 @@
             <option value="carbs" data-i18n="macro_carbs">Carboidrati</option>
             <option value="fat" data-i18n="macro_fat">Grassi</option>
             <option value="kcal" data-i18n="macro_kcal">Calorie</option>
+            <option value="fiber" data-i18n="macro_fiber">Fibre</option>
+            <option value="salt" data-i18n="macro_salt">Sale</option>
           </select>
         </div>
       </div>
@@ -631,11 +664,30 @@
         <input autocomplete="off" type="text" inputmode="decimal" class="qty numeric-clean" id="newFoodProtein" data-i18n-ph="food_protein_ph" placeholder="Prot. g">
         <input autocomplete="off" type="text" inputmode="decimal" class="qty numeric-clean" id="newFoodCarbs" data-i18n-ph="food_carbs_ph" placeholder="Carb. g">
         <input autocomplete="off" type="text" inputmode="decimal" class="qty numeric-clean" id="newFoodFat" data-i18n-ph="food_fat_ph" placeholder="Grassi g">
+        <input autocomplete="off" type="text" inputmode="decimal" class="qty numeric-clean" id="newFoodFiber" data-i18n-ph="food_fiber_ph" placeholder="Fibre g">
+        <input autocomplete="off" type="text" inputmode="decimal" class="qty numeric-clean" id="newFoodSalt" data-i18n-ph="food_salt_ph" placeholder="Sale g">
         <button class="btn btn-primary" id="addFoodBtn" data-i18n="btn_add_food">+ Aggiungi</button>
       </div>
       <div style="overflow-x:auto;">
         <table class="db-table" id="foodsTable"></table>
       </div>
+    </div>
+  </section>
+
+  <!-- BOOKS -->
+  <section class="panel" id="panel-books">
+    <h2 class="section-title" data-i18n="books_title">I miei libri</h2>
+    <p class="section-sub" data-i18n="books_sub">Tieni traccia dei libri che vuoi leggere, che stai leggendo e che hai già letto, con le tue impressioni personali.</p>
+
+    <div class="book-tabs no-print">
+      <button data-shelf="wishlist" class="active" data-i18n="shelf_wishlist">Vorrei leggere</button>
+      <button data-shelf="to-read" data-i18n="shelf_to_read">Da leggere</button>
+      <button data-shelf="reading" data-i18n="shelf_reading">In lettura</button>
+      <button data-shelf="read" data-i18n="shelf_read">Letti</button>
+    </div>
+
+    <div class="card">
+      <div class="book-grid" id="bookGrid"></div>
     </div>
   </section>
 </div>
@@ -647,6 +699,56 @@
     <div class="modal-actions">
       <button class="btn btn-ghost" id="noteCancel" data-i18n="btn_cancel">Annulla</button>
       <button class="btn btn-primary" id="noteSave" data-i18n="btn_save">Salva</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="catModalOverlay">
+  <div class="modal">
+    <h3 id="catModalTitle" data-i18n="cat_modal_new">Nuova categoria</h3>
+    <input autocomplete="off" type="text" id="catNameIt" data-i18n-ph="food_name_it_ph" placeholder="Nome (IT)">
+    <input autocomplete="off" type="text" id="catNameFr" data-i18n-ph="food_name_fr_ph" placeholder="Nom (FR)">
+    <label class="field-label" data-i18n="cat_unit_label">Tipo di traccia</label>
+    <select id="catUnit">
+      <option value="min" data-i18n="cat_unit_min">Tempo (minuti)</option>
+      <option value="ml" data-i18n="cat_unit_ml">Quantità (mL)</option>
+    </select>
+    <div class="modal-actions" style="justify-content:space-between;">
+      <button class="btn btn-danger" id="deleteCatBtn" data-i18n="btn_delete_cat">Elimina categoria</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" id="catCancel" data-i18n="btn_cancel">Annulla</button>
+        <button class="btn btn-primary" id="catSave" data-i18n="btn_save">Salva</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="bookModalOverlay">
+  <div class="modal">
+    <h3 id="bookModalTitle" data-i18n="book_modal_new">Nuovo libro</h3>
+    <input autocomplete="off" type="text" id="bTitle" data-i18n-ph="book_title_ph" placeholder="Titolo">
+    <input autocomplete="off" type="text" id="bAuthor" data-i18n-ph="book_author_ph" placeholder="Autore">
+    <label class="field-label" data-i18n="book_shelf_label">Stato</label>
+    <select id="bShelf">
+      <option value="wishlist" data-i18n="shelf_wishlist">Vorrei leggere</option>
+      <option value="to-read" data-i18n="shelf_to_read">Da leggere</option>
+      <option value="reading" data-i18n="shelf_reading">In lettura</option>
+      <option value="read" data-i18n="shelf_read">Letti</option>
+    </select>
+    <label class="field-label" data-i18n="book_liked_label">Ti è piaciuto?</label>
+    <select id="bLiked">
+      <option value="" data-i18n="book_liked_none">Non ancora valutato</option>
+      <option value="yes" data-i18n="book_liked_yes">Piaciuto</option>
+      <option value="no" data-i18n="book_liked_no">Non piaciuto</option>
+    </select>
+    <label class="field-label" data-i18n="book_notes_label">Note personali</label>
+    <textarea id="bNotes" data-i18n-ph="book_notes_ph" placeholder="Cosa ne pensi, citazioni, riflessioni…"></textarea>
+    <div class="modal-actions" style="justify-content:space-between;">
+      <button class="btn btn-danger" id="deleteBookBtn" data-i18n="btn_delete_book">Elimina libro</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" id="bookCancel" data-i18n="btn_cancel">Annulla</button>
+        <button class="btn btn-primary" id="bookSave" data-i18n="btn_save">Salva</button>
+      </div>
     </div>
   </div>
 </div>
@@ -668,6 +770,8 @@
       <input autocomplete="off" type="text" inputmode="decimal" class="qty numeric-clean" id="rProtein" data-i18n-ph="food_protein_ph" placeholder="Prot. g">
       <input autocomplete="off" type="text" inputmode="decimal" class="qty numeric-clean" id="rCarbs" data-i18n-ph="food_carbs_ph" placeholder="Carb. g">
       <input autocomplete="off" type="text" inputmode="decimal" class="qty numeric-clean" id="rFat" data-i18n-ph="food_fat_ph" placeholder="Grassi g">
+      <input autocomplete="off" type="text" inputmode="decimal" class="qty numeric-clean" id="rFiber" data-i18n-ph="food_fiber_ph" placeholder="Fibre g">
+      <input autocomplete="off" type="text" inputmode="decimal" class="qty numeric-clean" id="rSalt" data-i18n-ph="food_salt_ph" placeholder="Sale g">
     </div>
     <p style="font-size:11px;color:var(--ink-soft);margin-top:-4px;" data-i18n="auto_calc_note">Collega ogni ingrediente a un alimento del database (scheda Equivalenze) e indica la quantità in grammi per includerlo nel calcolo automatico. Puoi comunque correggere i valori a mano.</p>
     <textarea id="rInstructions" data-i18n-ph="recipe_instructions_ph" placeholder="Preparazione…"></textarea>
@@ -722,7 +826,16 @@ const MEAL_TYPES = [["colazione","meal_colazione"],["pranzo","meal_pranzo"],["sp
 const I18N = {
   it: {
     tagline:"routine · pasti · ricette",
-    tab_routine:"Routine", tab_meals:"Pasti & Spesa", tab_recipes:"Ricette", tab_medit:"Meditazione", tab_equiv:"Equivalenze", tab_month:"Mese",
+    tab_routine:"Routine", tab_meals:"Pasti & Spesa", tab_recipes:"Ricette", tab_medit:"Meditazione", tab_equiv:"Equivalenze", tab_month:"Mese", tab_books:"Libri",
+    books_title:"I miei libri", books_sub:"Tieni traccia dei libri che vuoi leggere, che stai leggendo e che hai già letto, con le tue impressioni personali.",
+    shelf_wishlist:"Vorrei leggere", shelf_to_read:"Da leggere", shelf_reading:"In lettura", shelf_read:"Letti",
+    new_book_tile:"+ Nuovo libro", btn_mark_read:"✓ Segna come letto",
+    book_modal_new:"Nuovo libro", book_modal_edit:"Modifica libro",
+    book_title_ph:"Titolo", book_author_ph:"Autore", book_shelf_label:"Stato", book_liked_label:"Ti è piaciuto?",
+    book_liked_none:"Non ancora valutato", book_liked_yes:"Piaciuto", book_liked_no:"Non piaciuto",
+    book_notes_label:"Note personali", book_notes_ph:"Cosa ne pensi, citazioni, riflessioni…",
+    btn_delete_book:"Elimina libro", alert_book_title_needed:"Inserisci almeno il titolo del libro.",
+    confirm_delete_book:"Eliminare definitivamente questo libro?",
     btn_this_week:"Questa settimana",
     month_title:"Vista mensile", month_sub:"Un colpo d'occhio su tutto il mese: più il pallino è pieno, più pratiche hai completato quel giorno. Clicca un giorno per aprire la sua settimana.",
     month_legend_none:"Nessuna pratica", month_legend_some:"Alcune", month_legend_all:"Tutte completate",
@@ -762,11 +875,12 @@ const I18N = {
     recording_label:"Registrazione",
     equiv_title:"Equivalenze nutrizionali", equiv_sub:"Sostituisci un alimento con un altro mantenendo invariato il macronutriente scelto.",
     equiv_food_a:"Alimento di partenza", equiv_qty:"Quantità (g)", equiv_food_b:"Sostituire con", equiv_keep:"Mantenere invariato",
-    macro_protein:"Proteine", macro_carbs:"Carboidrati", macro_fat:"Grassi", macro_kcal:"Calorie",
+    macro_protein:"Proteine", macro_carbs:"Carboidrati", macro_fat:"Grassi", macro_kcal:"Calorie", macro_fiber:"Fibre", macro_salt:"Sale",
     equiv_placeholder:"Seleziona due alimenti per calcolare l'equivalenza",
     equiv_result_text:(qtyB,foodB,qtyA,foodA,macroLabel)=>`di ${foodB} equivalgono a ${qtyA} g di ${foodA} per ${macroLabel}`,
     equiv_no_macro:(foodB, macroLabel)=>`${foodB} non contiene ${macroLabel}: impossibile calcolare l'equivalenza.`,
-    db_title:"Database alimenti (per 100 g)", food_name_ph:"Nome alimento", food_name_it_ph:"Nome (IT)", food_name_fr_ph:"Nom (FR)", food_protein_ph:"Prot. g", food_carbs_ph:"Carb. g", food_fat_ph:"Grassi g",
+    db_title:"Database alimenti (per 100 g)", food_name_ph:"Nome alimento", food_name_it_ph:"Nome (IT)", food_name_fr_ph:"Nom (FR)", food_protein_ph:"Prot. g", food_carbs_ph:"Carb. g", food_fat_ph:"Grassi g", food_fiber_ph:"Fibre g", food_salt_ph:"Sale g",
+    macro_fiber_label:"Fibre", macro_salt_label:"Sale",
     alert_food_name_needed:"Inserisci almeno un nome (italiano o francese) per l'alimento.",
     btn_add_food:"+ Aggiungi",
     note_modal_title:"Nota", note_placeholder:"Scrivi una nota…", btn_cancel:"Annulla", btn_save:"Salva",
@@ -788,6 +902,10 @@ const I18N = {
     confirm_remove_cat:(cat)=>`Rimuovere la categoria "${cat}" da tutta la settimana?`,
     alert_recipe_name:"Inserisci un nome per la ricetta.",
     alert_cat_exists:"Esiste già una categoria con questo nome.",
+    alert_cat_name_needed:"Inserisci almeno un nome (italiano o francese) per la categoria.",
+    cat_modal_new:"Nuova categoria", cat_modal_edit:"Modifica categoria",
+    cat_unit_label:"Tipo di traccia", cat_unit_min:"Tempo (minuti)", cat_unit_ml:"Quantità (mL)",
+    btn_delete_cat:"Elimina categoria",
     confirm_zero_macros:"Non hai inserito nessun valore nutrizionale: l'alimento verrà aggiunto con Kcal, Proteine, Carboidrati e Grassi a zero. Continuare?",
     prompt_rename_cat:"Rinomina categoria:",
     report_title:"Zenplicité — Report settimanale",
@@ -801,7 +919,16 @@ const I18N = {
   },
   fr: {
     tagline:"routine · repas · recettes",
-    tab_routine:"Routine", tab_meals:"Repas & Courses", tab_recipes:"Recettes", tab_medit:"Méditation", tab_equiv:"Équivalences", tab_month:"Mois",
+    tab_routine:"Routine", tab_meals:"Repas & Courses", tab_recipes:"Recettes", tab_medit:"Méditation", tab_equiv:"Équivalences", tab_month:"Mois", tab_books:"Livres",
+    books_title:"Mes livres", books_sub:"Garde une trace des livres que tu veux lire, que tu es en train de lire et que tu as déjà lus, avec tes impressions personnelles.",
+    shelf_wishlist:"À découvrir", shelf_to_read:"À lire", shelf_reading:"En cours", shelf_read:"Lus",
+    new_book_tile:"+ Nouveau livre", btn_mark_read:"✓ Marquer comme lu",
+    book_modal_new:"Nouveau livre", book_modal_edit:"Modifier le livre",
+    book_title_ph:"Titre", book_author_ph:"Auteur", book_shelf_label:"Statut", book_liked_label:"Tu as aimé ?",
+    book_liked_none:"Pas encore évalué", book_liked_yes:"Aimé", book_liked_no:"Pas aimé",
+    book_notes_label:"Notes personnelles", book_notes_ph:"Ce que tu en penses, citations, réflexions…",
+    btn_delete_book:"Supprimer le livre", alert_book_title_needed:"Indique au moins le titre du livre.",
+    confirm_delete_book:"Supprimer définitivement ce livre ?",
     btn_this_week:"Cette semaine",
     month_title:"Vue mensuelle", month_sub:"Un coup d'œil sur tout le mois : plus le point est plein, plus tu as accompli de pratiques ce jour-là. Clique sur un jour pour ouvrir sa semaine.",
     month_legend_none:"Aucune pratique", month_legend_some:"Quelques-unes", month_legend_all:"Toutes accomplies",
@@ -841,11 +968,12 @@ const I18N = {
     recording_label:"Enregistrement",
     equiv_title:"Équivalences nutritionnelles", equiv_sub:"Remplace un aliment par un autre en gardant inchangé le macronutriment choisi.",
     equiv_food_a:"Aliment de départ", equiv_qty:"Quantité (g)", equiv_food_b:"Remplacer par", equiv_keep:"Garder inchangé",
-    macro_protein:"Protéines", macro_carbs:"Glucides", macro_fat:"Lipides", macro_kcal:"Calories",
+    macro_protein:"Protéines", macro_carbs:"Glucides", macro_fat:"Lipides", macro_kcal:"Calories", macro_fiber:"Fibres", macro_salt:"Sel",
     equiv_placeholder:"Sélectionne deux aliments pour calculer l'équivalence",
     equiv_result_text:(qtyB,foodB,qtyA,foodA,macroLabel)=>`de ${foodB} équivalent à ${qtyA} g de ${foodA} pour les ${macroLabel}`,
     equiv_no_macro:(foodB, macroLabel)=>`${foodB} ne contient pas de ${macroLabel} : impossible de calculer l'équivalence.`,
-    db_title:"Base de données alimentaire (pour 100 g)", food_name_ph:"Nom de l'aliment", food_name_it_ph:"Nom (IT)", food_name_fr_ph:"Nom (FR)", food_protein_ph:"Prot. g", food_carbs_ph:"Gluc. g", food_fat_ph:"Lip. g",
+    db_title:"Base de données alimentaire (pour 100 g)", food_name_ph:"Nom de l'aliment", food_name_it_ph:"Nom (IT)", food_name_fr_ph:"Nom (FR)", food_protein_ph:"Prot. g", food_carbs_ph:"Gluc. g", food_fat_ph:"Lip. g", food_fiber_ph:"Fibres g", food_salt_ph:"Sel g",
+    macro_fiber_label:"Fibres", macro_salt_label:"Sel",
     alert_food_name_needed:"Indique au moins un nom (italien ou français) pour l'aliment.",
     btn_add_food:"+ Ajouter",
     note_modal_title:"Note", note_placeholder:"Écris une note…", btn_cancel:"Annuler", btn_save:"Enregistrer",
@@ -867,6 +995,10 @@ const I18N = {
     confirm_remove_cat:(cat)=>`Supprimer la catégorie « ${cat} » de toute la semaine ?`,
     alert_recipe_name:"Indique un nom pour la recette.",
     alert_cat_exists:"Une catégorie avec ce nom existe déjà.",
+    alert_cat_name_needed:"Indique au moins un nom (italien ou français) pour la catégorie.",
+    cat_modal_new:"Nouvelle catégorie", cat_modal_edit:"Modifier la catégorie",
+    cat_unit_label:"Type de suivi", cat_unit_min:"Temps (minutes)", cat_unit_ml:"Quantité (mL)",
+    btn_delete_cat:"Supprimer la catégorie",
     confirm_zero_macros:"Tu n'as saisi aucune valeur nutritionnelle : l'aliment sera ajouté avec Kcal, Protéines, Glucides et Lipides à zéro. Continuer ?",
     prompt_rename_cat:"Renommer la catégorie :",
     report_title:"Zenplicité — Rapport hebdomadaire",
@@ -924,6 +1056,7 @@ function setLanguage(lang){
   renderShoppingList();
   renderRecipes();
   renderEquiv();
+  renderBooks();
   if(document.getElementById('panel-month').classList.contains('active')) renderMonthView();
 }
 document.getElementById('langIt').addEventListener('click', ()=>setLanguage('it'));
@@ -939,28 +1072,36 @@ const BREATHE_PATTERNS = {
 };
 
 const DEFAULT_STATE = {
-  categories: ["Meditazione","Gratitudine","Movimento","Tempo di lavoro","Tempo per sé"],
+  categories: [
+    {id:"c01", name_it:"Meditazione", name_fr:"Méditation", unit:"min"},
+    {id:"c02", name_it:"Gratitudine", name_fr:"Gratitude", unit:"min"},
+    {id:"c03", name_it:"Movimento", name_fr:"Mouvement", unit:"min"},
+    {id:"c04", name_it:"Tempo di lavoro", name_fr:"Temps de travail", unit:"min"},
+    {id:"c05", name_it:"Tempo per sé", name_fr:"Temps pour soi", unit:"min"},
+    {id:"c06", name_it:"Idratazione", name_fr:"Hydratation", unit:"ml"}
+  ],
   weeks: {}, // weeks[mondayISO] = {routine, journal, meals, extraShoppingItems, shoppingChecked}
   currentWeekStart: null, // ISO date (Monday) of the week currently displayed
   recipes: [], // {id,name,category,servings,ingredients:[{name,qty,unit}],macros:{kcal,protein,carbs,fat},instructions}
+  books: [], // {id,title,author,shelf:'wishlist'|'to-read'|'reading'|'read',liked:''|'yes'|'no',notes}
   lang: 'it',
   foodsDB: [
-    {id:"f01", name_it:"Petto di pollo", name_fr:"Blanc de poulet", kcal:165, protein:31, carbs:0, fat:3.6},
-    {id:"f02", name_it:"Uova intere", name_fr:"Œufs entiers", kcal:155, protein:13, carbs:1.1, fat:11},
-    {id:"f03", name_it:"Tofu", name_fr:"Tofu", kcal:76, protein:8, carbs:1.9, fat:4.8},
-    {id:"f04", name_it:"Lenticchie cotte", name_fr:"Lentilles cuites", kcal:116, protein:9, carbs:20, fat:0.4},
-    {id:"f05", name_it:"Ceci cotti", name_fr:"Pois chiches cuits", kcal:164, protein:8.9, carbs:27.4, fat:2.6},
-    {id:"f06", name_it:"Salmone", name_fr:"Saumon", kcal:208, protein:20, carbs:0, fat:13},
-    {id:"f07", name_it:"Riso basmati cotto", name_fr:"Riz basmati cuit", kcal:130, protein:2.7, carbs:28, fat:0.3},
-    {id:"f08", name_it:"Quinoa cotta", name_fr:"Quinoa cuit", kcal:120, protein:4.4, carbs:21.3, fat:1.9},
-    {id:"f09", name_it:"Avena", name_fr:"Avoine", kcal:389, protein:16.9, carbs:66.3, fat:6.9},
-    {id:"f10", name_it:"Avocado", name_fr:"Avocat", kcal:160, protein:2, carbs:8.5, fat:14.7},
-    {id:"f11", name_it:"Mandorle", name_fr:"Amandes", kcal:579, protein:21.2, carbs:21.6, fat:49.9},
-    {id:"f12", name_it:"Olio extravergine d'oliva", name_fr:"Huile d'olive extra vierge", kcal:884, protein:0, carbs:0, fat:100},
-    {id:"f13", name_it:"Yogurt greco intero", name_fr:"Yaourt grec entier", kcal:97, protein:9, carbs:3.9, fat:5},
-    {id:"f14", name_it:"Parmigiano", name_fr:"Parmesan", kcal:392, protein:35.8, carbs:0, fat:28.4},
-    {id:"f15", name_it:"Banana", name_fr:"Banane", kcal:89, protein:1.1, carbs:22.8, fat:0.3},
-    {id:"f16", name_it:"Broccoli", name_fr:"Brocoli", kcal:34, protein:2.8, carbs:6.6, fat:0.4}
+    {id:"f01", name_it:"Petto di pollo", name_fr:"Blanc de poulet", kcal:165, protein:31, carbs:0, fat:3.6, fiber:0, salt:0.1},
+    {id:"f02", name_it:"Uova intere", name_fr:"Œufs entiers", kcal:155, protein:13, carbs:1.1, fat:11, fiber:0, salt:0.35},
+    {id:"f03", name_it:"Tofu", name_fr:"Tofu", kcal:76, protein:8, carbs:1.9, fat:4.8, fiber:0.3, salt:0.01},
+    {id:"f04", name_it:"Lenticchie cotte", name_fr:"Lentilles cuites", kcal:116, protein:9, carbs:20, fat:0.4, fiber:7.9, salt:0.01},
+    {id:"f05", name_it:"Ceci cotti", name_fr:"Pois chiches cuits", kcal:164, protein:8.9, carbs:27.4, fat:2.6, fiber:7.6, salt:0.02},
+    {id:"f06", name_it:"Salmone", name_fr:"Saumon", kcal:208, protein:20, carbs:0, fat:13, fiber:0, salt:0.05},
+    {id:"f07", name_it:"Riso basmati cotto", name_fr:"Riz basmati cuit", kcal:130, protein:2.7, carbs:28, fat:0.3, fiber:0.4, salt:0.005},
+    {id:"f08", name_it:"Quinoa cotta", name_fr:"Quinoa cuit", kcal:120, protein:4.4, carbs:21.3, fat:1.9, fiber:2.8, salt:0.005},
+    {id:"f09", name_it:"Avena", name_fr:"Avoine", kcal:389, protein:16.9, carbs:66.3, fat:6.9, fiber:10.6, salt:0.002},
+    {id:"f10", name_it:"Avocado", name_fr:"Avocat", kcal:160, protein:2, carbs:8.5, fat:14.7, fiber:6.7, salt:0.007},
+    {id:"f11", name_it:"Mandorle", name_fr:"Amandes", kcal:579, protein:21.2, carbs:21.6, fat:49.9, fiber:12.5, salt:0.001},
+    {id:"f12", name_it:"Olio extravergine d'oliva", name_fr:"Huile d'olive extra vierge", kcal:884, protein:0, carbs:0, fat:100, fiber:0, salt:0},
+    {id:"f13", name_it:"Yogurt greco intero", name_fr:"Yaourt grec entier", kcal:97, protein:9, carbs:3.9, fat:5, fiber:0, salt:0.06},
+    {id:"f14", name_it:"Parmigiano", name_fr:"Parmesan", kcal:392, protein:35.8, carbs:0, fat:28.4, fiber:0, salt:1.6},
+    {id:"f15", name_it:"Banana", name_fr:"Banane", kcal:89, protein:1.1, carbs:22.8, fat:0.3, fiber:2.6, salt:0.001},
+    {id:"f16", name_it:"Broccoli", name_fr:"Brocoli", kcal:34, protein:2.8, carbs:6.6, fat:0.4, fiber:2.6, salt:0.03}
   ]
 };
 
@@ -971,6 +1112,8 @@ let currentShoppingView = "aggregated";
 let noteCtx = null; // {day, cat}
 let editingRecipeId = null; // null = new
 let ingredientDraft = [];
+let currentBookShelf = 'wishlist';
+let editingBookId = null;
 let currentMonthAnchor = null; // Date used to anchor the monthly view
 
 function uid(){ return Math.random().toString(36).slice(2,10); }
@@ -1022,8 +1165,8 @@ function ensureWeekStructures(weekKey){
   DAYS.forEach(day=>{
     if(!wk.routine[day]) wk.routine[day] = {};
     state.categories.forEach(cat=>{
-      if(!wk.routine[day][cat]) wk.routine[day][cat] = {done:false, note:"", minutes:""};
-      if(wk.routine[day][cat].minutes===undefined) wk.routine[day][cat].minutes = "";
+      if(!wk.routine[day][cat.id]) wk.routine[day][cat.id] = {done:false, note:"", minutes:""};
+      if(wk.routine[day][cat.id].minutes===undefined) wk.routine[day][cat.id].minutes = "";
     });
     if(wk.journal[day]===undefined) wk.journal[day] = "";
     if(!wk.meals[day]) wk.meals[day] = {};
@@ -1098,6 +1241,7 @@ async function loadState(){
   }
   if(!state.categories) state.categories = DEFAULT_STATE.categories.slice();
   if(!state.recipes) state.recipes = [];
+  if(!state.books) state.books = [];
   if(!state.foodsDB) state.foodsDB = DEFAULT_STATE.foodsDB.slice();
 
   // Migrate old single-name foodsDB entries to bilingual {id, name_it, name_fr}
@@ -1142,6 +1286,39 @@ async function loadState(){
     delete state.extraShoppingItems;
     delete state.shoppingChecked;
   }
+
+  // Migrate old string-based categories to bilingual {id, name_it, name_fr, unit}
+  const catOldNameToId = {};
+  let catMigratedAny = false;
+  state.categories = state.categories.map(cat=>{
+    if(typeof cat === 'string'){
+      const newCat = {id:uid(), name_it:cat, name_fr:cat, unit:'min'};
+      catOldNameToId[cat] = newCat.id;
+      catMigratedAny = true;
+      return newCat;
+    }
+    if(!cat.unit) cat.unit = 'min';
+    return cat;
+  });
+  if(catMigratedAny){
+    Object.keys(state.weeks).forEach(wk=>{
+      DAYS.forEach(day=>{
+        const dayRoutine = state.weeks[wk].routine[day];
+        if(!dayRoutine) return;
+        Object.keys(catOldNameToId).forEach(oldName=>{
+          if(dayRoutine[oldName]){
+            dayRoutine[catOldNameToId[oldName]] = dayRoutine[oldName];
+            delete dayRoutine[oldName];
+          }
+        });
+      });
+    });
+  }
+  // Add the new Idratazione/Hydratation category if not already present
+  if(!state.categories.some(c => (c.name_it||'').toLowerCase()==='idratazione' || (c.name_fr||'').toLowerCase()==='hydratation')){
+    state.categories.push({id:uid(), name_it:"Idratazione", name_fr:"Hydratation", unit:"ml"});
+  }
+
   if(!state.currentWeekStart) state.currentWeekStart = mondayKeyFromDate(new Date());
   ensureWeekStructures(state.currentWeekStart);
   currentMonthAnchor = parseIsoDate(state.currentWeekStart);
@@ -1156,6 +1333,7 @@ document.querySelectorAll('nav.tabs button').forEach(btn=>{
     document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
     if(btn.dataset.tab==='meals'){ renderMeals(); renderShoppingList(); }
     if(btn.dataset.tab==='month'){ renderMonthView(); }
+    if(btn.dataset.tab==='books'){ renderBooks(); }
     if(btn.dataset.tab==='recipes'){ renderRecipes(); }
     if(btn.dataset.tab==='equiv'){ renderEquiv(); }
   });
@@ -1166,23 +1344,36 @@ document.getElementById('prevWeekBtn').addEventListener('click', goToPrevWeek);
 document.getElementById('nextWeekBtn').addEventListener('click', goToNextWeek);
 document.getElementById('thisWeekBtn').addEventListener('click', goToThisWeek);
 
+function catName(cat){
+  if(!cat) return '';
+  return cat['name_'+currentLang] || cat.name_it || cat.name_fr || '';
+}
+function catUnitLabel(cat){
+  return (cat && cat.unit==='ml') ? 'ml' : 'min';
+}
+function formatCatQuantity(value, unit){
+  const v = parseNum(value);
+  if(unit==='ml' && v>=1000) return (v/1000).toFixed(v%1000===0?0:1)+' L';
+  return v + ' ' + (unit==='ml' ? 'ml' : 'min');
+}
+
 function renderRoutine(){
   const table = document.getElementById('routineTable');
   let html = '<tr><th class="cat-head"></th>' + DAYS.map(d=>`<th>${dayLabel(d).slice(0,3)}</th>`).join('') + '</tr>';
   state.categories.forEach(cat=>{
     html += '<tr>';
-    html += `<td class="cat-label"><span class="cat-name"><span class="cat-dot"></span>${escapeHtml(cat)}</span><span class="cat-actions"><button class="edit-cat no-print" data-cat="${escapeAttr(cat)}" title="${escapeAttr(t('prompt_rename_cat'))}">✎</button><button class="remove-cat no-print" data-cat="${escapeAttr(cat)}" title="✕">✕</button></span></td>`;
+    html += `<td class="cat-label"><span class="cat-name"><span class="cat-dot"></span>${escapeHtml(catName(cat))}</span><span class="cat-actions"><button class="edit-cat no-print" data-catid="${escapeAttr(cat.id)}" title="${escapeAttr(t('prompt_rename_cat'))}">✎</button></span></td>`;
     DAYS.forEach(day=>{
-      const entry = W().routine[day][cat] || {done:false, note:"", minutes:""};
+      const entry = W().routine[day][cat.id] || {done:false, note:"", minutes:""};
       html += `<td>
         <div class="cell-wrap">
-          <div class="check ${entry.done?'done':''}" data-day="${escapeAttr(day)}" data-cat="${escapeAttr(cat)}"></div>
+          <div class="check ${entry.done?'done':''}" data-day="${escapeAttr(day)}" data-catid="${escapeAttr(cat.id)}"></div>
           <div class="time-wrap">
-            <input autocomplete="off" type="text" inputmode="decimal" class="time-input numeric-clean" data-day="${escapeAttr(day)}" data-cat="${escapeAttr(cat)}" value="${escapeAttr(entry.minutes)}" placeholder="0">
-            <span class="time-unit">min</span>
+            <input autocomplete="off" type="text" inputmode="decimal" class="time-input numeric-clean" data-day="${escapeAttr(day)}" data-catid="${escapeAttr(cat.id)}" value="${escapeAttr(entry.minutes)}" placeholder="0">
+            <span class="time-unit">${catUnitLabel(cat)}</span>
           </div>
           <div style="display:flex;align-items:center;gap:3px;">
-            <button class="note-btn no-print" data-day="${escapeAttr(day)}" data-cat="${escapeAttr(cat)}">✎</button>
+            <button class="note-btn no-print" data-day="${escapeAttr(day)}" data-catid="${escapeAttr(cat.id)}">✎</button>
             <span class="note-dot ${entry.note?'show':''}"></span>
           </div>
         </div>
@@ -1194,8 +1385,8 @@ function renderRoutine(){
 
   table.querySelectorAll('.check').forEach(el=>{
     el.addEventListener('click', ()=>{
-      const {day, cat} = el.dataset;
-      W().routine[day][cat].done = !W().routine[day][cat].done;
+      const {day, catid} = el.dataset;
+      W().routine[day][catid].done = !W().routine[day][catid].done;
       persist();
       renderRoutine();
     });
@@ -1203,95 +1394,97 @@ function renderRoutine(){
   table.querySelectorAll('.time-input').forEach(el=>{
     attachNumericClean(el);
     el.addEventListener('change', ()=>{
-      const {day, cat} = el.dataset;
-      W().routine[day][cat].minutes = el.value;
+      const {day, catid} = el.dataset;
+      W().routine[day][catid].minutes = el.value;
       persist();
       renderRoutineSummary();
     });
   });
   table.querySelectorAll('.note-btn').forEach(el=>{
     el.addEventListener('click', ()=>{
-      noteCtx = {day: el.dataset.day, cat: el.dataset.cat};
+      noteCtx = {day: el.dataset.day, cat: el.dataset.catid};
       document.getElementById('noteTextarea').value = W().routine[noteCtx.day][noteCtx.cat].note || "";
       document.getElementById('noteModalOverlay').classList.add('show');
     });
   });
   table.querySelectorAll('.edit-cat').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      const oldCat = el.dataset.cat;
-      const newCat = window.prompt(t('prompt_rename_cat'), oldCat);
-      if(newCat===null) return;
-      const trimmed = newCat.trim();
-      if(!trimmed || trimmed===oldCat) return;
-      if(state.categories.includes(trimmed)){ alert(t('alert_cat_exists')); return; }
-      renameCategory(oldCat, trimmed);
-    });
-  });
-  table.querySelectorAll('.remove-cat').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      const cat = el.dataset.cat;
-      if(!confirm(t('confirm_remove_cat')(cat))) return;
-      state.categories = state.categories.filter(c=>c!==cat);
-      Object.keys(state.weeks).forEach(wk=>{
-        DAYS.forEach(day=>{ if(state.weeks[wk].routine[day]) delete state.weeks[wk].routine[day][cat]; });
-      });
-      persist();
-      renderRoutine();
-    });
+    el.addEventListener('click', ()=> openCatModal(el.dataset.catid));
   });
   renderRoutineSummary();
-}
-
-function renameCategory(oldCat, newCat){
-  const idx = state.categories.indexOf(oldCat);
-  if(idx>-1) state.categories[idx] = newCat;
-  Object.keys(state.weeks).forEach(wk=>{
-    DAYS.forEach(day=>{
-      if(state.weeks[wk].routine[day] && state.weeks[wk].routine[day][oldCat]){
-        state.weeks[wk].routine[day][newCat] = state.weeks[wk].routine[day][oldCat];
-        delete state.weeks[wk].routine[day][oldCat];
-      }
-    });
-  });
-  persist();
-  renderRoutine();
 }
 
 function renderRoutineSummary(){
   const wrap = document.getElementById('routineSummary');
   if(!wrap) return;
-  let weekTotal = 0;
   const perCategory = {};
-  state.categories.forEach(cat=> perCategory[cat] = 0);
+  state.categories.forEach(cat=> perCategory[cat.id] = 0);
   DAYS.forEach(day=>{
     state.categories.forEach(cat=>{
-      const mins = parseNum(W().routine[day]?.[cat]?.minutes);
-      weekTotal += mins;
-      perCategory[cat] += mins;
+      perCategory[cat.id] += parseNum(W().routine[day]?.[cat.id]?.minutes);
     });
   });
-  let html = `<div class="summary-chip">${weekTotal} min</div>`;
+  let html = '';
   state.categories.forEach(cat=>{
-    if(perCategory[cat] > 0){
-      html += `<div class="summary-chip"><span class="lbl">${escapeHtml(cat)}</span>${perCategory[cat]} min</div>`;
+    if(perCategory[cat.id] > 0){
+      html += `<div class="summary-chip"><span class="lbl">${escapeHtml(catName(cat))}</span>${formatCatQuantity(perCategory[cat.id], cat.unit)}</div>`;
     }
   });
-  wrap.innerHTML = html;
+  wrap.innerHTML = html || `<div class="summary-chip">0 min</div>`;
 }
 
-document.getElementById('addCatBtn').addEventListener('click', ()=>{
-  const input = document.getElementById('newCatInput');
-  const val = input.value.trim();
-  if(!val) return;
-  if(state.categories.includes(val)){ input.value=''; return; }
-  state.categories.push(val);
-  Object.keys(state.weeks).forEach(wk=>ensureWeekStructures(wk));
-  input.value='';
+let editingCategoryId = null;
+function openCatModal(id){
+  editingCategoryId = id;
+  const overlay = document.getElementById('catModalOverlay');
+  const title = document.getElementById('catModalTitle');
+  const delBtn = document.getElementById('deleteCatBtn');
+  if(id){
+    const cat = state.categories.find(c=>c.id===id);
+    title.textContent = t('cat_modal_edit');
+    document.getElementById('catNameIt').value = cat.name_it||'';
+    document.getElementById('catNameFr').value = cat.name_fr||'';
+    document.getElementById('catUnit').value = cat.unit||'min';
+    delBtn.style.display = 'inline-block';
+  } else {
+    title.textContent = t('cat_modal_new');
+    document.getElementById('catNameIt').value = '';
+    document.getElementById('catNameFr').value = '';
+    document.getElementById('catUnit').value = 'min';
+    delBtn.style.display = 'none';
+  }
+  overlay.classList.add('show');
+}
+document.getElementById('addCatBtn').addEventListener('click', ()=> openCatModal(null));
+document.getElementById('catCancel').addEventListener('click', ()=>{
+  document.getElementById('catModalOverlay').classList.remove('show');
+});
+document.getElementById('catSave').addEventListener('click', ()=>{
+  const nameIt = document.getElementById('catNameIt').value.trim();
+  const nameFr = document.getElementById('catNameFr').value.trim();
+  const unit = document.getElementById('catUnit').value;
+  if(!nameIt && !nameFr){ alert(t('alert_cat_name_needed')); return; }
+  if(editingCategoryId){
+    const cat = state.categories.find(c=>c.id===editingCategoryId);
+    cat.name_it = nameIt||nameFr; cat.name_fr = nameFr||nameIt; cat.unit = unit;
+  } else {
+    state.categories.push({id:uid(), name_it:nameIt||nameFr, name_fr:nameFr||nameIt, unit});
+    Object.keys(state.weeks).forEach(wk=>ensureWeekStructures(wk));
+  }
   persist();
+  document.getElementById('catModalOverlay').classList.remove('show');
   renderRoutine();
 });
-document.getElementById('newCatInput').addEventListener('keydown', e=>{
-  if(e.key==='Enter') document.getElementById('addCatBtn').click();
+document.getElementById('deleteCatBtn').addEventListener('click', ()=>{
+  if(!editingCategoryId) return;
+  const cat = state.categories.find(c=>c.id===editingCategoryId);
+  if(!confirm(t('confirm_remove_cat')(catName(cat)))) return;
+  state.categories = state.categories.filter(c=>c.id!==editingCategoryId);
+  Object.keys(state.weeks).forEach(wk=>{
+    DAYS.forEach(day=>{ if(state.weeks[wk].routine[day]) delete state.weeks[wk].routine[day][editingCategoryId]; });
+  });
+  persist();
+  document.getElementById('catModalOverlay').classList.remove('show');
+  renderRoutine();
 });
 
 document.getElementById('noteCancel').addEventListener('click', ()=>{
@@ -1317,7 +1510,7 @@ function completionRatioForDate(date){
   let done = 0, total = 0;
   state.categories.forEach(cat=>{
     total++;
-    if(dayRoutine[cat] && dayRoutine[cat].done) done++;
+    if(dayRoutine[cat.id] && dayRoutine[cat.id].done) done++;
   });
   if(total===0) return null;
   return done/total;
@@ -1698,7 +1891,7 @@ function renderIngredientRows(){
 }
 
 function calcMacrosFromIngredients(){
-  const totals = {kcal:0, protein:0, carbs:0, fat:0};
+  const totals = {kcal:0, protein:0, carbs:0, fat:0, fiber:0, salt:0};
   let matched = 0;
   ingredientDraft.forEach(ing=>{
     if(!ing.foodRef) return;
@@ -1712,6 +1905,8 @@ function calcMacrosFromIngredients(){
     totals.protein += (Number(food.protein)||0)/100*grams;
     totals.carbs += (Number(food.carbs)||0)/100*grams;
     totals.fat += (Number(food.fat)||0)/100*grams;
+    totals.fiber += (Number(food.fiber)||0)/100*grams;
+    totals.salt += (Number(food.salt)||0)/100*grams;
     matched++;
   });
   if(matched===0){ alert(t('auto_calc_none')); return; }
@@ -1719,6 +1914,8 @@ function calcMacrosFromIngredients(){
   document.getElementById('rProtein').value = Math.round(totals.protein*10)/10;
   document.getElementById('rCarbs').value = Math.round(totals.carbs*10)/10;
   document.getElementById('rFat').value = Math.round(totals.fat*10)/10;
+  document.getElementById('rFiber').value = Math.round(totals.fiber*10)/10;
+  document.getElementById('rSalt').value = Math.round(totals.salt*100)/100;
 }
 document.getElementById('autoCalcMacrosBtn').addEventListener('click', calcMacrosFromIngredients);
 
@@ -1884,6 +2081,8 @@ function openRecipeModal(id){
     document.getElementById('rProtein').value = r.macros?.protein||'';
     document.getElementById('rCarbs').value = r.macros?.carbs||'';
     document.getElementById('rFat').value = r.macros?.fat||'';
+    document.getElementById('rFiber').value = r.macros?.fiber||'';
+    document.getElementById('rSalt').value = r.macros?.salt||'';
     document.getElementById('rInstructions').value = r.instructions||'';
     document.getElementById('rLink').value = r.link||'';
     renderQR(r.link||'');
@@ -1898,6 +2097,8 @@ function openRecipeModal(id){
     document.getElementById('rProtein').value = '';
     document.getElementById('rCarbs').value = '';
     document.getElementById('rFat').value = '';
+    document.getElementById('rFiber').value = '';
+    document.getElementById('rSalt').value = '';
     document.getElementById('rInstructions').value = '';
     document.getElementById('rLink').value = '';
     renderQR('');
@@ -1925,7 +2126,9 @@ document.getElementById('recipeSave').addEventListener('click', ()=>{
       kcal: document.getElementById('rKcal').value,
       protein: document.getElementById('rProtein').value,
       carbs: document.getElementById('rCarbs').value,
-      fat: document.getElementById('rFat').value
+      fat: document.getElementById('rFat').value,
+      fiber: document.getElementById('rFiber').value,
+      salt: document.getElementById('rSalt').value
     },
     instructions: document.getElementById('rInstructions').value.trim(),
     link: document.getElementById('rLink').value.trim()
@@ -1986,7 +2189,7 @@ function computeEquiv(){
   const sub = document.getElementById('equivResultSub');
   const foodA = state.foodsDB.find(f=>f.id===idA), foodB = state.foodsDB.find(f=>f.id===idB);
   if(!foodA || !foodB || qtyA<=0){ big.textContent='—'; sub.textContent=t('equiv_placeholder'); return; }
-  const macroLabelMap = {protein:t('macro_protein'), carbs:t('macro_carbs'), fat:t('macro_fat'), kcal:t('macro_kcal')};
+  const macroLabelMap = {protein:t('macro_protein'), carbs:t('macro_carbs'), fat:t('macro_fat'), kcal:t('macro_kcal'), fiber:t('macro_fiber'), salt:t('macro_salt')};
   const macroLabel = macroLabelMap[macro];
   const amountA = (foodA[macro]/100) * qtyA;
   const per100B = foodB[macro];
@@ -2002,7 +2205,7 @@ function computeEquiv(){
 
 function renderFoodsTable(){
   const table = document.getElementById('foodsTable');
-  let html = `<tr><th>${t('food_name_it_ph')}</th><th>${t('food_name_fr_ph')}</th><th>Kcal</th><th>${t('macro_protein_label')}</th><th>${t('macro_carbs_label')}</th><th>${t('macro_fat_label')}</th><th></th></tr>`;
+  let html = `<tr><th>${t('food_name_it_ph')}</th><th>${t('food_name_fr_ph')}</th><th>Kcal</th><th>${t('macro_protein_label')}</th><th>${t('macro_carbs_label')}</th><th>${t('macro_fat_label')}</th><th>${t('macro_fiber_label')}</th><th>${t('macro_salt_label')}</th><th></th></tr>`;
   state.foodsDB.forEach((f,i)=>{
     html += `<tr data-idx="${i}">
       <td><input type="text" class="db-edit" data-field="name_it" value="${escapeAttr(f.name_it)}"></td>
@@ -2011,6 +2214,8 @@ function renderFoodsTable(){
       <td><input type="text" inputmode="decimal" class="db-edit db-numeric" data-field="protein" value="${escapeAttr(f.protein)}"></td>
       <td><input type="text" inputmode="decimal" class="db-edit db-numeric" data-field="carbs" value="${escapeAttr(f.carbs)}"></td>
       <td><input type="text" inputmode="decimal" class="db-edit db-numeric" data-field="fat" value="${escapeAttr(f.fat)}"></td>
+      <td><input type="text" inputmode="decimal" class="db-edit db-numeric" data-field="fiber" value="${escapeAttr(f.fiber||0)}"></td>
+      <td><input type="text" inputmode="decimal" class="db-edit db-numeric" data-field="salt" value="${escapeAttr(f.salt||0)}"></td>
       <td><button class="icon-btn no-print" data-removefood="${i}">✕</button></td>
     </tr>`;
   });
@@ -2073,17 +2278,130 @@ document.getElementById('addFoodBtn').addEventListener('click', ()=>{
   const proteinRaw = document.getElementById('newFoodProtein').value;
   const carbsRaw = document.getElementById('newFoodCarbs').value;
   const fatRaw = document.getElementById('newFoodFat').value;
+  const fiberRaw = document.getElementById('newFoodFiber').value;
+  const saltRaw = document.getElementById('newFoodSalt').value;
   const kcal = parseNum(kcalRaw);
   const protein = parseNum(proteinRaw);
   const carbs = parseNum(carbsRaw);
   const fat = parseNum(fatRaw);
+  const fiber = parseNum(fiberRaw);
+  const salt = parseNum(saltRaw);
   if(!nameIt && !nameFr){ alert(t('alert_food_name_needed')); return; }
-  const allEmpty = !kcalRaw.trim() && !proteinRaw.trim() && !carbsRaw.trim() && !fatRaw.trim();
+  const allEmpty = !kcalRaw.trim() && !proteinRaw.trim() && !carbsRaw.trim() && !fatRaw.trim() && !fiberRaw.trim() && !saltRaw.trim();
   if(allEmpty && !confirm(t('confirm_zero_macros'))) return;
-  state.foodsDB.push({id:uid(), name_it:nameIt||nameFr, name_fr:nameFr||nameIt, kcal, protein, carbs, fat});
-  ['newFoodNameIt','newFoodNameFr','newFoodKcal','newFoodProtein','newFoodCarbs','newFoodFat'].forEach(id=>document.getElementById(id).value='');
+  state.foodsDB.push({id:uid(), name_it:nameIt||nameFr, name_fr:nameFr||nameIt, kcal, protein, carbs, fat, fiber, salt});
+  ['newFoodNameIt','newFoodNameFr','newFoodKcal','newFoodProtein','newFoodCarbs','newFoodFat','newFoodFiber','newFoodSalt'].forEach(id=>document.getElementById(id).value='');
   persist();
   renderEquiv();
+});
+
+/* ---------- BOOKS ---------- */
+const SHELVES = ['wishlist','to-read','reading','read'];
+function shelfLabel(s){
+  const map = {wishlist:'shelf_wishlist', 'to-read':'shelf_to_read', reading:'shelf_reading', read:'shelf_read'};
+  return t(map[s] || 'shelf_wishlist');
+}
+
+document.querySelectorAll('.book-tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    currentBookShelf = btn.dataset.shelf;
+    document.querySelectorAll('.book-tabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderBooks();
+  });
+});
+
+function renderBooks(){
+  const grid = document.getElementById('bookGrid');
+  const books = state.books.filter(b=>b.shelf===currentBookShelf);
+  let html = books.map(b=>{
+    const badges = [];
+    if(b.liked==='yes') badges.push(`<span class="book-badge liked">${escapeHtml(t('book_liked_yes'))}</span>`);
+    if(b.liked==='no') badges.push(`<span class="book-badge disliked">${escapeHtml(t('book_liked_no'))}</span>`);
+    const quickBtn = (b.shelf==='wishlist' || b.shelf==='to-read' || b.shelf==='reading')
+      ? `<button type="button" class="book-quick-btn" data-markread="${b.id}">${escapeHtml(t('btn_mark_read'))}</button>` : '';
+    return `<div class="book-card" data-id="${b.id}">
+      ${quickBtn}
+      <h4>${escapeHtml(b.title)}</h4>
+      <div class="book-author">${escapeHtml(b.author||'')}</div>
+      <div class="book-badges">${badges.join('')}</div>
+      ${b.notes ? `<div class="book-notes-preview">${escapeHtml(b.notes)}</div>` : ''}
+    </div>`;
+  }).join('');
+  html += `<div class="new-book-tile no-print" id="newBookTile">${escapeHtml(t('new_book_tile'))}</div>`;
+  grid.innerHTML = html;
+
+  grid.querySelectorAll('.book-card').forEach(card=>{
+    card.addEventListener('click', (e)=>{
+      if(e.target.closest('[data-markread]')) return;
+      openBookModal(card.dataset.id);
+    });
+  });
+  grid.querySelectorAll('[data-markread]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const b = state.books.find(x=>x.id===btn.dataset.markread);
+      if(b){ b.shelf = 'read'; persist(); renderBooks(); }
+    });
+  });
+  document.getElementById('newBookTile').addEventListener('click', ()=> openBookModal(null));
+}
+
+function openBookModal(id){
+  editingBookId = id;
+  const overlay = document.getElementById('bookModalOverlay');
+  const title = document.getElementById('bookModalTitle');
+  const delBtn = document.getElementById('deleteBookBtn');
+  if(id){
+    const b = state.books.find(x=>x.id===id);
+    title.textContent = t('book_modal_edit');
+    document.getElementById('bTitle').value = b.title||'';
+    document.getElementById('bAuthor').value = b.author||'';
+    document.getElementById('bShelf').value = b.shelf||'wishlist';
+    document.getElementById('bLiked').value = b.liked||'';
+    document.getElementById('bNotes').value = b.notes||'';
+    delBtn.style.display = 'inline-block';
+  } else {
+    title.textContent = t('book_modal_new');
+    document.getElementById('bTitle').value = '';
+    document.getElementById('bAuthor').value = '';
+    document.getElementById('bShelf').value = currentBookShelf;
+    document.getElementById('bLiked').value = '';
+    document.getElementById('bNotes').value = '';
+    delBtn.style.display = 'none';
+  }
+  overlay.classList.add('show');
+}
+document.getElementById('bookCancel').addEventListener('click', ()=>{
+  document.getElementById('bookModalOverlay').classList.remove('show');
+});
+document.getElementById('bookSave').addEventListener('click', ()=>{
+  const bTitle = document.getElementById('bTitle').value.trim();
+  if(!bTitle){ alert(t('alert_book_title_needed')); return; }
+  const payload = {
+    title: bTitle,
+    author: document.getElementById('bAuthor').value.trim(),
+    shelf: document.getElementById('bShelf').value,
+    liked: document.getElementById('bLiked').value,
+    notes: document.getElementById('bNotes').value.trim()
+  };
+  if(editingBookId){
+    const b = state.books.find(x=>x.id===editingBookId);
+    Object.assign(b, payload);
+  } else {
+    state.books.push({id:uid(), ...payload});
+  }
+  persist();
+  document.getElementById('bookModalOverlay').classList.remove('show');
+  renderBooks();
+});
+document.getElementById('deleteBookBtn').addEventListener('click', ()=>{
+  if(!editingBookId) return;
+  if(!confirm(t('confirm_delete_book'))) return;
+  state.books = state.books.filter(x=>x.id!==editingBookId);
+  persist();
+  document.getElementById('bookModalOverlay').classList.remove('show');
+  renderBooks();
 });
 
 /* ---------- EXPORT / PRINT ---------- */
@@ -2101,11 +2419,11 @@ function buildFullReportHTML(){
 
     html += `<div style="font-size:10.5px;text-transform:uppercase;letter-spacing:0.5px;color:${p.sageDark};font-weight:700;margin:10px 0 4px;">${t('report_routine')}</div>`;
     state.categories.forEach(cat=>{
-      const e = W().routine[day][cat] || {done:false, note:"", minutes:""};
+      const e = W().routine[day][cat.id] || {done:false, note:"", minutes:""};
       const status = e.done ? '✓' : '–';
-      const mins = e.minutes ? ` · ${escapeHtml(e.minutes)} min` : '';
+      const mins = e.minutes ? ` · ${formatCatQuantity(e.minutes, cat.unit)}` : '';
       const note = e.note ? ` — <span style="font-style:italic;color:${p.inkSoft};">${escapeHtml(e.note)}</span>` : '';
-      html += `<div style="font-size:12.5px;margin:2px 0;"><strong style="color:${p.sageDark};">${status}</strong> ${escapeHtml(cat)}${mins}${note}</div>`;
+      html += `<div style="font-size:12.5px;margin:2px 0;"><strong style="color:${p.sageDark};">${status}</strong> ${escapeHtml(catName(cat))}${mins}${note}</div>`;
     });
 
     html += `<div style="font-size:10.5px;text-transform:uppercase;letter-spacing:0.5px;color:${p.sageDark};font-weight:700;margin:12px 0 4px;">${t('report_meals')}</div>`;
@@ -2144,7 +2462,7 @@ function buildFullReportHTML(){
       const m = r.macros || {};
       html += `<div style="margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid ${p.line};page-break-inside:avoid;">`;
       html += `<h3 style="font-family:Georgia,serif;color:${p.sageDark};font-size:15px;margin:0 0 3px;">${escapeHtml(r.name)}</h3>`;
-      html += `<div style="font-size:11px;color:${p.inkSoft};margin-bottom:6px;">${escapeHtml(r.category||'')} · ${escapeHtml(String(r.servings||1))} ${t('report_portions')}${m.kcal?` · ${escapeHtml(String(m.kcal))} kcal`:''}${m.protein?` · P ${escapeHtml(String(m.protein))}g`:''}${m.carbs?` · C ${escapeHtml(String(m.carbs))}g`:''}${m.fat?` · G ${escapeHtml(String(m.fat))}g`:''}</div>`;
+      html += `<div style="font-size:11px;color:${p.inkSoft};margin-bottom:6px;">${escapeHtml(r.category||'')} · ${escapeHtml(String(r.servings||1))} ${t('report_portions')}${m.kcal?` · ${escapeHtml(String(m.kcal))} kcal`:''}${m.protein?` · P ${escapeHtml(String(m.protein))}g`:''}${m.carbs?` · C ${escapeHtml(String(m.carbs))}g`:''}${m.fat?` · G ${escapeHtml(String(m.fat))}g`:''}${m.fiber?` · ${t('macro_fiber_label')} ${escapeHtml(String(m.fiber))}g`:''}${m.salt?` · ${t('macro_salt_label')} ${escapeHtml(String(m.salt))}g`:''}</div>`;
       if((r.ingredients||[]).length){
         html += `<div style="font-size:12.5px;margin-bottom:6px;"><strong>${t('report_ingredients')}:</strong> ${r.ingredients.map(i=>`${escapeHtml(i.name)}${i.qty?` (${escapeHtml(String(i.qty))} ${escapeHtml(i.unit||'')})`:''}`).join(', ')}</div>`;
       }
@@ -2162,9 +2480,9 @@ function buildFullReportHTML(){
 
   html += `<h2 style="font-family:Georgia,serif;color:${p.sageDark};font-size:19px;margin:24px 0 10px;">${t('report_db')}</h2>`;
   html += `<table style="width:100%;border-collapse:collapse;font-size:12px;">`;
-  html += `<tr><th style="text-align:left;padding:6px;border-bottom:2px solid ${p.line};color:${p.inkSoft};font-size:10px;text-transform:uppercase;">${t('food_name_ph')}</th><th style="padding:6px;border-bottom:2px solid ${p.line};color:${p.inkSoft};font-size:10px;text-transform:uppercase;">Kcal</th><th style="padding:6px;border-bottom:2px solid ${p.line};color:${p.inkSoft};font-size:10px;text-transform:uppercase;">${t('macro_protein_label')}</th><th style="padding:6px;border-bottom:2px solid ${p.line};color:${p.inkSoft};font-size:10px;text-transform:uppercase;">${t('macro_carbs_label')}</th><th style="padding:6px;border-bottom:2px solid ${p.line};color:${p.inkSoft};font-size:10px;text-transform:uppercase;">${t('macro_fat_label')}</th></tr>`;
+  html += `<tr><th style="text-align:left;padding:6px;border-bottom:2px solid ${p.line};color:${p.inkSoft};font-size:10px;text-transform:uppercase;">${t('food_name_ph')}</th><th style="padding:6px;border-bottom:2px solid ${p.line};color:${p.inkSoft};font-size:10px;text-transform:uppercase;">Kcal</th><th style="padding:6px;border-bottom:2px solid ${p.line};color:${p.inkSoft};font-size:10px;text-transform:uppercase;">${t('macro_protein_label')}</th><th style="padding:6px;border-bottom:2px solid ${p.line};color:${p.inkSoft};font-size:10px;text-transform:uppercase;">${t('macro_carbs_label')}</th><th style="padding:6px;border-bottom:2px solid ${p.line};color:${p.inkSoft};font-size:10px;text-transform:uppercase;">${t('macro_fat_label')}</th><th style="padding:6px;border-bottom:2px solid ${p.line};color:${p.inkSoft};font-size:10px;text-transform:uppercase;">${t('macro_fiber_label')}</th><th style="padding:6px;border-bottom:2px solid ${p.line};color:${p.inkSoft};font-size:10px;text-transform:uppercase;">${t('macro_salt_label')}</th></tr>`;
   state.foodsDB.forEach(f=>{
-    html += `<tr><td style="padding:5px 6px;border-bottom:1px solid ${p.line};">${escapeHtml(foodName(f))}</td><td style="padding:5px 6px;border-bottom:1px solid ${p.line};text-align:center;">${f.kcal}</td><td style="padding:5px 6px;border-bottom:1px solid ${p.line};text-align:center;">${f.protein}g</td><td style="padding:5px 6px;border-bottom:1px solid ${p.line};text-align:center;">${f.carbs}g</td><td style="padding:5px 6px;border-bottom:1px solid ${p.line};text-align:center;">${f.fat}g</td></tr>`;
+    html += `<tr><td style="padding:5px 6px;border-bottom:1px solid ${p.line};">${escapeHtml(foodName(f))}</td><td style="padding:5px 6px;border-bottom:1px solid ${p.line};text-align:center;">${f.kcal}</td><td style="padding:5px 6px;border-bottom:1px solid ${p.line};text-align:center;">${f.protein}g</td><td style="padding:5px 6px;border-bottom:1px solid ${p.line};text-align:center;">${f.carbs}g</td><td style="padding:5px 6px;border-bottom:1px solid ${p.line};text-align:center;">${f.fat}g</td><td style="padding:5px 6px;border-bottom:1px solid ${p.line};text-align:center;">${f.fiber||0}g</td><td style="padding:5px 6px;border-bottom:1px solid ${p.line};text-align:center;">${f.salt||0}g</td></tr>`;
   });
   html += `</table>`;
 
@@ -2465,6 +2783,7 @@ async function init(){
   renderShoppingList();
   renderRecipes();
   renderEquiv();
+  renderBooks();
 }
 init();
 
