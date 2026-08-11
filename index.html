@@ -216,16 +216,22 @@
   .day-tabs button.active{background:var(--sage-pale);border-color:var(--sage);color:var(--sage-dark);}
 
   .meal-row{
-    display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid var(--line);flex-wrap:wrap;
+    display:flex;align-items:flex-start;gap:10px;padding:12px 4px;border-bottom:1px solid var(--line);flex-wrap:wrap;
   }
   .meal-row:last-child{border-bottom:none;}
-  .meal-label{width:100px;flex-shrink:0;font-weight:600;font-size:13px;color:var(--sage-dark);}
-  .meal-row select.recipe-select{
-    flex:2;min-width:150px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13.5px;
+  .meal-label{width:100px;flex-shrink:0;font-weight:600;font-size:13px;color:var(--sage-dark);padding-top:9px;}
+  .dishes-wrap{flex:1;display:flex;flex-direction:column;gap:8px;min-width:220px;}
+  .dish-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .dish-row select.course-select{
+    width:110px;flex-shrink:0;border:1px solid var(--line);border-radius:10px;padding:9px 8px;font-size:12.5px;
+    background:var(--sage-pale);font-family:var(--font-body);color:var(--sage-dark);font-weight:600;
+  }
+  .dish-row select.recipe-select{
+    flex:2;min-width:140px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13.5px;
     background:var(--white);font-family:var(--font-body);
   }
-  .meal-row select.servings-select{
-    width:92px;border:1px solid var(--line);border-radius:10px;padding:9px 8px;font-size:12.5px;
+  .dish-row select.servings-select{
+    width:86px;flex-shrink:0;border:1px solid var(--line);border-radius:10px;padding:9px 6px;font-size:12.5px;
     background:var(--white);font-family:var(--font-body);
   }
 
@@ -356,6 +362,12 @@
   .session-complete.show{display:block;}
 
   .rec-status{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);margin:12px 0;}
+  .tts-player{
+    background:var(--sage-pale);border-radius:12px;padding:12px 14px;margin-bottom:10px;
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .tts-step-label{font-size:12.5px;font-weight:700;color:var(--sage-dark);text-align:center;}
+  .tts-controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
   .rec-dot{width:10px;height:10px;border-radius:50%;background:#B65B4F;display:none;}
   .rec-dot.live{display:block;animation:pulse 1s infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
@@ -444,7 +456,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v3.5</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v3.9</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -814,7 +826,15 @@
     <input autocomplete="off" type="url" id="rLink" data-i18n-ph="recipe_link_ph" placeholder="https://…">
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px;flex-wrap:wrap;">
       <button type="button" class="btn btn-ghost btn-sm" id="listenRecipeBtn" data-i18n="btn_listen_recipe">🔊 Ascolta la ricetta</button>
-      <button type="button" class="btn btn-ghost btn-sm" id="stopListenBtn" style="display:none;" data-i18n="btn_stop_listen">⏹ Ferma lettura</button>
+    </div>
+    <div class="tts-player" id="ttsPlayer" style="display:none;">
+      <div class="tts-step-label" id="ttsStepLabel"></div>
+      <div class="tts-controls">
+        <button type="button" class="btn btn-ghost btn-sm" id="ttsPrevBtn" title="Passo precedente">⏮</button>
+        <button type="button" class="btn btn-accent btn-sm" id="ttsPlayPauseBtn" title="Pausa/Riprendi">⏸</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="ttsNextBtn" title="Passo successivo">⏭</button>
+        <button type="button" class="btn btn-danger btn-sm" id="ttsStopAllBtn" data-i18n="btn_stop_listen">⏹ Ferma lettura</button>
+      </div>
     </div>
     <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;">
       <button type="button" class="btn btn-ghost btn-sm" id="genQrBtn" data-i18n="btn_gen_qr">Genera QR code</button>
@@ -855,6 +875,7 @@ const DAY_LABELS = {
   fr: ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"]
 };
 const MEAL_TYPES = [["colazione","meal_colazione"],["pranzo","meal_pranzo"],["spuntino","meal_spuntino"],["cena","meal_cena"]];
+const COURSE_TYPES = ['','antipasto','primo','secondo','contorno','dolce','bevanda'];
 
 /* ---------- I18N ---------- */
 const I18N = {
@@ -904,6 +925,9 @@ const I18N = {
     preview_recipes_label:"Ricette da importare", preview_new_foods_label:"Nuovi alimenti (verranno aggiunti)", preview_matched_foods_label:"Alimenti già presenti (verranno collegati)",
     servings_word:"porz.",
     meal_colazione:"Colazione", meal_pranzo:"Pranzo", meal_spuntino:"Spuntino", meal_cena:"Cena",
+    course_none:"Piatto unico", course_antipasto:"Antipasto", course_primo:"Primo", course_secondo:"Secondo",
+    course_contorno:"Contorno", course_dolce:"Dolce", course_bevanda:"Bevanda",
+    btn_add_dish:"+ Aggiungi portata",
     macro_kcal_label:"Kcal", macro_protein_label:"Prot.", macro_carbs_label:"Carb.", macro_fat_label:"Grassi",
     medit_title:"Meditazione & Rilassamento", medit_sub:"Un momento guidato per respirare, ascoltare o registrare la tua voce.",
     breathe_title:"Respiro guidato", breathe_sub:"Scegli il tipo di respirazione, la visualizzazione e la durata della seduta.",
@@ -940,6 +964,8 @@ const I18N = {
     auto_calc_none:"Nessun ingrediente collegato a un alimento del database con quantità in grammi: collega almeno un ingrediente per calcolare automaticamente.",
     recipe_link_label:"Link (video, audio, articolo…)", recipe_link_ph:"https://…", btn_gen_qr:"Genera QR code",
     btn_listen_recipe:"🔊 Ascolta la ricetta", btn_stop_listen:"⏹ Ferma lettura",
+    btn_listen_short:"Ascolta", btn_stop_short:"Ferma",
+    speech_chunk_title:"Nome ricetta", speech_chunk_ingredients:"Ingredienti", speech_chunk_prep:"Preparazione", speech_chunk_step:"Passo",
     recipe_audio_label:"Audio della ricetta (facoltativo)", recipe_video_label:"Video della ricetta (facoltativo)",
     media_session_note:"Audio e video caricati restano disponibili solo in questa sessione: usa il campo Link per contenuti da conservare stabilmente.",
     report_link:"Link",
@@ -1010,6 +1036,9 @@ const I18N = {
     preview_recipes_label:"Recettes à importer", preview_new_foods_label:"Nouveaux aliments (seront ajoutés)", preview_matched_foods_label:"Aliments déjà présents (seront liés)",
     servings_word:"pers.",
     meal_colazione:"Petit-déjeuner", meal_pranzo:"Déjeuner", meal_spuntino:"Collation", meal_cena:"Dîner",
+    course_none:"Plat unique", course_antipasto:"Entrée", course_primo:"Premier plat", course_secondo:"Plat principal",
+    course_contorno:"Accompagnement", course_dolce:"Dessert", course_bevanda:"Boisson",
+    btn_add_dish:"+ Ajouter un plat",
     macro_kcal_label:"Kcal", macro_protein_label:"Prot.", macro_carbs_label:"Gluc.", macro_fat_label:"Lip.",
     medit_title:"Méditation & Relaxation", medit_sub:"Un moment guidé pour respirer, écouter ou enregistrer ta voix.",
     breathe_title:"Respiration guidée", breathe_sub:"Choisis le type de respiration, la visualisation et la durée de la séance.",
@@ -1046,6 +1075,8 @@ const I18N = {
     auto_calc_none:"Aucun ingrédient associé à un aliment de la base de données avec une quantité en grammes : associe au moins un ingrédient pour calculer automatiquement.",
     recipe_link_label:"Lien (vidéo, audio, article…)", recipe_link_ph:"https://…", btn_gen_qr:"Générer le QR code",
     btn_listen_recipe:"🔊 Écouter la recette", btn_stop_listen:"⏹ Arrêter la lecture",
+    btn_listen_short:"Écouter", btn_stop_short:"Arrêter",
+    speech_chunk_title:"Nom de la recette", speech_chunk_ingredients:"Ingrédients", speech_chunk_prep:"Préparation", speech_chunk_step:"Étape",
     recipe_audio_label:"Audio de la recette (facultatif)", recipe_video_label:"Vidéo de la recette (facultatif)",
     media_session_note:"Les fichiers audio et vidéo chargés ne restent disponibles que pour cette session : utilise le champ Lien pour un contenu conservé durablement.",
     report_link:"Lien",
@@ -1174,6 +1205,7 @@ let editingRecipeId = null; // null = new
 let ingredientDraft = [];
 let currentBookShelf = 'wishlist';
 let editingBookId = null;
+let speakingRecipeId = null;
 let currentMonthAnchor = null; // Date used to anchor the monthly view
 
 function uid(){ return Math.random().toString(36).slice(2,10); }
@@ -1231,8 +1263,12 @@ function ensureWeekStructures(weekKey){
     if(wk.journal[day]===undefined) wk.journal[day] = "";
     if(!wk.meals[day]) wk.meals[day] = {};
     MEAL_TYPES.forEach(([key])=>{
-      if(!wk.meals[day][key]) wk.meals[day][key] = {recipeId:null, text:"", servings:null};
-      if(wk.meals[day][key].servings===undefined) wk.meals[day][key].servings = null;
+      if(!wk.meals[day][key]){
+        wk.meals[day][key] = [{id:uid(), course:'', recipeId:null, servings:null}];
+      } else if(!Array.isArray(wk.meals[day][key])){
+        const old = wk.meals[day][key];
+        wk.meals[day][key] = [{id:uid(), course:'', recipeId: old.recipeId||null, servings: old.servings||null}];
+      }
     });
   });
   return wk;
@@ -1682,53 +1718,82 @@ function renderMealDayTabs(){
 function renderMeals(){
   const wrap = document.getElementById('mealRows');
   wrap.innerHTML = MEAL_TYPES.map(([key,labelKey])=>{
-    const entry = W().meals[currentMealDay][key];
-    const options = [`<option value="">${t('no_recipe_option')}</option>`]
-      .concat(state.recipes.map(r=>`<option value="${r.id}" ${entry.recipeId===r.id?'selected':''}>${escapeHtml(r.name)}</option>`))
-      .join('');
-    const recipe = entry.recipeId ? state.recipes.find(r=>r.id===entry.recipeId) : null;
-    const currentServings = entry.servings || (recipe ? recipe.servings : 1) || 1;
-    const servingsOptions = [1,2,3,4].map(n=>`<option value="${n}" ${Number(currentServings)===n?'selected':''}>${n} ${t('servings_word')}</option>`).join('');
+    const dishes = W().meals[currentMealDay][key];
+    const rowsHtml = dishes.map(dish=>{
+      const options = [`<option value="">${t('no_recipe_option')}</option>`]
+        .concat(state.recipes.map(r=>`<option value="${r.id}" ${dish.recipeId===r.id?'selected':''}>${escapeHtml(r.name)}</option>`))
+        .join('');
+      const recipe = dish.recipeId ? state.recipes.find(r=>r.id===dish.recipeId) : null;
+      const currentServings = dish.servings || (recipe ? recipe.servings : 1) || 1;
+      const servingsOptions = [1,2,3,4].map(n=>`<option value="${n}" ${Number(currentServings)===n?'selected':''}>${n} ${t('servings_word')}</option>`).join('');
+      const courseOptions = COURSE_TYPES.map(c=>`<option value="${c}" ${dish.course===c?'selected':''}>${c ? t('course_'+c) : t('course_none')}</option>`).join('');
+      return `<div class="dish-row" data-day="${escapeAttr(currentMealDay)}" data-meal="${key}" data-dish="${dish.id}">
+        <select class="course-select">${courseOptions}</select>
+        <select class="recipe-select">${options}</select>
+        <select class="servings-select" ${dish.recipeId?'':'disabled'}>${servingsOptions}</select>
+        <button type="button" class="icon-btn no-print remove-dish-btn" title="✕">✕</button>
+      </div>`;
+    }).join('');
     return `<div class="meal-row">
       <div class="meal-label">${t(labelKey)}</div>
-      <select class="recipe-select" data-day="${escapeAttr(currentMealDay)}" data-meal="${key}">${options}</select>
-      <select class="servings-select" data-day="${escapeAttr(currentMealDay)}" data-meal="${key}" ${entry.recipeId?'':'disabled'}>${servingsOptions}</select>
+      <div class="dishes-wrap">
+        ${rowsHtml}
+        <button type="button" class="btn btn-ghost btn-sm no-print add-dish-btn" data-day="${escapeAttr(currentMealDay)}" data-meal="${key}">${t('btn_add_dish')}</button>
+      </div>
     </div>`;
   }).join('');
 
-  wrap.querySelectorAll('.recipe-select').forEach(sel=>{
-    sel.addEventListener('change', ()=>{
-      const {day, meal} = sel.dataset;
-      W().meals[day][meal].recipeId = sel.value || null;
-      if(!sel.value) W().meals[day][meal].servings = null;
+  wrap.querySelectorAll('.dish-row').forEach(row=>{
+    const day = row.dataset.day, meal = row.dataset.meal, dishId = row.dataset.dish;
+    const dishObj = W().meals[day][meal].find(d=>d.id===dishId);
+    if(!dishObj) return;
+    row.querySelector('.course-select').addEventListener('change', (e)=>{
+      dishObj.course = e.target.value;
+      persist();
+    });
+    row.querySelector('.recipe-select').addEventListener('change', (e)=>{
+      dishObj.recipeId = e.target.value || null;
+      if(!e.target.value) dishObj.servings = null;
+      persist();
+      renderMeals();
+      renderShoppingList();
+    });
+    row.querySelector('.servings-select').addEventListener('change', (e)=>{
+      dishObj.servings = Number(e.target.value);
+      persist();
+      renderShoppingList();
+    });
+    row.querySelector('.remove-dish-btn').addEventListener('click', ()=>{
+      W().meals[day][meal] = W().meals[day][meal].filter(d=>d.id!==dishId);
       persist();
       renderMeals();
       renderShoppingList();
     });
   });
-  wrap.querySelectorAll('.servings-select').forEach(sel=>{
-    sel.addEventListener('change', ()=>{
-      const {day, meal} = sel.dataset;
-      W().meals[day][meal].servings = Number(sel.value);
+  wrap.querySelectorAll('.add-dish-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const day = btn.dataset.day, meal = btn.dataset.meal;
+      W().meals[day][meal].push({id:uid(), course:'', recipeId:null, servings:null});
       persist();
-      renderShoppingList();
+      renderMeals();
     });
   });
 
   const summary = document.getElementById('dayMacroSummary');
   let totals = {kcal:0, protein:0, carbs:0, fat:0};
   MEAL_TYPES.forEach(([key])=>{
-    const entry = W().meals[currentMealDay][key];
-    if(entry.recipeId){
-      const r = state.recipes.find(x=>x.id===entry.recipeId);
-      if(r && r.macros){
-        const scale = (entry.servings || r.servings || 1) / (r.servings || 1);
-        totals.kcal += (Number(r.macros.kcal)||0) * scale;
-        totals.protein += (Number(r.macros.protein)||0) * scale;
-        totals.carbs += (Number(r.macros.carbs)||0) * scale;
-        totals.fat += (Number(r.macros.fat)||0) * scale;
+    (W().meals[currentMealDay][key]||[]).forEach(dish=>{
+      if(dish.recipeId){
+        const r = state.recipes.find(x=>x.id===dish.recipeId);
+        if(r && r.macros){
+          const scale = (dish.servings || r.servings || 1) / (r.servings || 1);
+          totals.kcal += (Number(r.macros.kcal)||0) * scale;
+          totals.protein += (Number(r.macros.protein)||0) * scale;
+          totals.carbs += (Number(r.macros.carbs)||0) * scale;
+          totals.fat += (Number(r.macros.fat)||0) * scale;
+        }
       }
-    }
+    });
   });
   summary.innerHTML = `
     <span class="macro-chip">${t('macro_kcal_label')} ${Math.round(totals.kcal)}</span>
@@ -1745,15 +1810,16 @@ function collectRecipeItems(){
   const items = [];
   DAYS.forEach(day=>{
     MEAL_TYPES.forEach(([key,labelKey])=>{
-      const entry = W().meals[day][key];
-      if(!entry.recipeId) return;
-      const r = state.recipes.find(x=>x.id===entry.recipeId);
-      if(!r) return;
-      const scale = (entry.servings || r.servings || 1) / (r.servings || 1);
-      (r.ingredients||[]).forEach(ing=>{
-        items.push({
-          name: ing.name, qty: (Number(ing.qty)||0) * scale, unit: ing.unit||'',
-          source: `${dayLabel(day)} · ${t(labelKey)} · ${r.name}`
+      (W().meals[day][key]||[]).forEach(dish=>{
+        if(!dish.recipeId) return;
+        const r = state.recipes.find(x=>x.id===dish.recipeId);
+        if(!r) return;
+        const scale = (dish.servings || r.servings || 1) / (r.servings || 1);
+        (r.ingredients||[]).forEach(ing=>{
+          items.push({
+            name: ing.name, qty: (Number(ing.qty)||0) * scale, unit: ing.unit||'',
+            source: `${dayLabel(day)} · ${t(labelKey)}${dish.course?` (${t('course_'+dish.course)})`:''} · ${r.name}`
+          });
         });
       });
     });
@@ -1895,16 +1961,14 @@ function renderRecipes(){
     : state.recipes;
   let html = filtered.map(r=>{
     const m = r.macros || {};
-    const linkBtn = r.link ? `<a href="${escapeAttr(r.link)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:8px;display:inline-block;" onclick="event.stopPropagation()">🔗 ${escapeHtml(r.link.length>26?r.link.slice(0,26)+'…':r.link)}</a>` : '';
+    const linkBtn = r.link ? `<a href="${escapeAttr(r.link)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="display:inline-block;" onclick="event.stopPropagation()">🔗 ${escapeHtml(r.link.length>26?r.link.slice(0,26)+'…':r.link)}</a>` : '';
     return `<div class="recipe-card" data-id="${r.id}">
       <span class="recipe-cat-tag">${escapeHtml(r.category||'')}</span>
       <h4>${escapeHtml(r.name)}</h4>
       <div style="font-size:12px;color:var(--ink-soft);">${(r.ingredients||[]).length} · ${r.servings||1} ${t('servings_word')}</div>
       <div class="r-macros">${m.kcal?`${m.kcal} kcal · `:''}${m.protein?`P ${m.protein}g `:''}${m.carbs?`C ${m.carbs}g `:''}${m.fat?`G ${m.fat}g`:''}</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn btn-ghost btn-sm listen-card-btn" data-id="${r.id}" style="margin-top:8px;" onclick="event.stopPropagation()">🔊</button>
-        ${linkBtn}
-      </div>
+      <button type="button" class="btn btn-accent listen-card-btn" data-id="${r.id}" style="width:100%;margin-top:10px;font-size:13px;padding:9px 10px;" onclick="event.stopPropagation()">🔊 ${escapeHtml(t('btn_listen_short'))}</button>
+      ${linkBtn ? `<div style="margin-top:6px;">${linkBtn}</div>` : ''}
     </div>`;
   }).join('');
   html += `<div class="new-recipe-tile no-print" id="newRecipeTile">${t('new_recipe_tile')}</div>`;
@@ -1916,10 +1980,27 @@ function renderRecipes(){
   grid.querySelectorAll('.listen-card-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const r = state.recipes.find(x=>x.id===btn.dataset.id);
-      if(r) speakRecipe(r);
+      if(!r) return;
+      if(speakingRecipeId === r.id){
+        stopSpeaking();
+      } else {
+        speakingRecipeId = r.id;
+        updateListenButtons();
+        speakRecipe(r, ()=>{ speakingRecipeId = null; updateListenButtons(); });
+      }
     });
   });
+  updateListenButtons();
   document.getElementById('newRecipeTile').addEventListener('click', ()=> openRecipeModal(null));
+}
+
+function updateListenButtons(){
+  document.querySelectorAll('.listen-card-btn').forEach(btn=>{
+    const isPlaying = btn.dataset.id === speakingRecipeId;
+    btn.textContent = isPlaying ? `⏹ ${t('btn_stop_short')}` : `🔊 ${t('btn_listen_short')}`;
+    btn.classList.toggle('btn-accent', !isPlaying);
+    btn.classList.toggle('btn-danger', isPlaying);
+  });
 }
 
 function renderIngredientRows(){
@@ -1999,39 +2080,120 @@ function buildRecipeSpeechText(r){
   }
   return parts.join('. ');
 }
-function speakRecipe(r){
+function speakRecipe(r, onEnd){
   if(!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(buildRecipeSpeechText(r));
   utter.lang = currentLang === 'fr' ? 'fr-FR' : 'it-IT';
   utter.rate = 0.95;
-  const stopBtn = document.getElementById('stopListenBtn');
-  const startBtn = document.getElementById('listenRecipeBtn');
-  if(startBtn) startBtn.style.display = 'none';
-  if(stopBtn) stopBtn.style.display = 'inline-block';
-  utter.onend = ()=>{
-    if(startBtn) startBtn.style.display = 'inline-block';
-    if(stopBtn) stopBtn.style.display = 'none';
-  };
+  utter.onend = ()=>{ if(onEnd) onEnd(); };
   utter.onerror = utter.onend;
   window.speechSynthesis.speak(utter);
 }
 function stopSpeaking(){
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
-  const stopBtn = document.getElementById('stopListenBtn');
   const startBtn = document.getElementById('listenRecipeBtn');
+  const player = document.getElementById('ttsPlayer');
   if(startBtn) startBtn.style.display = 'inline-block';
-  if(stopBtn) stopBtn.style.display = 'none';
+  if(player) player.style.display = 'none';
+  speechChunks = [];
+  speechChunkIndex = 0;
+  speechIsPaused = false;
+  speakingRecipeId = null;
+  updateListenButtons();
 }
+
+/* ---------- TEXT-TO-SPEECH: STEP PLAYER (recipe modal) ---------- */
+let speechChunks = [];
+let speechChunkIndex = 0;
+let speechIsPaused = false;
+
+function buildRecipeSpeechChunks(r){
+  const chunks = [];
+  chunks.push({label: t('speech_chunk_title'), text: r.name || ''});
+  (r.ingredients||[]).forEach((i, idx)=>{
+    if(!i.name) return;
+    chunks.push({label: `${t('speech_chunk_ingredients')} ${idx+1}`, text: `${i.name}${i.qty?`, ${i.qty} ${i.unit||''}`:''}`});
+  });
+  if(r.instructions){
+    const lines = r.instructions.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+    const steps = lines.length > 1 ? lines : [r.instructions];
+    steps.forEach((step, stepIdx)=>{
+      const sentences = step.split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(Boolean);
+      const useSentences = sentences.length > 1 ? sentences : [step];
+      useSentences.forEach((sentence, subIdx)=>{
+        const label = useSentences.length > 1
+          ? `${t('speech_chunk_step')} ${stepIdx+1}/${steps.length} (${subIdx+1}/${useSentences.length})`
+          : `${t('speech_chunk_step')} ${stepIdx+1}/${steps.length}`;
+        chunks.push({label, text: sentence});
+      });
+    });
+  }
+  return chunks;
+}
+
+function updateTtsPlayerUI(){
+  const chunk = speechChunks[speechChunkIndex];
+  const label = document.getElementById('ttsStepLabel');
+  if(label) label.textContent = chunk ? chunk.label : '';
+  const playPauseBtn = document.getElementById('ttsPlayPauseBtn');
+  if(playPauseBtn) playPauseBtn.textContent = speechIsPaused ? '▶' : '⏸';
+  const prevBtn = document.getElementById('ttsPrevBtn');
+  const nextBtn = document.getElementById('ttsNextBtn');
+  if(prevBtn) prevBtn.disabled = speechChunkIndex <= 0;
+  if(nextBtn) nextBtn.disabled = speechChunkIndex >= speechChunks.length-1;
+}
+
+function speakChunk(idx){
+  if(!('speechSynthesis' in window)) return;
+  if(idx < 0 || idx >= speechChunks.length){ stopSpeaking(); return; }
+  window.speechSynthesis.cancel();
+  speechChunkIndex = idx;
+  speechIsPaused = false;
+  updateTtsPlayerUI();
+  const utter = new SpeechSynthesisUtterance(speechChunks[idx].text);
+  utter.lang = currentLang === 'fr' ? 'fr-FR' : 'it-IT';
+  utter.rate = 0.95;
+  utter.onend = ()=>{
+    if(speechIsPaused) return;
+    if(idx+1 < speechChunks.length) speakChunk(idx+1);
+    else stopSpeaking();
+  };
+  utter.onerror = ()=>{};
+  window.speechSynthesis.speak(utter);
+}
+
+function startRecipePlayer(r){
+  speechChunks = buildRecipeSpeechChunks(r);
+  if(!speechChunks.length) return;
+  document.getElementById('listenRecipeBtn').style.display = 'none';
+  document.getElementById('ttsPlayer').style.display = 'flex';
+  speakChunk(0);
+}
+
+function pauseResumeSpeech(){
+  if(!('speechSynthesis' in window)) return;
+  if(!speechIsPaused){
+    speechIsPaused = true;
+    window.speechSynthesis.cancel();
+    updateTtsPlayerUI();
+  } else {
+    speakChunk(speechChunkIndex);
+  }
+}
+
 document.getElementById('listenRecipeBtn').addEventListener('click', ()=>{
   const r = {
     name: document.getElementById('rName').value.trim() || '',
     ingredients: ingredientDraft.filter(i=>i.name && i.name.trim()),
     instructions: document.getElementById('rInstructions').value.trim()
   };
-  speakRecipe(r);
+  startRecipePlayer(r);
 });
-document.getElementById('stopListenBtn').addEventListener('click', stopSpeaking);
+document.getElementById('ttsPlayPauseBtn').addEventListener('click', pauseResumeSpeech);
+document.getElementById('ttsPrevBtn').addEventListener('click', ()=> speakChunk(speechChunkIndex-1));
+document.getElementById('ttsNextBtn').addEventListener('click', ()=> speakChunk(speechChunkIndex+1));
+document.getElementById('ttsStopAllBtn').addEventListener('click', stopSpeaking);
 
 function renderQR(link){
   const container = document.getElementById('qrContainer');
@@ -2215,9 +2377,11 @@ document.getElementById('deleteRecipeBtn').addEventListener('click', ()=>{
   Object.keys(state.weeks).forEach(wk=>{
     DAYS.forEach(day=>{
       MEAL_TYPES.forEach(([key])=>{
-        if(state.weeks[wk].meals[day] && state.weeks[wk].meals[day][key] && state.weeks[wk].meals[day][key].recipeId===editingRecipeId){
-          state.weeks[wk].meals[day][key].recipeId=null;
-          state.weeks[wk].meals[day][key].servings=null;
+        const dishes = state.weeks[wk].meals[day] && state.weeks[wk].meals[day][key];
+        if(Array.isArray(dishes)){
+          dishes.forEach(dish=>{
+            if(dish.recipeId===editingRecipeId){ dish.recipeId=null; dish.servings=null; }
+          });
         }
       });
     });
@@ -2757,10 +2921,19 @@ function buildFullReportHTML(){
 
     html += `<div style="font-size:10.5px;text-transform:uppercase;letter-spacing:0.5px;color:${p.sageDark};font-weight:700;margin:12px 0 4px;">${t('report_meals')}</div>`;
     MEAL_TYPES.forEach(([key,labelKey])=>{
-      const entry = W().meals[day][key];
-      const r = entry.recipeId ? state.recipes.find(x=>x.id===entry.recipeId) : null;
-      const servingsTxt = r ? ` (${entry.servings || r.servings || 1} ${t('servings_word')})` : '';
-      html += `<div style="font-size:12.5px;margin:2px 0;"><strong>${t(labelKey)}:</strong> ${r?escapeHtml(r.name)+servingsTxt:'—'}</div>`;
+      const dishes = (W().meals[day][key]||[]).filter(d=>d.recipeId);
+      if(!dishes.length){
+        html += `<div style="font-size:12.5px;margin:2px 0;"><strong>${t(labelKey)}:</strong> —</div>`;
+      } else {
+        const dishesText = dishes.map(dish=>{
+          const r = state.recipes.find(x=>x.id===dish.recipeId);
+          if(!r) return '';
+          const servingsTxt = ` (${dish.servings || r.servings || 1} ${t('servings_word')})`;
+          const courseTxt = dish.course ? `${t('course_'+dish.course)}: ` : '';
+          return `${courseTxt}${escapeHtml(r.name)}${servingsTxt}`;
+        }).filter(Boolean).join(' · ');
+        html += `<div style="font-size:12.5px;margin:2px 0;"><strong>${t(labelKey)}:</strong> ${dishesText}</div>`;
+      }
     });
 
     html += `<div style="font-size:10.5px;text-transform:uppercase;letter-spacing:0.5px;color:${p.sageDark};font-weight:700;margin:12px 0 4px;">${t('report_journal')}</div>`;
