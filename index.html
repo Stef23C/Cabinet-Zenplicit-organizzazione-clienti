@@ -456,7 +456,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v3.9</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v4.0</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -2147,20 +2147,28 @@ function updateTtsPlayerUI(){
 function speakChunk(idx){
   if(!('speechSynthesis' in window)) return;
   if(idx < 0 || idx >= speechChunks.length){ stopSpeaking(); return; }
-  window.speechSynthesis.cancel();
-  speechChunkIndex = idx;
-  speechIsPaused = false;
-  updateTtsPlayerUI();
-  const utter = new SpeechSynthesisUtterance(speechChunks[idx].text);
-  utter.lang = currentLang === 'fr' ? 'fr-FR' : 'it-IT';
-  utter.rate = 0.95;
-  utter.onend = ()=>{
-    if(speechIsPaused) return;
-    if(idx+1 < speechChunks.length) speakChunk(idx+1);
-    else stopSpeaking();
+  const synth = window.speechSynthesis;
+  const doSpeak = ()=>{
+    speechChunkIndex = idx;
+    speechIsPaused = false;
+    updateTtsPlayerUI();
+    const utter = new SpeechSynthesisUtterance(speechChunks[idx].text);
+    utter.lang = currentLang === 'fr' ? 'fr-FR' : 'it-IT';
+    utter.rate = 0.95;
+    utter.onend = ()=>{
+      if(speechIsPaused) return;
+      if(idx+1 < speechChunks.length) speakChunk(idx+1);
+      else stopSpeaking();
+    };
+    utter.onerror = ()=>{};
+    synth.speak(utter);
   };
-  utter.onerror = ()=>{};
-  window.speechSynthesis.speak(utter);
+  if(synth.speaking || synth.pending){
+    synth.cancel();
+    setTimeout(doSpeak, 180);
+  } else {
+    doSpeak();
+  }
 }
 
 function startRecipePlayer(r){
