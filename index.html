@@ -456,7 +456,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v4.0</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v4.1</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -964,7 +964,7 @@ const I18N = {
     auto_calc_none:"Nessun ingrediente collegato a un alimento del database con quantità in grammi: collega almeno un ingrediente per calcolare automaticamente.",
     recipe_link_label:"Link (video, audio, articolo…)", recipe_link_ph:"https://…", btn_gen_qr:"Genera QR code",
     btn_listen_recipe:"🔊 Ascolta la ricetta", btn_stop_listen:"⏹ Ferma lettura",
-    btn_listen_short:"Ascolta", btn_stop_short:"Ferma",
+    btn_listen_short:"Ascolta", btn_stop_short:"Ferma", btn_pause_short:"Pausa", btn_resume_short:"Riprendi",
     speech_chunk_title:"Nome ricetta", speech_chunk_ingredients:"Ingredienti", speech_chunk_prep:"Preparazione", speech_chunk_step:"Passo",
     recipe_audio_label:"Audio della ricetta (facoltativo)", recipe_video_label:"Video della ricetta (facoltativo)",
     media_session_note:"Audio e video caricati restano disponibili solo in questa sessione: usa il campo Link per contenuti da conservare stabilmente.",
@@ -1075,7 +1075,7 @@ const I18N = {
     auto_calc_none:"Aucun ingrédient associé à un aliment de la base de données avec une quantité en grammes : associe au moins un ingrédient pour calculer automatiquement.",
     recipe_link_label:"Lien (vidéo, audio, article…)", recipe_link_ph:"https://…", btn_gen_qr:"Générer le QR code",
     btn_listen_recipe:"🔊 Écouter la recette", btn_stop_listen:"⏹ Arrêter la lecture",
-    btn_listen_short:"Écouter", btn_stop_short:"Arrêter",
+    btn_listen_short:"Écouter", btn_stop_short:"Arrêter", btn_pause_short:"Pause", btn_resume_short:"Reprendre",
     speech_chunk_title:"Nom de la recette", speech_chunk_ingredients:"Ingrédients", speech_chunk_prep:"Préparation", speech_chunk_step:"Étape",
     recipe_audio_label:"Audio de la recette (facultatif)", recipe_video_label:"Vidéo de la recette (facultatif)",
     media_session_note:"Les fichiers audio et vidéo chargés ne restent disponibles que pour cette session : utilise le champ Lien pour un contenu conservé durablement.",
@@ -1980,26 +1980,46 @@ function renderRecipes(){
   grid.querySelectorAll('.listen-card-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const r = state.recipes.find(x=>x.id===btn.dataset.id);
-      if(!r) return;
-      if(speakingRecipeId === r.id){
-        stopSpeaking();
-      } else {
-        speakingRecipeId = r.id;
-        updateListenButtons();
-        speakRecipe(r, ()=>{ speakingRecipeId = null; updateListenButtons(); });
-      }
+      if(r) toggleCardListen(r);
     });
   });
   updateListenButtons();
   document.getElementById('newRecipeTile').addEventListener('click', ()=> openRecipeModal(null));
 }
 
+function toggleCardListen(r){
+  if(speakingRecipeId === r.id){
+    if(speechIsPaused){
+      speakChunk(speechChunkIndex);
+    } else {
+      speechIsPaused = true;
+      window.speechSynthesis.cancel();
+      updateTtsPlayerUI();
+      updateListenButtons();
+    }
+  } else {
+    speakingRecipeId = r.id;
+    speechChunks = buildRecipeSpeechChunks(r);
+    speechChunkIndex = 0;
+    updateListenButtons();
+    if(speechChunks.length) speakChunk(0);
+  }
+}
+
 function updateListenButtons(){
   document.querySelectorAll('.listen-card-btn').forEach(btn=>{
-    const isPlaying = btn.dataset.id === speakingRecipeId;
-    btn.textContent = isPlaying ? `⏹ ${t('btn_stop_short')}` : `🔊 ${t('btn_listen_short')}`;
-    btn.classList.toggle('btn-accent', !isPlaying);
-    btn.classList.toggle('btn-danger', isPlaying);
+    const isThis = btn.dataset.id === speakingRecipeId;
+    btn.classList.remove('btn-accent','btn-danger');
+    if(!isThis){
+      btn.textContent = `🔊 ${t('btn_listen_short')}`;
+      btn.classList.add('btn-accent');
+    } else if(speechIsPaused){
+      btn.textContent = `▶ ${t('btn_resume_short')}`;
+      btn.classList.add('btn-accent');
+    } else {
+      btn.textContent = `⏸ ${t('btn_pause_short')}`;
+      btn.classList.add('btn-danger');
+    }
   });
 }
 
@@ -2152,6 +2172,7 @@ function speakChunk(idx){
     speechChunkIndex = idx;
     speechIsPaused = false;
     updateTtsPlayerUI();
+    updateListenButtons();
     const utter = new SpeechSynthesisUtterance(speechChunks[idx].text);
     utter.lang = currentLang === 'fr' ? 'fr-FR' : 'it-IT';
     utter.rate = 0.95;
@@ -2185,6 +2206,7 @@ function pauseResumeSpeech(){
     speechIsPaused = true;
     window.speechSynthesis.cancel();
     updateTtsPlayerUI();
+    updateListenButtons();
   } else {
     speakChunk(speechChunkIndex);
   }
