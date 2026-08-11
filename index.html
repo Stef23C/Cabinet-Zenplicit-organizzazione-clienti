@@ -294,6 +294,19 @@
     color:var(--sage-dark);font-weight:600;font-size:14px;cursor:pointer;min-height:120px;background:var(--sage-pale);
   }
   .new-recipe-tile:hover{background:var(--beige-deep);}
+  .card-tts-player{
+    margin-top:8px;background:var(--sage-pale);border-radius:10px;padding:8px 10px;
+    display:flex;flex-direction:column;gap:6px;
+  }
+  .card-tts-step{font-size:11px;font-weight:700;color:var(--sage-dark);text-align:center;}
+  .card-tts-controls{display:flex;gap:8px;justify-content:center;}
+  .card-tts-controls button{flex:1;}
+  .tea-entry{
+    display:inline-flex;align-items:center;gap:8px;background:var(--sage-pale);border-radius:100px;
+    padding:6px 8px 6px 14px;margin:4px 6px 4px 0;font-size:13px;color:var(--sage-dark);font-weight:600;
+  }
+  .tea-entry button{background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:12px;padding:2px 4px;}
+  .tea-entry button:hover{color:#B65B4F;}
 
   .ing-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;flex-wrap:wrap;}
   .ing-row input.iname{flex:2;min-width:110px;}
@@ -456,7 +469,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v4.1</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v4.3</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -472,6 +485,7 @@
     <button data-tab="medit" data-i18n="tab_medit">Meditazione</button>
     <button data-tab="equiv" data-i18n="tab_equiv">Equivalenze</button>
     <button data-tab="books" data-i18n="tab_books">Libri</button>
+    <button data-tab="teas" data-i18n="tab_teas">Tisane</button>
   </nav>
 
   <div class="export-bar no-print">
@@ -685,6 +699,33 @@
     </div>
 
     <div class="card foods-db">
+      <h2 class="section-title" style="font-size:17px;" data-i18n="portions_title">Porzioni frutta e verdura</h2>
+      <p class="section-sub" data-i18n="portions_sub">Quanto pesa davvero una porzione? Scegli l'alimento e la quantità mangiata per scoprire a quante porzioni corrisponde.</p>
+      <div class="equiv-grid">
+        <div class="equiv-col">
+          <label data-i18n="portions_food_label">Alimento</label>
+          <select id="portionFoodSelect"></select>
+          <label data-i18n="portions_qty_label">Quantità mangiata (g)</label>
+          <input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="portionQtyInput" value="80">
+        </div>
+        <div class="equiv-col">
+          <label data-i18n="portions_ref_label">1 porzione corrisponde a</label>
+          <div id="portionRefText" style="font-size:13.5px;color:var(--ink-soft);padding:9px 0;">—</div>
+        </div>
+      </div>
+      <div class="equiv-result">
+        <div class="big" id="portionResultBig">—</div>
+        <div class="sub" id="portionResultSub" data-i18n="portions_placeholder">Seleziona un alimento per calcolare le porzioni</div>
+      </div>
+      <div class="import-export-bar no-print" style="margin-top:18px;">
+        <button class="btn btn-ghost btn-sm" id="addPortionBtn" data-i18n="btn_add_portion">+ Aggiungi alimento</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="db-table" id="portionsTable"></table>
+      </div>
+    </div>
+
+    <div class="card foods-db">
       <h2 class="section-title" style="font-size:17px;" data-i18n="db_title">Database alimenti (per 100 g)</h2>
       <div class="import-export-bar no-print">
         <button class="btn btn-ghost btn-sm" id="exportFoodsBtn" data-i18n="btn_export_foods">⬇ Esporta alimenti (JSON)</button>
@@ -723,6 +764,36 @@
 
     <div class="card">
       <div class="book-grid" id="bookGrid"></div>
+    </div>
+  </section>
+
+  <!-- TEAS -->
+  <section class="panel" id="panel-teas">
+    <h2 class="section-title" data-i18n="teas_title">Le mie tisane</h2>
+    <p class="section-sub" data-i18n="teas_sub">Gestisci il tuo elenco di tisane e tieni traccia di quelle bevute giorno per giorno.</p>
+
+    <div class="card">
+      <h2 class="section-title" style="font-size:16.5px;" data-i18n="teas_catalog_title">Catalogo tisane</h2>
+      <div class="add-item-row no-print" style="margin-top:10px;">
+        <input autocomplete="off" type="text" class="name" id="newTeaNameIt" data-i18n-ph="tea_name_it_ph" placeholder="Nome (IT)">
+        <input autocomplete="off" type="text" class="name" id="newTeaNameFr" data-i18n-ph="tea_name_fr_ph" placeholder="Nom (FR)">
+        <input autocomplete="off" type="text" class="name" id="newTeaNote" data-i18n-ph="tea_note_ph" placeholder="Nota (facoltativa)">
+        <button class="btn btn-primary" id="addTeaBtn" data-i18n="btn_add_tea">+ Aggiungi</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="db-table" id="teasTable"></table>
+      </div>
+    </div>
+
+    <h2 class="section-title" style="margin-top:26px;" data-i18n="tealog_title">Diario tisane</h2>
+    <p class="section-sub" data-i18n="tealog_sub">Segna quali tisane hai bevuto in ogni giorno della settimana.</p>
+    <div class="card">
+      <div class="day-tabs no-print" id="teaDayTabs"></div>
+      <div class="add-item-row no-print">
+        <select id="teaLogSelect" style="flex:2;min-width:160px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13.5px;background:var(--white);"></select>
+        <button class="btn btn-accent" id="addTeaLogBtn" data-i18n="btn_add_tea_entry">+ Aggiungi al giorno</button>
+      </div>
+      <div id="teaLogList"></div>
     </div>
   </section>
 </div>
@@ -881,7 +952,12 @@ const COURSE_TYPES = ['','antipasto','primo','secondo','contorno','dolce','bevan
 const I18N = {
   it: {
     tagline:"routine · pasti · ricette",
-    tab_routine:"Routine", tab_meals:"Pasti & Spesa", tab_recipes:"Ricette", tab_medit:"Meditazione", tab_equiv:"Equivalenze", tab_month:"Mese", tab_books:"Libri",
+    tab_routine:"Routine", tab_meals:"Pasti & Spesa", tab_recipes:"Ricette", tab_medit:"Meditazione", tab_equiv:"Equivalenze", tab_month:"Mese", tab_books:"Libri", tab_teas:"Tisane",
+    teas_title:"Le mie tisane", teas_sub:"Gestisci il tuo elenco di tisane e tieni traccia di quelle bevute giorno per giorno.",
+    teas_catalog_title:"Catalogo tisane", tea_name_it_ph:"Nome (IT)", tea_name_fr_ph:"Nom (FR)", tea_note_ph:"Nota (facoltativa)", tea_note_label:"Nota",
+    btn_add_tea:"+ Aggiungi",
+    tealog_title:"Diario tisane", tealog_sub:"Segna quali tisane hai bevuto in ogni giorno della settimana.",
+    btn_add_tea_entry:"+ Aggiungi al giorno", tealog_empty:"Nessuna tisana registrata per questo giorno.",
     books_title:"I miei libri", books_sub:"Tieni traccia dei libri che vuoi leggere, che stai leggendo e che hai già letto, con le tue impressioni personali.",
     shelf_wishlist:"Vorrei leggere", shelf_to_read:"Da leggere", shelf_reading:"In lettura", shelf_read:"Letti",
     new_book_tile:"+ Nuovo libro", btn_mark_read:"✓ Segna come letto",
@@ -951,6 +1027,11 @@ const I18N = {
     equiv_result_text:(qtyB,foodB,qtyA,foodA,macroLabel)=>`di ${foodB} equivalgono a ${qtyA} g di ${foodA} per ${macroLabel}`,
     equiv_no_macro:(foodB, macroLabel)=>`${foodB} non contiene ${macroLabel}: impossibile calcolare l'equivalenza.`,
     db_title:"Database alimenti (per 100 g)", food_name_ph:"Nome alimento", food_name_it_ph:"Nome (IT)", food_name_fr_ph:"Nom (FR)", food_protein_ph:"Prot. g", food_carbs_ph:"Carb. g", food_fat_ph:"Grassi g", food_fiber_ph:"Fibre g", food_salt_ph:"Sale g",
+    portions_title:"Porzioni frutta e verdura", portions_sub:"Quanto pesa davvero una porzione? Scegli l'alimento e la quantità mangiata per scoprire a quante porzioni corrisponde.",
+    portions_food_label:"Alimento", portions_qty_label:"Quantità mangiata (g)", portions_ref_label:"1 porzione corrisponde a",
+    portions_placeholder:"Seleziona un alimento per calcolare le porzioni",
+    portions_result_text:(qty,name,portions)=>`${qty} g di ${name} corrispondono a ${portions} porzioni.`,
+    btn_add_portion:"+ Aggiungi alimento", portions_grams_label:"g per porzione",
     macro_fiber_label:"Fibre", macro_salt_label:"Sale",
     alert_food_name_needed:"Inserisci almeno un nome (italiano o francese) per l'alimento.",
     btn_add_food:"+ Aggiungi",
@@ -992,7 +1073,12 @@ const I18N = {
   },
   fr: {
     tagline:"routine · repas · recettes",
-    tab_routine:"Routine", tab_meals:"Repas & Courses", tab_recipes:"Recettes", tab_medit:"Méditation", tab_equiv:"Équivalences", tab_month:"Mois", tab_books:"Livres",
+    tab_routine:"Routine", tab_meals:"Repas & Courses", tab_recipes:"Recettes", tab_medit:"Méditation", tab_equiv:"Équivalences", tab_month:"Mois", tab_books:"Livres", tab_teas:"Infusions",
+    teas_title:"Mes infusions", teas_sub:"Gère ta liste d'infusions et suis celles bues chaque jour de la semaine.",
+    teas_catalog_title:"Catalogue des infusions", tea_name_it_ph:"Nom (IT)", tea_name_fr_ph:"Nom (FR)", tea_note_ph:"Note (facultative)", tea_note_label:"Note",
+    btn_add_tea:"+ Ajouter",
+    tealog_title:"Journal des infusions", tealog_sub:"Note quelles infusions tu as bues chaque jour de la semaine.",
+    btn_add_tea_entry:"+ Ajouter au jour", tealog_empty:"Aucune infusion enregistrée pour ce jour.",
     books_title:"Mes livres", books_sub:"Garde une trace des livres que tu veux lire, que tu es en train de lire et que tu as déjà lus, avec tes impressions personnelles.",
     shelf_wishlist:"À découvrir", shelf_to_read:"À lire", shelf_reading:"En cours", shelf_read:"Lus",
     new_book_tile:"+ Nouveau livre", btn_mark_read:"✓ Marquer comme lu",
@@ -1062,6 +1148,11 @@ const I18N = {
     equiv_result_text:(qtyB,foodB,qtyA,foodA,macroLabel)=>`de ${foodB} équivalent à ${qtyA} g de ${foodA} pour les ${macroLabel}`,
     equiv_no_macro:(foodB, macroLabel)=>`${foodB} ne contient pas de ${macroLabel} : impossible de calculer l'équivalence.`,
     db_title:"Base de données alimentaire (pour 100 g)", food_name_ph:"Nom de l'aliment", food_name_it_ph:"Nom (IT)", food_name_fr_ph:"Nom (FR)", food_protein_ph:"Prot. g", food_carbs_ph:"Gluc. g", food_fat_ph:"Lip. g", food_fiber_ph:"Fibres g", food_salt_ph:"Sel g",
+    portions_title:"Portions de fruits et légumes", portions_sub:"Combien pèse vraiment une portion ? Choisis l'aliment et la quantité mangée pour savoir à combien de portions ça correspond.",
+    portions_food_label:"Aliment", portions_qty_label:"Quantité mangée (g)", portions_ref_label:"1 portion correspond à",
+    portions_placeholder:"Sélectionne un aliment pour calculer les portions",
+    portions_result_text:(qty,name,portions)=>`${qty} g de ${name} correspondent à ${portions} portions.`,
+    btn_add_portion:"+ Ajouter un aliment", portions_grams_label:"g par portion",
     macro_fiber_label:"Fibres", macro_salt_label:"Sel",
     alert_food_name_needed:"Indique au moins un nom (italien ou français) pour l'aliment.",
     btn_add_food:"+ Ajouter",
@@ -1148,6 +1239,10 @@ function setLanguage(lang){
   renderRecipes();
   renderEquiv();
   renderBooks();
+  renderTeasTable();
+  renderTeaDayTabs();
+  renderTeaLog();
+  renderTeaLogSelect();
   if(document.getElementById('panel-month').classList.contains('active')) renderMonthView();
 }
 document.getElementById('langIt').addEventListener('click', ()=>setLanguage('it'));
@@ -1175,6 +1270,30 @@ const DEFAULT_STATE = {
   currentWeekStart: null, // ISO date (Monday) of the week currently displayed
   recipes: [], // {id,name,category,servings,ingredients:[{name,qty,unit}],macros:{kcal,protein,carbs,fat},instructions}
   books: [], // {id,title,author,shelf:'wishlist'|'to-read'|'reading'|'read',liked:''|'yes'|'no',notes}
+  teas: [
+    {id:"t01", name_it:"Camomilla", name_fr:"Camomille", note:""},
+    {id:"t02", name_it:"Menta", name_fr:"Menthe", note:""},
+    {id:"t03", name_it:"Zenzero e limone", name_fr:"Gingembre et citron", note:""},
+    {id:"t04", name_it:"Tè verde", name_fr:"Thé vert", note:""},
+    {id:"t05", name_it:"Tisana rilassante", name_fr:"Tisane relaxante", note:""}
+  ],
+  portionsDB: [
+    {id:"p01", name_it:"Mela", name_fr:"Pomme", portion_g:150},
+    {id:"p02", name_it:"Banana", name_fr:"Banane", portion_g:120},
+    {id:"p03", name_it:"Arancia", name_fr:"Orange", portion_g:150},
+    {id:"p04", name_it:"Pera", name_fr:"Poire", portion_g:150},
+    {id:"p05", name_it:"Fragole", name_fr:"Fraises", portion_g:150},
+    {id:"p06", name_it:"Uva", name_fr:"Raisin", portion_g:100},
+    {id:"p07", name_it:"Melone", name_fr:"Melon", portion_g:200},
+    {id:"p08", name_it:"Pomodori", name_fr:"Tomates", portion_g:200},
+    {id:"p09", name_it:"Insalata verde", name_fr:"Salade verte", portion_g:50},
+    {id:"p10", name_it:"Zucchine", name_fr:"Courgettes", portion_g:200},
+    {id:"p11", name_it:"Carote", name_fr:"Carottes", portion_g:200},
+    {id:"p12", name_it:"Broccoli", name_fr:"Brocoli", portion_g:200},
+    {id:"p13", name_it:"Spinaci", name_fr:"Épinards", portion_g:200},
+    {id:"p14", name_it:"Peperoni", name_fr:"Poivrons", portion_g:200},
+    {id:"p15", name_it:"Finocchi", name_fr:"Fenouil", portion_g:200}
+  ],
   lang: 'it',
   foodsDB: [
     {id:"f01", name_it:"Petto di pollo", name_fr:"Blanc de poulet", kcal:165, protein:31, carbs:0, fat:3.6, fiber:0, salt:0.1},
@@ -1205,6 +1324,7 @@ let editingRecipeId = null; // null = new
 let ingredientDraft = [];
 let currentBookShelf = 'wishlist';
 let editingBookId = null;
+let currentTeaDay = DAYS[0];
 let speakingRecipeId = null;
 let currentMonthAnchor = null; // Date used to anchor the monthly view
 
@@ -1246,7 +1366,7 @@ function formatWeekRange(weekKey){
 
 function ensureWeekStructures(weekKey){
   if(!state.weeks[weekKey]){
-    state.weeks[weekKey] = {routine:{}, journal:{}, meals:{}, extraShoppingItems:[], shoppingChecked:{}};
+    state.weeks[weekKey] = {routine:{}, journal:{}, meals:{}, extraShoppingItems:[], shoppingChecked:{}, teaLog:{}};
   }
   const wk = state.weeks[weekKey];
   if(!wk.routine) wk.routine = {};
@@ -1254,6 +1374,7 @@ function ensureWeekStructures(weekKey){
   if(!wk.meals) wk.meals = {};
   if(!wk.extraShoppingItems) wk.extraShoppingItems = [];
   if(!wk.shoppingChecked) wk.shoppingChecked = {};
+  if(!wk.teaLog) wk.teaLog = {};
   DAYS.forEach(day=>{
     if(!wk.routine[day]) wk.routine[day] = {};
     state.categories.forEach(cat=>{
@@ -1261,6 +1382,7 @@ function ensureWeekStructures(weekKey){
       if(wk.routine[day][cat.id].minutes===undefined) wk.routine[day][cat.id].minutes = "";
     });
     if(wk.journal[day]===undefined) wk.journal[day] = "";
+    if(!wk.teaLog[day]) wk.teaLog[day] = [];
     if(!wk.meals[day]) wk.meals[day] = {};
     MEAL_TYPES.forEach(([key])=>{
       if(!wk.meals[day][key]){
@@ -1338,6 +1460,8 @@ async function loadState(){
   if(!state.categories) state.categories = DEFAULT_STATE.categories.slice();
   if(!state.recipes) state.recipes = [];
   if(!state.books) state.books = [];
+  if(!state.teas) state.teas = DEFAULT_STATE.teas.slice();
+  if(!state.portionsDB) state.portionsDB = DEFAULT_STATE.portionsDB.slice();
   if(!state.foodsDB) state.foodsDB = DEFAULT_STATE.foodsDB.slice();
 
   // Migrate old single-name foodsDB entries to bilingual {id, name_it, name_fr}
@@ -1430,6 +1554,7 @@ document.querySelectorAll('nav.tabs button').forEach(btn=>{
     if(btn.dataset.tab==='meals'){ renderMeals(); renderShoppingList(); }
     if(btn.dataset.tab==='month'){ renderMonthView(); }
     if(btn.dataset.tab==='books'){ renderBooks(); }
+    if(btn.dataset.tab==='teas'){ renderTeasTable(); renderTeaDayTabs(); renderTeaLog(); }
     if(btn.dataset.tab==='recipes'){ renderRecipes(); }
     if(btn.dataset.tab==='equiv'){ renderEquiv(); }
   });
@@ -1968,6 +2093,13 @@ function renderRecipes(){
       <div style="font-size:12px;color:var(--ink-soft);">${(r.ingredients||[]).length} · ${r.servings||1} ${t('servings_word')}</div>
       <div class="r-macros">${m.kcal?`${m.kcal} kcal · `:''}${m.protein?`P ${m.protein}g `:''}${m.carbs?`C ${m.carbs}g `:''}${m.fat?`G ${m.fat}g`:''}</div>
       <button type="button" class="btn btn-accent listen-card-btn" data-id="${r.id}" style="width:100%;margin-top:10px;font-size:13px;padding:9px 10px;" onclick="event.stopPropagation()">🔊 ${escapeHtml(t('btn_listen_short'))}</button>
+      <div class="card-tts-player" id="cardTts-${r.id}" style="display:none;" onclick="event.stopPropagation()">
+        <div class="card-tts-step" id="cardTtsStep-${r.id}"></div>
+        <div class="card-tts-controls">
+          <button type="button" class="btn btn-ghost btn-sm card-tts-prev" data-id="${r.id}">⏮</button>
+          <button type="button" class="btn btn-ghost btn-sm card-tts-next" data-id="${r.id}">⏭</button>
+        </div>
+      </div>
       ${linkBtn ? `<div style="margin-top:6px;">${linkBtn}</div>` : ''}
     </div>`;
   }).join('');
@@ -1983,6 +2115,16 @@ function renderRecipes(){
       if(r) toggleCardListen(r);
     });
   });
+  grid.querySelectorAll('.card-tts-prev').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(btn.dataset.id === speakingRecipeId) speakChunk(speechChunkIndex-1);
+    });
+  });
+  grid.querySelectorAll('.card-tts-next').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(btn.dataset.id === speakingRecipeId) speakChunk(speechChunkIndex+1);
+    });
+  });
   updateListenButtons();
   document.getElementById('newRecipeTile').addEventListener('click', ()=> openRecipeModal(null));
 }
@@ -1993,6 +2135,7 @@ function toggleCardListen(r){
       speakChunk(speechChunkIndex);
     } else {
       speechIsPaused = true;
+      speechGeneration++;
       window.speechSynthesis.cancel();
       updateTtsPlayerUI();
       updateListenButtons();
@@ -2008,7 +2151,8 @@ function toggleCardListen(r){
 
 function updateListenButtons(){
   document.querySelectorAll('.listen-card-btn').forEach(btn=>{
-    const isThis = btn.dataset.id === speakingRecipeId;
+    const id = btn.dataset.id;
+    const isThis = id === speakingRecipeId;
     btn.classList.remove('btn-accent','btn-danger');
     if(!isThis){
       btn.textContent = `🔊 ${t('btn_listen_short')}`;
@@ -2019,6 +2163,13 @@ function updateListenButtons(){
     } else {
       btn.textContent = `⏸ ${t('btn_pause_short')}`;
       btn.classList.add('btn-danger');
+    }
+    const playerEl = document.getElementById('cardTts-'+id);
+    const stepEl = document.getElementById('cardTtsStep-'+id);
+    if(playerEl) playerEl.style.display = isThis ? 'flex' : 'none';
+    if(stepEl){
+      const chunk = isThis ? speechChunks[speechChunkIndex] : null;
+      stepEl.textContent = chunk ? chunk.label : '';
     }
   });
 }
@@ -2111,6 +2262,7 @@ function speakRecipe(r, onEnd){
   window.speechSynthesis.speak(utter);
 }
 function stopSpeaking(){
+  speechGeneration++;
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
   const startBtn = document.getElementById('listenRecipeBtn');
   const player = document.getElementById('ttsPlayer');
@@ -2127,6 +2279,7 @@ function stopSpeaking(){
 let speechChunks = [];
 let speechChunkIndex = 0;
 let speechIsPaused = false;
+let speechGeneration = 0;
 
 function buildRecipeSpeechChunks(r){
   const chunks = [];
@@ -2168,7 +2321,9 @@ function speakChunk(idx){
   if(!('speechSynthesis' in window)) return;
   if(idx < 0 || idx >= speechChunks.length){ stopSpeaking(); return; }
   const synth = window.speechSynthesis;
+  const myGen = ++speechGeneration;
   const doSpeak = ()=>{
+    if(myGen !== speechGeneration) return;
     speechChunkIndex = idx;
     speechIsPaused = false;
     updateTtsPlayerUI();
@@ -2177,6 +2332,7 @@ function speakChunk(idx){
     utter.lang = currentLang === 'fr' ? 'fr-FR' : 'it-IT';
     utter.rate = 0.95;
     utter.onend = ()=>{
+      if(myGen !== speechGeneration) return;
       if(speechIsPaused) return;
       if(idx+1 < speechChunks.length) speakChunk(idx+1);
       else stopSpeaking();
@@ -2204,6 +2360,7 @@ function pauseResumeSpeech(){
   if(!('speechSynthesis' in window)) return;
   if(!speechIsPaused){
     speechIsPaused = true;
+    speechGeneration++;
     window.speechSynthesis.cancel();
     updateTtsPlayerUI();
     updateListenButtons();
@@ -2695,6 +2852,7 @@ function renderEquiv(){
   if(prevB && state.foodsDB.some(f=>f.id===prevB)) selB.value = prevB; else if(state.foodsDB.length>1) selB.selectedIndex = 1;
   computeEquiv();
   renderFoodsTable();
+  renderPortions();
 }
 
 function computeEquiv(){
@@ -2925,6 +3083,162 @@ document.getElementById('deleteBookBtn').addEventListener('click', ()=>{
   persist();
   document.getElementById('bookModalOverlay').classList.remove('show');
   renderBooks();
+});
+
+/* ---------- TEAS ---------- */
+function renderTeasTable(){
+  const table = document.getElementById('teasTable');
+  let html = `<tr><th>${t('food_name_it_ph')}</th><th>${t('food_name_fr_ph')}</th><th>${t('tea_note_label')}</th><th></th></tr>`;
+  state.teas.forEach((tea,i)=>{
+    html += `<tr data-idx="${i}">
+      <td><input type="text" class="db-edit" data-field="name_it" value="${escapeAttr(tea.name_it)}"></td>
+      <td><input type="text" class="db-edit" data-field="name_fr" value="${escapeAttr(tea.name_fr)}"></td>
+      <td><input type="text" class="db-edit" data-field="note" value="${escapeAttr(tea.note||'')}"></td>
+      <td><button class="icon-btn no-print" data-removetea="${i}">✕</button></td>
+    </tr>`;
+  });
+  table.innerHTML = html;
+  table.querySelectorAll('.db-edit').forEach(input=>{
+    input.addEventListener('change', ()=>{
+      const idx = Number(input.closest('tr').dataset.idx);
+      const field = input.dataset.field;
+      if(state.teas[idx]){ state.teas[idx][field] = input.value.trim(); persist(); renderTeaLogSelect(); }
+    });
+  });
+  table.querySelectorAll('[data-removetea]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      state.teas.splice(Number(btn.dataset.removetea),1);
+      persist();
+      renderTeasTable();
+      renderTeaLogSelect();
+      renderTeaLog();
+    });
+  });
+}
+
+document.getElementById('addTeaBtn').addEventListener('click', ()=>{
+  const nameIt = document.getElementById('newTeaNameIt').value.trim();
+  const nameFr = document.getElementById('newTeaNameFr').value.trim();
+  const note = document.getElementById('newTeaNote').value.trim();
+  if(!nameIt && !nameFr){ alert(t('alert_food_name_needed')); return; }
+  state.teas.push({id:uid(), name_it:nameIt||nameFr, name_fr:nameFr||nameIt, note});
+  ['newTeaNameIt','newTeaNameFr','newTeaNote'].forEach(id=>document.getElementById(id).value='');
+  persist();
+  renderTeasTable();
+  renderTeaLogSelect();
+});
+
+function renderTeaDayTabs(){
+  const wrap = document.getElementById('teaDayTabs');
+  wrap.innerHTML = DAYS.map(d=>`<button data-day="${escapeAttr(d)}" class="${d===currentTeaDay?'active':''}">${dayLabel(d)}</button>`).join('');
+  wrap.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      currentTeaDay = b.dataset.day;
+      renderTeaDayTabs();
+      renderTeaLog();
+    });
+  });
+}
+
+function renderTeaLogSelect(){
+  const sel = document.getElementById('teaLogSelect');
+  sel.innerHTML = state.teas.map(tea=>`<option value="${escapeAttr(tea.id)}">${escapeHtml(foodNameLike(tea))}</option>`).join('');
+}
+function foodNameLike(tea){
+  return tea['name_'+currentLang] || tea.name_it || tea.name_fr || '';
+}
+
+function renderTeaLog(){
+  const wrap = document.getElementById('teaLogList');
+  const entries = W().teaLog[currentTeaDay] || [];
+  if(!entries.length){ wrap.innerHTML = `<p style="font-size:12.5px;color:var(--ink-soft);">${t('tealog_empty')}</p>`; return; }
+  wrap.innerHTML = entries.map(entry=>{
+    const tea = state.teas.find(x=>x.id===entry.teaId);
+    return `<span class="tea-entry">${escapeHtml(tea?foodNameLike(tea):'—')}<button type="button" data-removeentry="${entry.id}">✕</button></span>`;
+  }).join('');
+  wrap.querySelectorAll('[data-removeentry]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      W().teaLog[currentTeaDay] = W().teaLog[currentTeaDay].filter(e=>e.id!==btn.dataset.removeentry);
+      persist();
+      renderTeaLog();
+    });
+  });
+}
+
+document.getElementById('addTeaLogBtn').addEventListener('click', ()=>{
+  const teaId = document.getElementById('teaLogSelect').value;
+  if(!teaId) return;
+  W().teaLog[currentTeaDay].push({id:uid(), teaId});
+  persist();
+  renderTeaLog();
+});
+
+/* ---------- FRUIT & VEG PORTIONS ---------- */
+function renderPortions(){
+  const sel = document.getElementById('portionFoodSelect');
+  const prev = sel.value;
+  sel.innerHTML = state.portionsDB.map(p=>`<option value="${escapeAttr(p.id)}">${escapeHtml(foodNameLike(p))}</option>`).join('');
+  if(prev && state.portionsDB.some(p=>p.id===prev)) sel.value = prev;
+  computePortion();
+  renderPortionsTable();
+}
+
+function computePortion(){
+  const id = document.getElementById('portionFoodSelect').value;
+  const qty = parseNum(document.getElementById('portionQtyInput').value);
+  const big = document.getElementById('portionResultBig');
+  const sub = document.getElementById('portionResultSub');
+  const refText = document.getElementById('portionRefText');
+  const food = state.portionsDB.find(p=>p.id===id);
+  if(!food){ big.textContent='—'; sub.textContent=t('portions_placeholder'); refText.textContent='—'; return; }
+  refText.textContent = `${food.portion_g} g`;
+  if(qty<=0 || !food.portion_g){ big.textContent='—'; sub.textContent=t('portions_placeholder'); return; }
+  const portions = qty / food.portion_g;
+  big.textContent = portions.toFixed(1).replace(/\.0$/, '');
+  sub.textContent = t('portions_result_text')(qty, foodNameLike(food), portions.toFixed(1));
+}
+['portionFoodSelect','portionQtyInput'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', computePortion);
+  document.getElementById(id).addEventListener('change', computePortion);
+});
+
+function renderPortionsTable(){
+  const table = document.getElementById('portionsTable');
+  let html = `<tr><th>${t('food_name_it_ph')}</th><th>${t('food_name_fr_ph')}</th><th>${t('portions_grams_label')}</th><th></th></tr>`;
+  state.portionsDB.forEach((p,i)=>{
+    html += `<tr data-idx="${i}">
+      <td><input type="text" class="db-edit" data-field="name_it" value="${escapeAttr(p.name_it)}"></td>
+      <td><input type="text" class="db-edit" data-field="name_fr" value="${escapeAttr(p.name_fr)}"></td>
+      <td><input type="text" inputmode="decimal" class="db-edit db-numeric" data-field="portion_g" value="${escapeAttr(p.portion_g)}"></td>
+      <td><button class="icon-btn no-print" data-removeportion="${i}">✕</button></td>
+    </tr>`;
+  });
+  table.innerHTML = html;
+  table.querySelectorAll('.db-edit').forEach(input=>{
+    if(input.classList.contains('db-numeric')) attachNumericClean(input);
+    input.addEventListener('change', ()=>{
+      const idx = Number(input.closest('tr').dataset.idx);
+      const field = input.dataset.field;
+      if(!state.portionsDB[idx]) return;
+      state.portionsDB[idx][field] = field==='portion_g' ? parseNum(input.value) : input.value.trim();
+      persist();
+      renderPortions();
+    });
+  });
+  table.querySelectorAll('[data-removeportion]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      state.portionsDB.splice(Number(btn.dataset.removeportion),1);
+      persist();
+      renderPortions();
+    });
+  });
+}
+
+document.getElementById('addPortionBtn').addEventListener('click', ()=>{
+  state.portionsDB.push({id:uid(), name_it:'', name_fr:'', portion_g:0});
+  persist();
+  renderPortionsTable();
+  renderPortions();
 });
 
 /* ---------- EXPORT / PRINT ---------- */
@@ -3307,6 +3621,7 @@ async function init(){
   renderWeekLabel();
   currentMealDay = DAYS[0];
   currentJournalDay = DAYS[0];
+  currentTeaDay = DAYS[0];
   renderRoutine();
   renderJournalDayTabs();
   renderJournal();
@@ -3316,6 +3631,10 @@ async function init(){
   renderRecipes();
   renderEquiv();
   renderBooks();
+  renderTeasTable();
+  renderTeaDayTabs();
+  renderTeaLog();
+  renderTeaLogSelect();
 }
 init();
 
