@@ -444,7 +444,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v3.2</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v3.4</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -556,8 +556,8 @@
     <p class="section-sub" data-i18n="recipes_sub">Crea, modifica ed elimina le tue ricette con ingredienti e valori nutrizionali.</p>
     <div class="import-export-bar no-print">
       <button class="btn btn-ghost btn-sm" id="exportRecipesBtn" data-i18n="btn_export_recipes">⬇ Esporta ricette (JSON)</button>
-      <button class="btn btn-ghost btn-sm" id="importRecipesBtn" data-i18n="btn_import_recipes">⬆ Importa ricette (JSON)</button>
-      <input type="file" id="importRecipesFile" accept="application/json" style="display:none;">
+      <button class="btn btn-ghost btn-sm" id="importRecipesBtn" data-i18n="btn_import_recipes">⬆ Importa ricette (JSON o testo)</button>
+      <input type="file" id="importRecipesFile" accept="application/json,.json,.csv,.txt" style="display:none;">
     </div>
     <input autocomplete="off" type="text" id="recipeSearchInput" class="search-input no-print" data-i18n-ph="search_recipes_ph" placeholder="Cerca ricetta…">
     <div class="recipe-grid" id="recipeGrid"></div>
@@ -676,8 +676,8 @@
       <h2 class="section-title" style="font-size:17px;" data-i18n="db_title">Database alimenti (per 100 g)</h2>
       <div class="import-export-bar no-print">
         <button class="btn btn-ghost btn-sm" id="exportFoodsBtn" data-i18n="btn_export_foods">⬇ Esporta alimenti (JSON)</button>
-        <button class="btn btn-ghost btn-sm" id="importFoodsBtn" data-i18n="btn_import_foods">⬆ Importa alimenti (JSON)</button>
-        <input type="file" id="importFoodsFile" accept="application/json" style="display:none;">
+        <button class="btn btn-ghost btn-sm" id="importFoodsBtn" data-i18n="btn_import_foods">⬆ Importa alimenti (JSON o testo)</button>
+        <input type="file" id="importFoodsFile" accept="application/json,.json,.csv,.txt" style="display:none;">
       </div>
       <div class="add-item-row no-print" style="margin-top:10px;">
         <input autocomplete="off" type="text" class="name" id="newFoodNameIt" data-i18n-ph="food_name_it_ph" placeholder="Nome (IT)">
@@ -889,8 +889,10 @@ const I18N = {
     no_recipe_option:"— nessuna ricetta —",
     recipes_title:"Le mie ricette", recipes_sub:"Crea, modifica ed elimina le tue ricette con ingredienti e valori nutrizionali.",
     new_recipe_tile:"+ Nuova ricetta",
-    btn_export_recipes:"⬇ Esporta ricette (JSON)", btn_import_recipes:"⬆ Importa ricette (JSON)",
-    btn_export_foods:"⬇ Esporta alimenti (JSON)", btn_import_foods:"⬆ Importa alimenti (JSON)",
+    btn_export_recipes:"⬇ Esporta ricette (JSON)", btn_import_recipes:"⬆ Importa ricette (JSON o testo)",
+    preview_linked_ingredients_label:"Collegamenti automatici",
+    preview_linked_ingredients_text:(linked,total)=>`${linked} di ${total} ingredienti collegati automaticamente ad alimenti già nel database (per il calcolo nutrizionale).`,
+    btn_export_foods:"⬇ Esporta alimenti (JSON)", btn_import_foods:"⬆ Importa alimenti (JSON o testo)",
     alert_nothing_to_export:"Non c'è ancora nulla da esportare.",
     alert_import_invalid:"Il file selezionato non sembra un file valido esportato da Zenplicité.",
     alert_import_success:(n)=>`${n} ${n===1?'ricetta importata':'ricette importate'} con successo.`,
@@ -993,8 +995,10 @@ const I18N = {
     no_recipe_option:"— aucune recette —",
     recipes_title:"Mes recettes", recipes_sub:"Crée, modifie et supprime tes recettes avec les ingrédients et les valeurs nutritionnelles.",
     new_recipe_tile:"+ Nouvelle recette",
-    btn_export_recipes:"⬇ Exporter les recettes (JSON)", btn_import_recipes:"⬆ Importer des recettes (JSON)",
-    btn_export_foods:"⬇ Exporter les aliments (JSON)", btn_import_foods:"⬆ Importer des aliments (JSON)",
+    btn_export_recipes:"⬇ Exporter les recettes (JSON)", btn_import_recipes:"⬆ Importer des recettes (JSON ou texte)",
+    preview_linked_ingredients_label:"Liaisons automatiques",
+    preview_linked_ingredients_text:(linked,total)=>`${linked} ingrédient${linked===1?'':'s'} sur ${total} lié${linked===1?'':'s'} automatiquement à des aliments déjà présents dans la base (pour le calcul nutritionnel).`,
+    btn_export_foods:"⬇ Exporter les aliments (JSON)", btn_import_foods:"⬆ Importer des aliments (JSON ou texte)",
     alert_nothing_to_export:"Il n'y a encore rien à exporter.",
     alert_import_invalid:"Le fichier sélectionné ne semble pas être un fichier valide exporté depuis Zenplicité.",
     alert_import_success:(n)=>`${n} recette${n===1?'':'s'} importée${n===1?'':'s'} avec succès.`,
@@ -2278,7 +2282,7 @@ document.getElementById('importPreviewConfirm').addEventListener('click', ()=>{
     pendingImport.recipes.forEach(r=>{
       const newIngredients = (r.ingredients||[]).map(i=>({
         name:i.name||'', qty:i.qty||'', unit:i.unit||'',
-        foodRef: i.foodRef && foodIdMap[i.foodRef] ? foodIdMap[i.foodRef] : ''
+        foodRef: foodIdMap[i.foodRef] ? foodIdMap[i.foodRef] : (i.foodRef && state.foodsDB.some(f=>f.id===i.foodRef) ? i.foodRef : '')
       }));
       state.recipes.push({
         id:uid(), name:r.name||t('recipe_modal_new'), category:r.category||'', servings:Number(r.servings)||1,
@@ -2309,6 +2313,12 @@ function showImportPreview(kind, incomingRecipes, incomingFoods){
   if(kind === 'recipes'){
     html += `<div class="import-preview-section"><div class="import-preview-label">${t('preview_recipes_label')} (${incomingRecipes.length})</div>
       <div class="import-preview-list">${incomingRecipes.map(r=>escapeHtml(r.name||'—')).join('<br>')}</div></div>`;
+    let linkedCount = 0, totalIng = 0;
+    incomingRecipes.forEach(r=> (r.ingredients||[]).forEach(i=>{ totalIng++; if(i.foodRef) linkedCount++; }));
+    if(totalIng){
+      html += `<div class="import-preview-section"><div class="import-preview-label">${t('preview_linked_ingredients_label')}</div>
+        <div class="import-preview-list">${t('preview_linked_ingredients_text')(linkedCount, totalIng)}</div></div>`;
+    }
   }
   if(matchResult.newFoods.length){
     html += `<div class="import-preview-section"><div class="import-preview-label">${t('preview_new_foods_label')} (${matchResult.newFoods.length})</div>
@@ -2332,6 +2342,61 @@ document.getElementById('exportRecipesBtn').addEventListener('click', ()=>{
   downloadJSON({type:'zenplicite-recipes', version:1, recipes: state.recipes, foods}, 'zenplicite-ricette.json');
 });
 
+const RECIPE_FIELD_MAP = {
+  'nome':'name', 'titre':'name', 'title':'name',
+  'categoria':'category', 'catégorie':'category',
+  'porzioni':'servings', 'portions':'servings',
+  'ingredienti':'ingredients_raw', 'ingrédients':'ingredients_raw',
+  'kcal':'kcal',
+  'proteine':'protein', 'protéines':'protein',
+  'carboidrati':'carbs', 'glucides':'carbs',
+  'grassi':'fat', 'lipides':'fat',
+  'fibre':'fiber', 'fibres':'fiber',
+  'sale':'salt', 'sel':'salt',
+  'preparazione':'instructions', 'préparation':'instructions',
+  'link':'link', 'lien':'link'
+};
+function parseRecipesPlainText(text){
+  const blocks = text.split(/^={3,}\s*$/m).map(b=>b.trim()).filter(b=>b.length);
+  const recipes = [];
+  blocks.forEach(block=>{
+    const lines = block.split(/\r?\n/);
+    const fields = {};
+    let currentKey = null;
+    lines.forEach(line=>{
+      const m = line.match(/^([A-Za-zÀ-ÿ ]+):\s*(.*)$/);
+      const mappedKey = m ? RECIPE_FIELD_MAP[m[1].trim().toLowerCase()] : null;
+      if(mappedKey){
+        currentKey = mappedKey;
+        fields[currentKey] = m[2].trim();
+      } else if(currentKey && line.trim()){
+        fields[currentKey] += '\n' + line.trim();
+      }
+    });
+    if(!fields.name) return;
+    const ingredients = (fields.ingredients_raw||'').split(';').map(s=>s.trim()).filter(Boolean).map(s=>{
+      const im = s.match(/^(.*?)\s+(\d+(?:[.,]\d+)?)\s*(g|ml|kg|l)?\.?$/i);
+      let name, qty='', unit='';
+      if(im){ name = im[1].trim(); qty = im[2].replace(',', '.'); unit = (im[3]||'').toLowerCase(); }
+      else { name = s; }
+      let foodRef = '';
+      const matchedFood = state.foodsDB.find(f => f.name_it && f.name_it.toLowerCase()===name.toLowerCase() || f.name_fr && f.name_fr.toLowerCase()===name.toLowerCase());
+      if(matchedFood) foodRef = matchedFood.id;
+      return {name, qty, unit, foodRef};
+    });
+    recipes.push({
+      name: fields.name,
+      category: fields.category||'',
+      servings: Number(fields.servings)||1,
+      ingredients,
+      macros: {kcal:fields.kcal||'', protein:fields.protein||'', carbs:fields.carbs||'', fat:fields.fat||'', fiber:fields.fiber||'', salt:fields.salt||''},
+      instructions: fields.instructions||'',
+      link: fields.link||''
+    });
+  });
+  return recipes;
+}
+
 document.getElementById('importRecipesBtn').addEventListener('click', ()=>{
   document.getElementById('importRecipesFile').click();
 });
@@ -2340,10 +2405,17 @@ document.getElementById('importRecipesFile').addEventListener('change', (e)=>{
   if(!file) return;
   const reader = new FileReader();
   reader.onload = ()=>{
+    const raw = reader.result.trim();
     try{
-      const data = JSON.parse(reader.result);
-      const incomingRecipes = Array.isArray(data.recipes) ? data.recipes : (Array.isArray(data) ? data : []);
-      const incomingFoods = Array.isArray(data.foods) ? data.foods : [];
+      let incomingRecipes, incomingFoods;
+      if(raw.startsWith('{') || raw.startsWith('[')){
+        const data = JSON.parse(raw);
+        incomingRecipes = Array.isArray(data.recipes) ? data.recipes : (Array.isArray(data) ? data : []);
+        incomingFoods = Array.isArray(data.foods) ? data.foods : [];
+      } else {
+        incomingRecipes = parseRecipesPlainText(raw);
+        incomingFoods = [];
+      }
       if(!incomingRecipes.length){ alert(t('alert_import_invalid')); return; }
       showImportPreview('recipes', incomingRecipes, incomingFoods);
     }catch(err){
@@ -2359,6 +2431,25 @@ document.getElementById('exportFoodsBtn').addEventListener('click', ()=>{
   downloadJSON({type:'zenplicite-foods', version:1, foods: state.foodsDB}, 'zenplicite-alimenti.json');
 });
 
+function parseFoodsPlainText(text){
+  const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length);
+  const foods = [];
+  lines.forEach((line, idx)=>{
+    const delim = line.includes(';') ? ';' : (line.includes('\t') ? '\t' : ',');
+    const parts = line.split(delim).map(p=>p.trim());
+    if(parts.length < 2) return;
+    const [name_it, name_fr, kcal, protein, carbs, fat, fiber, salt] = parts;
+    if(idx===0 && !/\d/.test(kcal||'')) return; // skip a header row like "Nome IT;Nome FR;Kcal;..."
+    if(!name_it && !name_fr) return;
+    foods.push({
+      name_it: name_it||'', name_fr: name_fr||'',
+      kcal: parseNum(kcal), protein: parseNum(protein), carbs: parseNum(carbs),
+      fat: parseNum(fat), fiber: parseNum(fiber), salt: parseNum(salt)
+    });
+  });
+  return foods;
+}
+
 document.getElementById('importFoodsBtn').addEventListener('click', ()=>{
   document.getElementById('importFoodsFile').click();
 });
@@ -2367,9 +2458,15 @@ document.getElementById('importFoodsFile').addEventListener('change', (e)=>{
   if(!file) return;
   const reader = new FileReader();
   reader.onload = ()=>{
+    const raw = reader.result.trim();
     try{
-      const data = JSON.parse(reader.result);
-      const incoming = Array.isArray(data.foods) ? data.foods : (Array.isArray(data) ? data : []);
+      let incoming;
+      if(raw.startsWith('{') || raw.startsWith('[')){
+        const data = JSON.parse(raw);
+        incoming = Array.isArray(data.foods) ? data.foods : (Array.isArray(data) ? data : []);
+      } else {
+        incoming = parseFoodsPlainText(raw);
+      }
       if(!incoming.length){ alert(t('alert_import_invalid')); return; }
       showImportPreview('foods', [], incoming);
     }catch(err){
