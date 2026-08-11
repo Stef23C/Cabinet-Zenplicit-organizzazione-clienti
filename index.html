@@ -444,7 +444,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v3.4</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v3.5</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -557,7 +557,7 @@
     <div class="import-export-bar no-print">
       <button class="btn btn-ghost btn-sm" id="exportRecipesBtn" data-i18n="btn_export_recipes">⬇ Esporta ricette (JSON)</button>
       <button class="btn btn-ghost btn-sm" id="importRecipesBtn" data-i18n="btn_import_recipes">⬆ Importa ricette (JSON o testo)</button>
-      <input type="file" id="importRecipesFile" accept="application/json,.json,.csv,.txt" style="display:none;">
+      <input type="file" id="importRecipesFile" accept=".txt,.csv,.json,text/plain,text/csv,application/json" style="display:none;">
     </div>
     <input autocomplete="off" type="text" id="recipeSearchInput" class="search-input no-print" data-i18n-ph="search_recipes_ph" placeholder="Cerca ricetta…">
     <div class="recipe-grid" id="recipeGrid"></div>
@@ -677,7 +677,7 @@
       <div class="import-export-bar no-print">
         <button class="btn btn-ghost btn-sm" id="exportFoodsBtn" data-i18n="btn_export_foods">⬇ Esporta alimenti (JSON)</button>
         <button class="btn btn-ghost btn-sm" id="importFoodsBtn" data-i18n="btn_import_foods">⬆ Importa alimenti (JSON o testo)</button>
-        <input type="file" id="importFoodsFile" accept="application/json,.json,.csv,.txt" style="display:none;">
+        <input type="file" id="importFoodsFile" accept=".txt,.csv,.json,text/plain,text/csv,application/json" style="display:none;">
       </div>
       <div class="add-item-row no-print" style="margin-top:10px;">
         <input autocomplete="off" type="text" class="name" id="newFoodNameIt" data-i18n-ph="food_name_it_ph" placeholder="Nome (IT)">
