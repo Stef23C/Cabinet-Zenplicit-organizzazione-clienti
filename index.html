@@ -485,7 +485,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v4.8</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v4.9</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -583,6 +583,10 @@
       <details class="no-print" style="margin-top:12px;">
         <summary style="cursor:pointer;font-size:12px;color:var(--sage-dark);font-weight:600;" data-i18n="goals_toggle">🎯 Modifica obiettivi giornalieri</summary>
         <div class="goals-grid">
+          <label><span data-i18n="goal_kcal_label">Kcal obiettivo (al giorno)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalKcalTarget"></label>
+          <label><span data-i18n="goal_protein_label">Proteine obiettivo (g/giorno)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalProteinTarget"></label>
+          <label><span data-i18n="goal_carbs_label">Carboidrati obiettivo (g/giorno)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalCarbsTarget"></label>
+          <label><span data-i18n="goal_fat_label">Grassi obiettivo (g/giorno)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalFatTarget"></label>
           <label><span data-i18n="goal_fiber_label">Fibre minime (g/giorno)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalFiberMin"></label>
           <label><span data-i18n="goal_salt_label">Sale massimo (g/giorno)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalSaltMax"></label>
           <label><span data-i18n="goal_fruit_label">Porzioni di frutta</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalFruitTarget"></label>
@@ -1058,6 +1062,8 @@ const I18N = {
     fv_week_text:(fruit,veg)=>`Questa settimana: ${fruit} porzioni di frutta, ${veg} di verdura.`,
     salt_max_suffix:"max",
     goals_toggle:"🎯 Modifica obiettivi giornalieri",
+    goal_kcal_label:"Kcal obiettivo (al giorno)", goal_protein_label:"Proteine obiettivo (g/giorno)",
+    goal_carbs_label:"Carboidrati obiettivo (g/giorno)", goal_fat_label:"Grassi obiettivo (g/giorno)",
     goal_fiber_label:"Fibre minime (g/giorno)", goal_salt_label:"Sale massimo (g/giorno)",
     goal_fruit_label:"Porzioni di frutta", goal_veg_label:"Porzioni di verdura",
     portions_type_label:"Tipo",
@@ -1190,6 +1196,8 @@ const I18N = {
     fv_week_text:(fruit,veg)=>`Cette semaine : ${fruit} portions de fruits, ${veg} de légumes.`,
     salt_max_suffix:"max",
     goals_toggle:"🎯 Modifier les objectifs quotidiens",
+    goal_kcal_label:"Kcal objectif (par jour)", goal_protein_label:"Protéines objectif (g/jour)",
+    goal_carbs_label:"Glucides objectif (g/jour)", goal_fat_label:"Lipides objectif (g/jour)",
     goal_fiber_label:"Fibres minimales (g/jour)", goal_salt_label:"Sel maximum (g/jour)",
     goal_fruit_label:"Portions de fruits", goal_veg_label:"Portions de légumes",
     portions_type_label:"Type",
@@ -1364,7 +1372,7 @@ const DEFAULT_STATE = {
     {id:"p14", name_it:"Peperoni", name_fr:"Poivrons", portion_g:200, type:"vegetable"},
     {id:"p15", name_it:"Finocchi", name_fr:"Fenouil", portion_g:200, type:"vegetable"}
   ],
-  nutritionGoals: {fiberMin:25, saltMax:5, fruitTarget:2, vegTarget:3},
+  nutritionGoals: {fiberMin:25, saltMax:5, fruitTarget:2, vegTarget:3, kcalTarget:2000, proteinTarget:60, carbsTarget:250, fatTarget:70},
   lang: 'it',
   foodsDB: [
     {id:"f01", name_it:"Petto di pollo", name_fr:"Blanc de poulet", kcal:165, protein:31, carbs:0, fat:3.6, fiber:0, salt:0.1},
@@ -1910,12 +1918,17 @@ document.getElementById('journalTextarea').addEventListener('input', (e)=>{
 
 /* ---------- MEALS ---------- */
 function renderGoalsInputs(){
+  document.getElementById('goalKcalTarget').value = state.nutritionGoals.kcalTarget;
+  document.getElementById('goalProteinTarget').value = state.nutritionGoals.proteinTarget;
+  document.getElementById('goalCarbsTarget').value = state.nutritionGoals.carbsTarget;
+  document.getElementById('goalFatTarget').value = state.nutritionGoals.fatTarget;
   document.getElementById('goalFiberMin').value = state.nutritionGoals.fiberMin;
   document.getElementById('goalSaltMax').value = state.nutritionGoals.saltMax;
   document.getElementById('goalFruitTarget').value = state.nutritionGoals.fruitTarget;
   document.getElementById('goalVegTarget').value = state.nutritionGoals.vegTarget;
 }
-[['goalFiberMin','fiberMin'],['goalSaltMax','saltMax'],['goalFruitTarget','fruitTarget'],['goalVegTarget','vegTarget']].forEach(([elId,key])=>{
+[['goalKcalTarget','kcalTarget'],['goalProteinTarget','proteinTarget'],['goalCarbsTarget','carbsTarget'],['goalFatTarget','fatTarget'],
+ ['goalFiberMin','fiberMin'],['goalSaltMax','saltMax'],['goalFruitTarget','fruitTarget'],['goalVegTarget','vegTarget']].forEach(([elId,key])=>{
   const el = document.getElementById(elId);
   attachNumericClean(el);
   el.addEventListener('change', ()=>{
@@ -2131,10 +2144,10 @@ function updateMealSummary(){
   const saltOk = totals.salt <= goals.saltMax;
   const chip = (label, val, ok)=> `<span class="macro-chip" style="background:${ok===undefined?'var(--beige)':(ok?'var(--sage-pale)':'var(--beige-deep)')};color:${ok===undefined?'var(--ink-soft)':(ok?'var(--sage-dark)':'var(--accent)')};">${label} ${val}</span>`;
   summary.innerHTML = `
-    <span class="macro-chip">${t('macro_kcal_label')} ${Math.round(totals.kcal)}</span>
-    <span class="macro-chip">${t('macro_protein_label')} ${Math.round(totals.protein)} g</span>
-    <span class="macro-chip">${t('macro_carbs_label')} ${Math.round(totals.carbs)} g</span>
-    <span class="macro-chip">${t('macro_fat_label')} ${Math.round(totals.fat)} g</span>
+    ${chip(t('macro_kcal_label'), `${Math.round(totals.kcal)}/${goals.kcalTarget}`)}
+    ${chip(t('macro_protein_label'), `${Math.round(totals.protein)}/${goals.proteinTarget} g`)}
+    ${chip(t('macro_carbs_label'), `${Math.round(totals.carbs)}/${goals.carbsTarget} g`)}
+    ${chip(t('macro_fat_label'), `${Math.round(totals.fat)}/${goals.fatTarget} g`)}
     ${chip(t('macro_fiber_label'), `${(Math.round(totals.fiber*10)/10)}/${goals.fiberMin} g`, fiberMet)}
     ${chip(t('macro_salt_label'), `${(Math.round(totals.salt*100)/100)}/${goals.saltMax} g ${t('salt_max_suffix')}`, saltOk)}
     ${chip('🍎', `${fvToday.fruit.toFixed(1)}/${goals.fruitTarget} ${t('fv_fruit_label')}`, fruitMet)}
