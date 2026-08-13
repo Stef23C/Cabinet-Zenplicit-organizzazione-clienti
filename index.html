@@ -479,7 +479,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v4.6</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v4.7</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -2039,7 +2039,7 @@ function computeFruitVegPortionsForDay(day){
 
 function updateMealSummary(){
   const summary = document.getElementById('dayMacroSummary');
-  let totals = {kcal:0, protein:0, carbs:0, fat:0};
+  let totals = {kcal:0, protein:0, carbs:0, fat:0, fiber:0, salt:0};
   MEAL_TYPES.forEach(([key])=>{
     (W().meals[currentMealDay][key]||[]).forEach(dish=>{
       if((dish.itemType||'recipe')==='recipe' && dish.recipeId){
@@ -2050,6 +2050,8 @@ function updateMealSummary(){
           totals.protein += (Number(r.macros.protein)||0) * scale;
           totals.carbs += (Number(r.macros.carbs)||0) * scale;
           totals.fat += (Number(r.macros.fat)||0) * scale;
+          totals.fiber += (Number(r.macros.fiber)||0) * scale;
+          totals.salt += (Number(r.macros.salt)||0) * scale;
         }
       } else if(dish.itemType==='food' && dish.foodRef){
         const f = state.foodsDB.find(x=>x.id===dish.foodRef);
@@ -2059,6 +2061,8 @@ function updateMealSummary(){
           totals.protein += (Number(f.protein)||0)/100*grams;
           totals.carbs += (Number(f.carbs)||0)/100*grams;
           totals.fat += (Number(f.fat)||0)/100*grams;
+          totals.fiber += (Number(f.fiber)||0)/100*grams;
+          totals.salt += (Number(f.salt)||0)/100*grams;
         }
       }
     });
@@ -2072,6 +2076,8 @@ function updateMealSummary(){
     <span class="macro-chip">${t('macro_protein_label')} ${Math.round(totals.protein)} g</span>
     <span class="macro-chip">${t('macro_carbs_label')} ${Math.round(totals.carbs)} g</span>
     <span class="macro-chip">${t('macro_fat_label')} ${Math.round(totals.fat)} g</span>
+    <span class="macro-chip">${t('macro_fiber_label')} ${Math.round(totals.fiber*10)/10} g</span>
+    <span class="macro-chip">${t('macro_salt_label')} ${Math.round(totals.salt*100)/100} g</span>
     <span class="macro-chip" style="background:${fvGoalMet?'var(--sage-pale)':'var(--beige-deep)'};color:${fvGoalMet?'var(--sage-dark)':'var(--accent)'};">🍎🥦 ${fvToday.toFixed(1)}/5 ${t('fv_portions_label')}</span>`;
   const weekEl = document.getElementById('fvWeekTotal');
   if(weekEl) weekEl.textContent = t('fv_week_text')(fvWeek.toFixed(1));
