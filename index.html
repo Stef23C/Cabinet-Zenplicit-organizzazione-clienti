@@ -244,6 +244,12 @@
   .macro-chip{
     background:var(--beige);border-radius:100px;padding:5px 12px;font-size:12px;color:var(--ink-soft);font-weight:600;
   }
+  .goals-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:10px;}
+  .goals-grid label{font-size:11px;color:var(--ink-soft);font-weight:600;display:flex;flex-direction:column;gap:4px;}
+  .goals-grid input{
+    border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:13px;font-family:var(--font-body);
+    background:var(--cream);color:var(--ink);font-weight:500;
+  }
 
   /* SHOPPING LIST */
   .list-toggle{display:flex;gap:8px;margin-bottom:14px;}
@@ -479,7 +485,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v4.7</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v4.8</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -574,6 +580,15 @@
       <div id="mealRows"></div>
       <div class="macro-summary" id="dayMacroSummary"></div>
       <p id="fvWeekTotal" style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;"></p>
+      <details class="no-print" style="margin-top:12px;">
+        <summary style="cursor:pointer;font-size:12px;color:var(--sage-dark);font-weight:600;" data-i18n="goals_toggle">🎯 Modifica obiettivi giornalieri</summary>
+        <div class="goals-grid">
+          <label><span data-i18n="goal_fiber_label">Fibre minime (g/giorno)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalFiberMin"></label>
+          <label><span data-i18n="goal_salt_label">Sale massimo (g/giorno)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalSaltMax"></label>
+          <label><span data-i18n="goal_fruit_label">Porzioni di frutta</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalFruitTarget"></label>
+          <label><span data-i18n="goal_veg_label">Porzioni di verdura</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalVegTarget"></label>
+        </div>
+      </details>
     </div>
 
     <h2 class="section-title" style="margin-top:26px;" data-i18n="shop_title">Lista della spesa</h2>
@@ -1039,7 +1054,13 @@ const I18N = {
     course_contorno:"Contorno", course_dolce:"Dolce", course_bevanda:"Bevanda",
     btn_add_dish:"+ Aggiungi portata",
     macro_kcal_label:"Kcal", macro_protein_label:"Prot.", macro_carbs_label:"Carb.", macro_fat_label:"Grassi",
-    fv_portions_label:"porzioni oggi", fv_week_text:(n)=>`Questa settimana: ${n} porzioni totali di frutta e verdura.`,
+    fv_fruit_label:"porzioni frutta", fv_veg_label:"porzioni verdura",
+    fv_week_text:(fruit,veg)=>`Questa settimana: ${fruit} porzioni di frutta, ${veg} di verdura.`,
+    salt_max_suffix:"max",
+    goals_toggle:"🎯 Modifica obiettivi giornalieri",
+    goal_fiber_label:"Fibre minime (g/giorno)", goal_salt_label:"Sale massimo (g/giorno)",
+    goal_fruit_label:"Porzioni di frutta", goal_veg_label:"Porzioni di verdura",
+    portions_type_label:"Tipo",
     medit_title:"Meditazione & Rilassamento", medit_sub:"Un momento guidato per respirare, ascoltare o registrare la tua voce.",
     breathe_title:"Respiro guidato", breathe_sub:"Scegli il tipo di respirazione, la visualizzazione e la durata della seduta.",
     pattern_square:"Respiro quadrato (4-4-4-4)", pattern_relax:"Rilassante (4-7-8)", pattern_simple:"Semplice (5-5)",
@@ -1165,7 +1186,13 @@ const I18N = {
     course_contorno:"Accompagnement", course_dolce:"Dessert", course_bevanda:"Boisson",
     btn_add_dish:"+ Ajouter un plat",
     macro_kcal_label:"Kcal", macro_protein_label:"Prot.", macro_carbs_label:"Gluc.", macro_fat_label:"Lip.",
-    fv_portions_label:"portions aujourd'hui", fv_week_text:(n)=>`Cette semaine : ${n} portions totales de fruits et légumes.`,
+    fv_fruit_label:"portions de fruits", fv_veg_label:"portions de légumes",
+    fv_week_text:(fruit,veg)=>`Cette semaine : ${fruit} portions de fruits, ${veg} de légumes.`,
+    salt_max_suffix:"max",
+    goals_toggle:"🎯 Modifier les objectifs quotidiens",
+    goal_fiber_label:"Fibres minimales (g/jour)", goal_salt_label:"Sel maximum (g/jour)",
+    goal_fruit_label:"Portions de fruits", goal_veg_label:"Portions de légumes",
+    portions_type_label:"Type",
     medit_title:"Méditation & Relaxation", medit_sub:"Un moment guidé pour respirer, écouter ou enregistrer ta voix.",
     breathe_title:"Respiration guidée", breathe_sub:"Choisis le type de respiration, la visualisation et la durée de la séance.",
     pattern_square:"Respiration carrée (4-4-4-4)", pattern_relax:"Relaxante (4-7-8)", pattern_simple:"Simple (5-5)",
@@ -1276,6 +1303,7 @@ function setLanguage(lang){
   renderJournalDayTabs();
   renderJournal();
   renderMealDayTabs();
+  renderGoalsInputs();
   renderMeals();
   renderShoppingList();
   renderRecipes();
@@ -1320,22 +1348,23 @@ const DEFAULT_STATE = {
     {id:"t05", name_it:"Tisana rilassante", name_fr:"Tisane relaxante", note:""}
   ],
   portionsDB: [
-    {id:"p01", name_it:"Mela", name_fr:"Pomme", portion_g:150},
-    {id:"p02", name_it:"Banana", name_fr:"Banane", portion_g:120},
-    {id:"p03", name_it:"Arancia", name_fr:"Orange", portion_g:150},
-    {id:"p04", name_it:"Pera", name_fr:"Poire", portion_g:150},
-    {id:"p05", name_it:"Fragole", name_fr:"Fraises", portion_g:150},
-    {id:"p06", name_it:"Uva", name_fr:"Raisin", portion_g:100},
-    {id:"p07", name_it:"Melone", name_fr:"Melon", portion_g:200},
-    {id:"p08", name_it:"Pomodori", name_fr:"Tomates", portion_g:200},
-    {id:"p09", name_it:"Insalata verde", name_fr:"Salade verte", portion_g:50},
-    {id:"p10", name_it:"Zucchine", name_fr:"Courgettes", portion_g:200},
-    {id:"p11", name_it:"Carote", name_fr:"Carottes", portion_g:200},
-    {id:"p12", name_it:"Broccoli", name_fr:"Brocoli", portion_g:200},
-    {id:"p13", name_it:"Spinaci", name_fr:"Épinards", portion_g:200},
-    {id:"p14", name_it:"Peperoni", name_fr:"Poivrons", portion_g:200},
-    {id:"p15", name_it:"Finocchi", name_fr:"Fenouil", portion_g:200}
+    {id:"p01", name_it:"Mela", name_fr:"Pomme", portion_g:150, type:"fruit"},
+    {id:"p02", name_it:"Banana", name_fr:"Banane", portion_g:120, type:"fruit"},
+    {id:"p03", name_it:"Arancia", name_fr:"Orange", portion_g:150, type:"fruit"},
+    {id:"p04", name_it:"Pera", name_fr:"Poire", portion_g:150, type:"fruit"},
+    {id:"p05", name_it:"Fragole", name_fr:"Fraises", portion_g:150, type:"fruit"},
+    {id:"p06", name_it:"Uva", name_fr:"Raisin", portion_g:100, type:"fruit"},
+    {id:"p07", name_it:"Melone", name_fr:"Melon", portion_g:200, type:"fruit"},
+    {id:"p08", name_it:"Pomodori", name_fr:"Tomates", portion_g:200, type:"vegetable"},
+    {id:"p09", name_it:"Insalata verde", name_fr:"Salade verte", portion_g:50, type:"vegetable"},
+    {id:"p10", name_it:"Zucchine", name_fr:"Courgettes", portion_g:200, type:"vegetable"},
+    {id:"p11", name_it:"Carote", name_fr:"Carottes", portion_g:200, type:"vegetable"},
+    {id:"p12", name_it:"Broccoli", name_fr:"Brocoli", portion_g:200, type:"vegetable"},
+    {id:"p13", name_it:"Spinaci", name_fr:"Épinards", portion_g:200, type:"vegetable"},
+    {id:"p14", name_it:"Peperoni", name_fr:"Poivrons", portion_g:200, type:"vegetable"},
+    {id:"p15", name_it:"Finocchi", name_fr:"Fenouil", portion_g:200, type:"vegetable"}
   ],
+  nutritionGoals: {fiberMin:25, saltMax:5, fruitTarget:2, vegTarget:3},
   lang: 'it',
   foodsDB: [
     {id:"f01", name_it:"Petto di pollo", name_fr:"Blanc de poulet", kcal:165, protein:31, carbs:0, fat:3.6, fiber:0, salt:0.1},
@@ -1456,6 +1485,7 @@ function goToWeek(weekKey){
   renderJournalDayTabs();
   renderJournal();
   renderMealDayTabs();
+  renderGoalsInputs();
   renderMeals();
   renderShoppingList();
 }
@@ -1510,6 +1540,9 @@ async function loadState(){
   if(!state.books) state.books = [];
   if(!state.teas) state.teas = DEFAULT_STATE.teas.slice();
   if(!state.portionsDB) state.portionsDB = DEFAULT_STATE.portionsDB.slice();
+  state.portionsDB.forEach(p=>{ if(!p.type) p.type = 'vegetable'; });
+  if(!state.nutritionGoals) state.nutritionGoals = {...DEFAULT_STATE.nutritionGoals};
+  else state.nutritionGoals = {...DEFAULT_STATE.nutritionGoals, ...state.nutritionGoals};
   if(!state.foodsDB) state.foodsDB = DEFAULT_STATE.foodsDB.slice();
 
   // Migrate old single-name foodsDB entries to bilingual {id, name_it, name_fr}
@@ -1876,6 +1909,22 @@ document.getElementById('journalTextarea').addEventListener('input', (e)=>{
 });
 
 /* ---------- MEALS ---------- */
+function renderGoalsInputs(){
+  document.getElementById('goalFiberMin').value = state.nutritionGoals.fiberMin;
+  document.getElementById('goalSaltMax').value = state.nutritionGoals.saltMax;
+  document.getElementById('goalFruitTarget').value = state.nutritionGoals.fruitTarget;
+  document.getElementById('goalVegTarget').value = state.nutritionGoals.vegTarget;
+}
+[['goalFiberMin','fiberMin'],['goalSaltMax','saltMax'],['goalFruitTarget','fruitTarget'],['goalVegTarget','vegTarget']].forEach(([elId,key])=>{
+  const el = document.getElementById(elId);
+  attachNumericClean(el);
+  el.addEventListener('change', ()=>{
+    state.nutritionGoals[key] = parseNum(el.value) || DEFAULT_STATE.nutritionGoals[key];
+    persist();
+    updateMealSummary();
+  });
+});
+
 function renderMealDayTabs(){
   const wrap = document.getElementById('mealDayTabs');
   wrap.innerHTML = DAYS.map(d=>`<button data-day="${escapeAttr(d)}" class="${d===currentMealDay?'active':''}">${dayLabel(d)}</button>`).join('');
@@ -2002,7 +2051,12 @@ function matchPortionByName(name){
 }
 
 function computeFruitVegPortionsForDay(day){
-  let portions = 0;
+  const result = {fruit:0, vegetable:0};
+  const addMatch = (match, grams)=>{
+    if(!match || !match.portion_g) return;
+    const key = match.type==='fruit' ? 'fruit' : 'vegetable';
+    result[key] += grams/match.portion_g;
+  };
   MEAL_TYPES.forEach(([key])=>{
     (W().meals[day][key]||[]).forEach(dish=>{
       if((dish.itemType||'recipe')==='food'){
@@ -2012,7 +2066,7 @@ function computeFruitVegPortionsForDay(day){
         const grams = parseNum(dish.foodQty);
         if(grams<=0) return;
         const match = matchPortionByName(f.name_it) || matchPortionByName(f.name_fr);
-        if(match && match.portion_g) portions += grams/match.portion_g;
+        addMatch(match, grams);
       } else {
         if(!dish.recipeId) return;
         const r = state.recipes.find(x=>x.id===dish.recipeId);
@@ -2029,12 +2083,12 @@ function computeFruitVegPortionsForDay(day){
             if(f) match = matchPortionByName(f.name_it) || matchPortionByName(f.name_fr);
           }
           if(!match) match = matchPortionByName(ing.name);
-          if(match && match.portion_g) portions += grams/match.portion_g;
+          addMatch(match, grams);
         });
       }
     });
   });
-  return portions;
+  return result;
 }
 
 function updateMealSummary(){
@@ -2067,20 +2121,26 @@ function updateMealSummary(){
       }
     });
   });
+  const goals = state.nutritionGoals;
   const fvToday = computeFruitVegPortionsForDay(currentMealDay);
-  let fvWeek = 0;
-  DAYS.forEach(d => fvWeek += computeFruitVegPortionsForDay(d));
-  const fvGoalMet = fvToday >= 5;
+  let fvWeekFruit = 0, fvWeekVeg = 0;
+  DAYS.forEach(d => { const r = computeFruitVegPortionsForDay(d); fvWeekFruit += r.fruit; fvWeekVeg += r.vegetable; });
+  const fruitMet = fvToday.fruit >= goals.fruitTarget;
+  const vegMet = fvToday.vegetable >= goals.vegTarget;
+  const fiberMet = totals.fiber >= goals.fiberMin;
+  const saltOk = totals.salt <= goals.saltMax;
+  const chip = (label, val, ok)=> `<span class="macro-chip" style="background:${ok===undefined?'var(--beige)':(ok?'var(--sage-pale)':'var(--beige-deep)')};color:${ok===undefined?'var(--ink-soft)':(ok?'var(--sage-dark)':'var(--accent)')};">${label} ${val}</span>`;
   summary.innerHTML = `
     <span class="macro-chip">${t('macro_kcal_label')} ${Math.round(totals.kcal)}</span>
     <span class="macro-chip">${t('macro_protein_label')} ${Math.round(totals.protein)} g</span>
     <span class="macro-chip">${t('macro_carbs_label')} ${Math.round(totals.carbs)} g</span>
     <span class="macro-chip">${t('macro_fat_label')} ${Math.round(totals.fat)} g</span>
-    <span class="macro-chip">${t('macro_fiber_label')} ${Math.round(totals.fiber*10)/10} g</span>
-    <span class="macro-chip">${t('macro_salt_label')} ${Math.round(totals.salt*100)/100} g</span>
-    <span class="macro-chip" style="background:${fvGoalMet?'var(--sage-pale)':'var(--beige-deep)'};color:${fvGoalMet?'var(--sage-dark)':'var(--accent)'};">🍎🥦 ${fvToday.toFixed(1)}/5 ${t('fv_portions_label')}</span>`;
+    ${chip(t('macro_fiber_label'), `${(Math.round(totals.fiber*10)/10)}/${goals.fiberMin} g`, fiberMet)}
+    ${chip(t('macro_salt_label'), `${(Math.round(totals.salt*100)/100)}/${goals.saltMax} g ${t('salt_max_suffix')}`, saltOk)}
+    ${chip('🍎', `${fvToday.fruit.toFixed(1)}/${goals.fruitTarget} ${t('fv_fruit_label')}`, fruitMet)}
+    ${chip('🥦', `${fvToday.vegetable.toFixed(1)}/${goals.vegTarget} ${t('fv_veg_label')}`, vegMet)}`;
   const weekEl = document.getElementById('fvWeekTotal');
-  if(weekEl) weekEl.textContent = t('fv_week_text')(fvWeek.toFixed(1));
+  if(weekEl) weekEl.textContent = t('fv_week_text')(fvWeekFruit.toFixed(1), fvWeekVeg.toFixed(1));
 }
 
 /* ---------- SHOPPING LIST ---------- */
@@ -3414,12 +3474,16 @@ function computePortion(){
 
 function renderPortionsTable(){
   const table = document.getElementById('portionsTable');
-  let html = `<tr><th>${t('food_name_it_ph')}</th><th>${t('food_name_fr_ph')}</th><th>${t('portions_grams_label')}</th><th></th></tr>`;
+  let html = `<tr><th>${t('food_name_it_ph')}</th><th>${t('food_name_fr_ph')}</th><th>${t('portions_grams_label')}</th><th>${t('portions_type_label')}</th><th></th></tr>`;
   state.portionsDB.forEach((p,i)=>{
     html += `<tr data-idx="${i}">
       <td><input type="text" class="db-edit" data-field="name_it" value="${escapeAttr(p.name_it)}"></td>
       <td><input type="text" class="db-edit" data-field="name_fr" value="${escapeAttr(p.name_fr)}"></td>
       <td><input type="text" inputmode="decimal" class="db-edit db-numeric" data-field="portion_g" value="${escapeAttr(p.portion_g)}"></td>
+      <td><select class="db-edit" data-field="type">
+        <option value="fruit" ${p.type==='fruit'?'selected':''}>${t('fv_fruit_label')}</option>
+        <option value="vegetable" ${p.type==='vegetable'?'selected':''}>${t('fv_veg_label')}</option>
+      </select></td>
       <td><button class="icon-btn no-print" data-removeportion="${i}">✕</button></td>
     </tr>`;
   });
@@ -3445,7 +3509,7 @@ function renderPortionsTable(){
 }
 
 document.getElementById('addPortionBtn').addEventListener('click', ()=>{
-  state.portionsDB.push({id:uid(), name_it:'', name_fr:'', portion_g:0});
+  state.portionsDB.push({id:uid(), name_it:'', name_fr:'', portion_g:0, type:'vegetable'});
   persist();
   renderPortionsTable();
   renderPortions();
@@ -3563,7 +3627,7 @@ function buildMealsSectionHTML(){
     html += `<div style="margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid ${p.line};page-break-inside:avoid;">`;
     const fvDay = computeFruitVegPortionsForDay(day);
     html += `<h2 style="font-family:Georgia,serif;color:${p.sageDark};font-size:16px;margin:0 0 2px;">${escapeHtml(dayLabel(day))}</h2>`;
-    html += `<div style="font-size:11px;color:${p.inkSoft};margin-bottom:8px;">🍎🥦 ${fvDay.toFixed(1)}/5 ${t('fv_portions_label')}</div>`;
+    html += `<div style="font-size:11px;color:${p.inkSoft};margin-bottom:8px;">🍎 ${fvDay.fruit.toFixed(1)}/${state.nutritionGoals.fruitTarget} ${t('fv_fruit_label')} · 🥦 ${fvDay.vegetable.toFixed(1)}/${state.nutritionGoals.vegTarget} ${t('fv_veg_label')}</div>`;
     MEAL_TYPES.forEach(([key,labelKey])=>{
       const dishes = (W().meals[day][key]||[]).filter(d=>(d.itemType||'recipe')==='food' ? d.foodRef : d.recipeId);
       if(!dishes.length){
@@ -4032,6 +4096,7 @@ async function init(){
   renderJournalDayTabs();
   renderJournal();
   renderMealDayTabs();
+  renderGoalsInputs();
   renderMeals();
   renderShoppingList();
   renderRecipes();
