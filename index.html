@@ -328,7 +328,7 @@
   .ing-row input.iname{flex:2;min-width:110px;}
   .ing-row input.iqty{width:70px;}
   .ing-row input.iunit{width:70px;}
-  .ing-row select.ilink{flex:1;min-width:140px;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font-size:12.5px;font-family:var(--font-body);background:var(--cream);}
+  .ing-row input.ilink{flex:1;min-width:140px;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font-size:12.5px;font-family:var(--font-body);background:var(--cream);}
   .ing-row button{flex-shrink:0;}
 
   /* EQUIVALENCES */
@@ -485,7 +485,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v4.9</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v5.0</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -711,13 +711,14 @@
       <div class="equiv-grid">
         <div class="equiv-col">
           <label data-i18n="equiv_food_a">Alimento di partenza</label>
-          <select id="equivFoodA"></select>
+          <input autocomplete="off" type="text" list="foodsDatalist" id="equivFoodA">
+          <datalist id="foodsDatalist"></datalist>
           <label data-i18n="equiv_qty">Quantità (g)</label>
           <input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="equivQtyA" value="100">
         </div>
         <div class="equiv-col">
           <label data-i18n="equiv_food_b">Sostituire con</label>
-          <select id="equivFoodB"></select>
+          <input autocomplete="off" type="text" list="foodsDatalist" id="equivFoodB">
           <label data-i18n="equiv_keep">Mantenere invariato</label>
           <select id="equivMacro">
             <option value="protein" data-i18n="macro_protein">Proteine</option>
@@ -741,7 +742,8 @@
       <div class="equiv-grid">
         <div class="equiv-col">
           <label data-i18n="portions_food_label">Alimento</label>
-          <select id="portionFoodSelect"></select>
+          <input autocomplete="off" type="text" list="portionsDatalist" id="portionFoodSelect">
+          <datalist id="portionsDatalist"></datalist>
           <label data-i18n="portions_qty_label">Quantità mangiata (g)</label>
           <input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="portionQtyInput" value="80">
         </div>
@@ -1089,6 +1091,7 @@ const I18N = {
     equiv_result_text:(qtyB,foodB,qtyA,foodA,macroLabel)=>`di ${foodB} equivalgono a ${qtyA} g di ${foodA} per ${macroLabel}`,
     equiv_no_macro:(foodB, macroLabel)=>`${foodB} non contiene ${macroLabel}: impossibile calcolare l'equivalenza.`,
     db_title:"Database alimenti (per 100 g)", food_name_ph:"Nome alimento", food_name_it_ph:"Nome (IT)", food_name_fr_ph:"Nom (FR)", food_protein_ph:"Prot. g", food_carbs_ph:"Carb. g", food_fat_ph:"Grassi g", food_fiber_ph:"Fibre g", food_salt_ph:"Sale g",
+    search_food_ph:"Cerca alimento…",
     portions_title:"Porzioni frutta e verdura", portions_sub:"Quanto pesa davvero una porzione? Scegli l'alimento e la quantità mangiata per scoprire a quante porzioni corrisponde.",
     portions_food_label:"Alimento", portions_qty_label:"Quantità mangiata (g)", portions_ref_label:"1 porzione corrisponde a",
     portions_placeholder:"Seleziona un alimento per calcolare le porzioni",
@@ -1223,6 +1226,7 @@ const I18N = {
     equiv_result_text:(qtyB,foodB,qtyA,foodA,macroLabel)=>`de ${foodB} équivalent à ${qtyA} g de ${foodA} pour les ${macroLabel}`,
     equiv_no_macro:(foodB, macroLabel)=>`${foodB} ne contient pas de ${macroLabel} : impossible de calculer l'équivalence.`,
     db_title:"Base de données alimentaire (pour 100 g)", food_name_ph:"Nom de l'aliment", food_name_it_ph:"Nom (IT)", food_name_fr_ph:"Nom (FR)", food_protein_ph:"Prot. g", food_carbs_ph:"Gluc. g", food_fat_ph:"Lip. g", food_fiber_ph:"Fibres g", food_salt_ph:"Sel g",
+    search_food_ph:"Rechercher un aliment…",
     portions_title:"Portions de fruits et légumes", portions_sub:"Combien pèse vraiment une portion ? Choisis l'aliment et la quantité mangée pour savoir à combien de portions ça correspond.",
     portions_food_label:"Aliment", portions_qty_label:"Quantité mangée (g)", portions_ref_label:"1 portion correspond à",
     portions_placeholder:"Sélectionne un aliment pour calculer les portions",
@@ -1370,7 +1374,13 @@ const DEFAULT_STATE = {
     {id:"p12", name_it:"Broccoli", name_fr:"Brocoli", portion_g:200, type:"vegetable"},
     {id:"p13", name_it:"Spinaci", name_fr:"Épinards", portion_g:200, type:"vegetable"},
     {id:"p14", name_it:"Peperoni", name_fr:"Poivrons", portion_g:200, type:"vegetable"},
-    {id:"p15", name_it:"Finocchi", name_fr:"Fenouil", portion_g:200, type:"vegetable"}
+    {id:"p15", name_it:"Finocchi", name_fr:"Fenouil", portion_g:200, type:"vegetable"},
+    {id:"p16", name_it:"Piselli surgelati", name_fr:"Petits pois surgelés", portion_g:150, type:"vegetable"},
+    {id:"p17", name_it:"Spinaci surgelati", name_fr:"Épinards surgelés", portion_g:200, type:"vegetable"},
+    {id:"p18", name_it:"Fagiolini surgelati", name_fr:"Haricots verts surgelés", portion_g:200, type:"vegetable"},
+    {id:"p19", name_it:"Cavolfiore fresco", name_fr:"Chou-fleur frais", portion_g:200, type:"vegetable"},
+    {id:"p20", name_it:"Cavolo verza fresco", name_fr:"Chou de Savoie frais", portion_g:200, type:"vegetable"},
+    {id:"p21", name_it:"Melanzane fresche", name_fr:"Aubergines fraîches", portion_g:200, type:"vegetable"}
   ],
   nutritionGoals: {fiberMin:25, saltMax:5, fruitTarget:2, vegTarget:3, kcalTarget:2000, proteinTarget:60, carbsTarget:250, fatTarget:70},
   lang: 'it',
@@ -1390,7 +1400,40 @@ const DEFAULT_STATE = {
     {id:"f13", name_it:"Yogurt greco intero", name_fr:"Yaourt grec entier", kcal:97, protein:9, carbs:3.9, fat:5, fiber:0, salt:0.06},
     {id:"f14", name_it:"Parmigiano", name_fr:"Parmesan", kcal:392, protein:35.8, carbs:0, fat:28.4, fiber:0, salt:1.6},
     {id:"f15", name_it:"Banana", name_fr:"Banane", kcal:89, protein:1.1, carbs:22.8, fat:0.3, fiber:2.6, salt:0.001},
-    {id:"f16", name_it:"Broccoli", name_fr:"Brocoli", kcal:34, protein:2.8, carbs:6.6, fat:0.4, fiber:2.6, salt:0.03}
+    {id:"f16", name_it:"Broccoli", name_fr:"Brocoli", kcal:34, protein:2.8, carbs:6.6, fat:0.4, fiber:2.6, salt:0.03},
+
+    {id:"f17", name_it:"Pane di pseudocereali", name_fr:"Pain de pseudo-céréales", kcal:250, protein:9, carbs:45, fat:3, fiber:6, salt:1},
+    {id:"f18", name_it:"Farro monococco cotto", name_fr:"Petit épeautre (engrain) cuit", kcal:120, protein:5, carbs:23, fat:1, fiber:3, salt:0.01},
+    {id:"f19", name_it:"Farro dicocco cotto", name_fr:"Épeautre (dicoccum) cuit", kcal:120, protein:5.5, carbs:23, fat:1.2, fiber:3.5, salt:0.01},
+    {id:"f20", name_it:"Kamut cotto", name_fr:"Kamut cuit", kcal:130, protein:5.5, carbs:26, fat:1, fiber:3, salt:0.01},
+    {id:"f21", name_it:"Grano saraceno cotto", name_fr:"Sarrasin cuit", kcal:92, protein:3.4, carbs:20, fat:0.6, fiber:2.7, salt:0.003},
+
+    {id:"f22", name_it:"Uva sultanina (uvetta)", name_fr:"Raisins secs (sultanine)", kcal:299, protein:3, carbs:79, fat:0.5, fiber:4, salt:0.03},
+    {id:"f23", name_it:"Noci pecan", name_fr:"Noix de pécan", kcal:691, protein:9, carbs:14, fat:72, fiber:10, salt:0},
+    {id:"f24", name_it:"Albicocche secche", name_fr:"Abricots secs", kcal:241, protein:3.4, carbs:63, fat:0.5, fiber:7, salt:0.01},
+    {id:"f25", name_it:"Fichi secchi", name_fr:"Figues sèches", kcal:249, protein:3.3, carbs:64, fat:0.9, fiber:10, salt:0.01},
+    {id:"f26", name_it:"Prugne secche", name_fr:"Pruneaux", kcal:240, protein:2.2, carbs:63, fat:0.4, fiber:7, salt:0.005},
+    {id:"f27", name_it:"Noci del Brasile", name_fr:"Noix du Brésil", kcal:656, protein:14, carbs:12, fat:66, fiber:8, salt:0.003},
+    {id:"f28", name_it:"Anacardi", name_fr:"Noix de cajou", kcal:553, protein:18, carbs:30, fat:44, fiber:3.3, salt:0.012},
+    {id:"f29", name_it:"Nocciole", name_fr:"Noisettes", kcal:628, protein:15, carbs:17, fat:61, fiber:9.7, salt:0},
+
+    {id:"f30", name_it:"Orata fresca", name_fr:"Dorade fraîche", kcal:110, protein:20, carbs:0, fat:3, fiber:0, salt:0.1},
+    {id:"f31", name_it:"Branzino fresco", name_fr:"Bar (loup) frais", kcal:97, protein:18, carbs:0, fat:2.5, fiber:0, salt:0.1},
+    {id:"f32", name_it:"Tonno fresco", name_fr:"Thon frais", kcal:144, protein:23, carbs:0, fat:5, fiber:0, salt:0.05},
+    {id:"f33", name_it:"Merluzzo fresco", name_fr:"Cabillaud frais", kcal:82, protein:18, carbs:0, fat:0.7, fiber:0, salt:0.2},
+    {id:"f34", name_it:"Trota fresca", name_fr:"Truite fraîche", kcal:119, protein:20, carbs:0, fat:4, fiber:0, salt:0.06},
+    {id:"f35", name_it:"Sogliola fresca", name_fr:"Sole fraîche", kcal:91, protein:19, carbs:0, fat:1.5, fiber:0, salt:0.1},
+
+    {id:"f36", name_it:"Merluzzo surgelato", name_fr:"Cabillaud surgelé", kcal:80, protein:17, carbs:0, fat:0.6, fiber:0, salt:0.2},
+    {id:"f37", name_it:"Salmone surgelato", name_fr:"Saumon surgelé", kcal:180, protein:20, carbs:0, fat:11, fiber:0, salt:0.07},
+    {id:"f38", name_it:"Gamberi surgelati", name_fr:"Crevettes surgelées", kcal:85, protein:18, carbs:0.5, fat:1, fiber:0, salt:0.3},
+
+    {id:"f39", name_it:"Piselli surgelati", name_fr:"Petits pois surgelés", kcal:77, protein:5.4, carbs:13, fat:0.5, fiber:5, salt:0.003},
+    {id:"f40", name_it:"Spinaci surgelati", name_fr:"Épinards surgelés", kcal:23, protein:2.9, carbs:1, fat:0.4, fiber:2.6, salt:0.14},
+    {id:"f41", name_it:"Fagiolini surgelati", name_fr:"Haricots verts surgelés", kcal:31, protein:1.8, carbs:5, fat:0.2, fiber:3, salt:0.003},
+    {id:"f42", name_it:"Cavolfiore fresco", name_fr:"Chou-fleur frais", kcal:25, protein:1.9, carbs:5, fat:0.3, fiber:2, salt:0.03},
+    {id:"f43", name_it:"Cavolo verza fresco", name_fr:"Chou de Savoie frais", kcal:27, protein:2, carbs:4.3, fat:0.1, fiber:3, salt:0.02},
+    {id:"f44", name_it:"Melanzane fresche", name_fr:"Aubergines fraîches", kcal:25, protein:1, carbs:4.8, fat:0.2, fiber:3, salt:0.002}
   ]
 };
 
@@ -1963,9 +2006,7 @@ function renderMeals(){
       const recipe = dish.recipeId ? state.recipes.find(r=>r.id===dish.recipeId) : null;
       const currentServings = dish.servings || (recipe ? recipe.servings : 1) || 1;
       const servingsOptions = [1,2,3,4].map(n=>`<option value="${n}" ${Number(currentServings)===n?'selected':''}>${n} ${t('servings_word')}</option>`).join('');
-      const foodOptions = [`<option value="">${t('no_food_option')}</option>`]
-        .concat(state.foodsDB.map(f=>`<option value="${f.id}" ${dish.foodRef===f.id?'selected':''}>${escapeHtml(foodName(f))}</option>`))
-        .join('');
+      const currentFoodName = dish.foodRef ? escapeAttr(foodName(state.foodsDB.find(f=>f.id===dish.foodRef)||{})) : '';
       return `<div class="dish-row" data-day="${escapeAttr(currentMealDay)}" data-meal="${key}" data-dish="${dish.id}">
         <select class="course-select">${courseOptions}</select>
         <select class="item-type-select">
@@ -1977,7 +2018,7 @@ function renderMeals(){
           <select class="servings-select" style="width:92px;" ${dish.recipeId?'':'disabled'}>${servingsOptions}</select>
         </span>
         <span class="food-fields" style="display:${itemType==='food'?'flex':'none'};gap:8px;flex:1;flex-wrap:wrap;">
-          <select class="food-select" style="flex:2;min-width:140px;">${foodOptions}</select>
+          <input autocomplete="off" type="text" list="foodsDatalist" class="food-select" placeholder="${escapeAttr(t('search_food_ph'))}" value="${currentFoodName}" style="flex:2;min-width:140px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13.5px;background:var(--white);">
           <input type="text" inputmode="decimal" class="food-qty-input numeric-clean" placeholder="g" value="${escapeAttr(dish.foodQty||'')}" style="width:70px;border:1px solid var(--line);border-radius:10px;padding:9px 8px;font-size:12.5px;">
         </span>
         <button type="button" class="icon-btn no-print remove-dish-btn" title="✕">✕</button>
@@ -2022,7 +2063,9 @@ function renderMeals(){
     const foodSel = row.querySelector('.food-select');
     if(foodSel){
       foodSel.addEventListener('change', (e)=>{
-        dishObj.foodRef = e.target.value || null;
+        const typed = e.target.value.trim().toLowerCase();
+        const match = state.foodsDB.find(f=>foodName(f).toLowerCase()===typed);
+        dishObj.foodRef = match ? match.id : null;
         persist();
         renderShoppingList();
         updateMealSummary();
@@ -2418,26 +2461,30 @@ function updateListenButtons(){
 
 function renderIngredientRows(){
   const wrap = document.getElementById('ingredientsList');
-  const foodsOptions = state.foodsDB.map(f=>`<option value="${escapeAttr(f.id)}">${escapeHtml(foodName(f))}</option>`).join('');
-  wrap.innerHTML = ingredientDraft.map((ing,i)=>`
+  wrap.innerHTML = ingredientDraft.map((ing,i)=>{
+    const linkedFood = ing.foodRef ? state.foodsDB.find(f=>f.id===ing.foodRef) : null;
+    const linkedName = linkedFood ? escapeAttr(foodName(linkedFood)) : '';
+    return `
     <div class="ing-row" data-idx="${i}">
       <input autocomplete="off" type="text" class="iname" placeholder="${escapeAttr(t('ingredients_label'))}" value="${escapeAttr(ing.name)}">
       <input autocomplete="off" type="text" class="iqty" placeholder="Qty (g)" value="${escapeAttr(ing.qty)}">
       <input autocomplete="off" type="text" class="iunit" placeholder="Unit" value="${escapeAttr(ing.unit)}">
-      <select class="ilink" title="${escapeAttr(t('auto_calc_note'))}">
-        <option value="">— manuale —</option>
-        ${foodsOptions}
-      </select>
+      <input autocomplete="off" type="text" list="foodsDatalist" class="ilink" title="${escapeAttr(t('auto_calc_note'))}" placeholder="${escapeAttr(t('search_food_ph'))}" value="${linkedName}">
       <button class="icon-btn" data-removeing="${i}">✕</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   wrap.querySelectorAll('.ing-row').forEach(row=>{
     const idx = Number(row.dataset.idx);
     row.querySelector('.iname').addEventListener('input', e=> ingredientDraft[idx].name = e.target.value);
     row.querySelector('.iqty').addEventListener('input', e=> ingredientDraft[idx].qty = e.target.value);
     row.querySelector('.iunit').addEventListener('input', e=> ingredientDraft[idx].unit = e.target.value);
     const linkSel = row.querySelector('.ilink');
-    linkSel.value = ingredientDraft[idx].foodRef || '';
-    linkSel.addEventListener('change', e=> ingredientDraft[idx].foodRef = e.target.value || '');
+    linkSel.addEventListener('change', e=>{
+      const typed = e.target.value.trim().toLowerCase();
+      const match = state.foodsDB.find(f=>foodName(f).toLowerCase()===typed);
+      ingredientDraft[idx].foodRef = match ? match.id : '';
+      if(!match) e.target.value = '';
+    });
   });
   wrap.querySelectorAll('[data-removeing]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
@@ -3124,28 +3171,36 @@ document.getElementById('foodSearchInput').addEventListener('input', (e)=>{
 });
 
 /* ---------- EQUIVALENCES ---------- */
+function findFoodByTypedName(str){
+  const typed = (str||'').trim().toLowerCase();
+  if(!typed) return null;
+  return state.foodsDB.find(f=>foodName(f).toLowerCase()===typed) || null;
+}
+function findPortionByTypedName(str){
+  const typed = (str||'').trim().toLowerCase();
+  if(!typed) return null;
+  return state.portionsDB.find(p=>foodNameLike(p).toLowerCase()===typed) || null;
+}
+
 function renderEquiv(){
   const selA = document.getElementById('equivFoodA');
   const selB = document.getElementById('equivFoodB');
-  const options = state.foodsDB.map(f=>`<option value="${escapeAttr(f.id)}">${escapeHtml(foodName(f))}</option>`).join('');
   const prevA = selA.value, prevB = selB.value;
-  selA.innerHTML = options;
-  selB.innerHTML = options;
-  if(prevA && state.foodsDB.some(f=>f.id===prevA)) selA.value = prevA;
-  if(prevB && state.foodsDB.some(f=>f.id===prevB)) selB.value = prevB; else if(state.foodsDB.length>1) selB.selectedIndex = 1;
+  buildFoodDatalist();
+  if(!findFoodByTypedName(prevA) && state.foodsDB.length) selA.value = foodName(state.foodsDB[0]);
+  if(!findFoodByTypedName(prevB) && state.foodsDB.length>1) selB.value = foodName(state.foodsDB[1]);
   computeEquiv();
   renderFoodsTable();
   renderPortions();
 }
 
 function computeEquiv(){
-  const idA = document.getElementById('equivFoodA').value;
-  const idB = document.getElementById('equivFoodB').value;
+  const foodA = findFoodByTypedName(document.getElementById('equivFoodA').value);
+  const foodB = findFoodByTypedName(document.getElementById('equivFoodB').value);
   const qtyA = parseNum(document.getElementById('equivQtyA').value);
   const macro = document.getElementById('equivMacro').value;
   const big = document.getElementById('equivResultBig');
   const sub = document.getElementById('equivResultSub');
-  const foodA = state.foodsDB.find(f=>f.id===idA), foodB = state.foodsDB.find(f=>f.id===idB);
   if(!foodA || !foodB || qtyA<=0){ big.textContent='—'; sub.textContent=t('equiv_placeholder'); return; }
   const macroLabelMap = {protein:t('macro_protein'), carbs:t('macro_carbs'), fat:t('macro_fat'), kcal:t('macro_kcal'), fiber:t('macro_fiber'), salt:t('macro_salt')};
   const macroLabel = macroLabelMap[macro];
@@ -3457,22 +3512,28 @@ document.getElementById('addTeaLogBtn').addEventListener('click', ()=>{
 });
 
 /* ---------- FRUIT & VEG PORTIONS ---------- */
+function buildFoodDatalist(){
+  const dl = document.getElementById('foodsDatalist');
+  if(dl) dl.innerHTML = state.foodsDB.map(f=>`<option value="${escapeAttr(foodName(f))}">`).join('');
+  const dl2 = document.getElementById('portionsDatalist');
+  if(dl2) dl2.innerHTML = state.portionsDB.map(p=>`<option value="${escapeAttr(foodNameLike(p))}">`).join('');
+}
+
 function renderPortions(){
   const sel = document.getElementById('portionFoodSelect');
   const prev = sel.value;
-  sel.innerHTML = state.portionsDB.map(p=>`<option value="${escapeAttr(p.id)}">${escapeHtml(foodNameLike(p))}</option>`).join('');
-  if(prev && state.portionsDB.some(p=>p.id===prev)) sel.value = prev;
+  buildFoodDatalist();
+  if(!findPortionByTypedName(prev) && state.portionsDB.length) sel.value = foodNameLike(state.portionsDB[0]);
   computePortion();
   renderPortionsTable();
 }
 
 function computePortion(){
-  const id = document.getElementById('portionFoodSelect').value;
   const qty = parseNum(document.getElementById('portionQtyInput').value);
   const big = document.getElementById('portionResultBig');
   const sub = document.getElementById('portionResultSub');
   const refText = document.getElementById('portionRefText');
-  const food = state.portionsDB.find(p=>p.id===id);
+  const food = findPortionByTypedName(document.getElementById('portionFoodSelect').value);
   if(!food){ big.textContent='—'; sub.textContent=t('portions_placeholder'); refText.textContent='—'; return; }
   refText.textContent = `${food.portion_g} g`;
   if(qty<=0 || !food.portion_g){ big.textContent='—'; sub.textContent=t('portions_placeholder'); return; }
