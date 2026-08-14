@@ -485,7 +485,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v5.1</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v5.2</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -879,6 +879,10 @@
   <div class="modal">
     <h3 id="importPreviewTitle" data-i18n="import_preview_title">Anteprima importazione</h3>
     <div id="importPreviewBody"></div>
+    <label id="importUpdateExistingWrap" style="display:none;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;color:var(--ink);">
+      <input type="checkbox" id="importUpdateExisting" style="width:auto;margin:0;">
+      <span data-i18n="import_update_existing_label">Aggiorna i valori degli alimenti già presenti con quelli di questo file</span>
+    </label>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="importPreviewCancel" data-i18n="btn_cancel">Annulla</button>
       <button class="btn btn-primary" id="importPreviewConfirm" data-i18n="btn_confirm_import">Conferma importazione</button>
@@ -1054,6 +1058,7 @@ const I18N = {
     import_preview_title:"Anteprima importazione", import_preview_title_recipes:"Anteprima importazione ricette", import_preview_title_foods:"Anteprima importazione alimenti",
     btn_confirm_import:"Conferma importazione",
     preview_recipes_label:"Ricette da importare", preview_new_foods_label:"Nuovi alimenti (verranno aggiunti)", preview_matched_foods_label:"Alimenti già presenti (verranno collegati)",
+    import_update_existing_label:"Aggiorna i valori degli alimenti già presenti con quelli di questo file",
     servings_word:"porz.",
     meal_colazione:"Colazione", meal_pranzo:"Pranzo", meal_spuntino:"Spuntino", meal_cena:"Cena",
     course_none:"Piatto unico", course_antipasto:"Antipasto", course_primo:"Primo", course_secondo:"Secondo",
@@ -1189,6 +1194,7 @@ const I18N = {
     import_preview_title:"Aperçu de l'importation", import_preview_title_recipes:"Aperçu de l'importation des recettes", import_preview_title_foods:"Aperçu de l'importation des aliments",
     btn_confirm_import:"Confirmer l'importation",
     preview_recipes_label:"Recettes à importer", preview_new_foods_label:"Nouveaux aliments (seront ajoutés)", preview_matched_foods_label:"Aliments déjà présents (seront liés)",
+    import_update_existing_label:"Mettre à jour les valeurs des aliments déjà présents avec celles de ce fichier",
     servings_word:"pers.",
     meal_colazione:"Petit-déjeuner", meal_pranzo:"Déjeuner", meal_spuntino:"Collation", meal_cena:"Dîner",
     course_none:"Plat unique", course_antipasto:"Entrée", course_primo:"Premier plat", course_secondo:"Plat principal",
@@ -3236,11 +3242,24 @@ document.getElementById('importPreviewConfirm').addEventListener('click', ()=>{
     renderEquiv();
   } else if(pendingImport.kind === 'foods'){
     const matchResult = matchFoodsForImport(pendingImport.foods);
+    const doUpdate = document.getElementById('importUpdateExisting').checked;
     matchResult.newFoods.forEach(f=>{
       state.foodsDB.push({id:uid(), name_it:f.name_it||f.name_fr||'', name_fr:f.name_fr||f.name_it||'',
         kcal:Number(f.kcal)||0, protein:Number(f.protein)||0, carbs:Number(f.carbs)||0, fat:Number(f.fat)||0,
         fiber:Number(f.fiber)||0, salt:Number(f.salt)||0});
     });
+    if(doUpdate){
+      matchResult.matches.forEach(m=>{
+        const existing = state.foodsDB.find(x=>x.id===m.existingId);
+        if(!existing) return;
+        existing.kcal = Number(m.incoming.kcal)||0;
+        existing.protein = Number(m.incoming.protein)||0;
+        existing.carbs = Number(m.incoming.carbs)||0;
+        existing.fat = Number(m.incoming.fat)||0;
+        existing.fiber = Number(m.incoming.fiber)||0;
+        existing.salt = Number(m.incoming.salt)||0;
+      });
+    }
     persist();
     renderEquiv();
   }
@@ -3273,6 +3292,15 @@ function showImportPreview(kind, incomingRecipes, incomingFoods){
   if(!html) html = `<p style="font-size:13px;color:var(--ink-soft);">${t('alert_import_invalid')}</p>`;
   body.innerHTML = html;
   document.getElementById('importPreviewTitle').textContent = kind==='recipes' ? t('import_preview_title_recipes') : t('import_preview_title_foods');
+  const updateWrap = document.getElementById('importUpdateExistingWrap');
+  const updateCheckbox = document.getElementById('importUpdateExisting');
+  if(kind==='foods' && matchResult.matches.length){
+    updateWrap.style.display = 'flex';
+    updateCheckbox.checked = false;
+  } else {
+    updateWrap.style.display = 'none';
+    updateCheckbox.checked = false;
+  }
   document.getElementById('importPreviewOverlay').classList.add('show');
 }
 
