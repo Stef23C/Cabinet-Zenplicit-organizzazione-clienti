@@ -485,7 +485,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v5.3</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v5.4</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -758,6 +758,9 @@
       </div>
       <div class="import-export-bar no-print" style="margin-top:18px;">
         <button class="btn btn-ghost btn-sm" id="addPortionBtn" data-i18n="btn_add_portion">+ Aggiungi alimento</button>
+        <button class="btn btn-ghost btn-sm" id="exportPortionsBtn" data-i18n="btn_export_portions">⬇ Esporta porzioni (JSON o testo)</button>
+        <button class="btn btn-ghost btn-sm" id="importPortionsBtn" data-i18n="btn_import_portions">⬆ Importa porzioni (JSON o testo)</button>
+        <input type="file" id="importPortionsFile" accept=".txt,.csv,.json,text/plain,text/csv,application/json" style="display:none;">
       </div>
       <div style="overflow-x:auto;">
         <table class="db-table" id="portionsTable"></table>
@@ -1049,6 +1052,8 @@ const I18N = {
     preview_linked_ingredients_label:"Collegamenti automatici",
     preview_linked_ingredients_text:(linked,total)=>`${linked} di ${total} ingredienti collegati automaticamente ad alimenti già nel database (per il calcolo nutrizionale).`,
     btn_export_foods:"⬇ Esporta alimenti (JSON)", btn_import_foods:"⬆ Importa alimenti (JSON o testo)",
+    btn_export_portions:"⬇ Esporta porzioni (JSON o testo)", btn_import_portions:"⬆ Importa porzioni (JSON o testo)",
+    import_preview_title_portions:"Anteprima importazione porzioni",
     alert_nothing_to_export:"Non c'è ancora nulla da esportare.",
     alert_import_invalid:"Il file selezionato non sembra un file valido esportato da Zenplicité.",
     alert_import_success:(n)=>`${n} ${n===1?'ricetta importata':'ricette importate'} con successo.`,
@@ -1185,6 +1190,8 @@ const I18N = {
     preview_linked_ingredients_label:"Liaisons automatiques",
     preview_linked_ingredients_text:(linked,total)=>`${linked} ingrédient${linked===1?'':'s'} sur ${total} lié${linked===1?'':'s'} automatiquement à des aliments déjà présents dans la base (pour le calcul nutritionnel).`,
     btn_export_foods:"⬇ Exporter les aliments (JSON)", btn_import_foods:"⬆ Importer des aliments (JSON ou texte)",
+    btn_export_portions:"⬇ Exporter les portions (JSON ou texte)", btn_import_portions:"⬆ Importer des portions (JSON ou texte)",
+    import_preview_title_portions:"Aperçu de l'importation des portions",
     alert_nothing_to_export:"Il n'y a encore rien à exporter.",
     alert_import_invalid:"Le fichier sélectionné ne semble pas être un fichier valide exporté depuis Zenplicité.",
     alert_import_success:(n)=>`${n} recette${n===1?'':'s'} importée${n===1?'':'s'} avec succès.`,
@@ -3203,6 +3210,39 @@ function matchFoodsForImport(incomingFoods){
   });
   return {matches, newFoods};
 }
+
+function matchPortionsForImport(incomingPortions){
+  const matches = [];
+  const newPortions = [];
+  incomingPortions.forEach(p=>{
+    const existing = state.portionsDB.find(x =>
+      (p.name_it && x.name_it && x.name_it.toLowerCase()===p.name_it.toLowerCase()) ||
+      (p.name_fr && x.name_fr && x.name_fr.toLowerCase()===p.name_fr.toLowerCase())
+    );
+    if(existing) matches.push({incoming:p, existingId:existing.id, existingName:foodNameLike(existing)});
+    else newPortions.push(p);
+  });
+  return {matches, newPortions};
+}
+
+function parsePortionsPlainText(text){
+  const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length);
+  const portions = [];
+  lines.forEach((line, idx)=>{
+    const delim = line.includes(';') ? ';' : (line.includes('\t') ? '\t' : ',');
+    const parts = line.split(delim).map(p=>p.trim());
+    if(parts.length < 2) return;
+    const [name_it, name_fr, portion_g, type] = parts;
+    if(idx===0 && !/\d/.test(portion_g||'')) return;
+    if(!name_it && !name_fr) return;
+    portions.push({
+      name_it: name_it||'', name_fr: name_fr||'',
+      portion_g: parseNum(portion_g),
+      type: (type||'').trim().toLowerCase()==='fruit' ? 'fruit' : 'vegetable'
+    });
+  });
+  return portions;
+}
 function applyFoodMatches(matchResult){
   const foodIdMap = {};
   matchResult.matches.forEach(m=>{ foodIdMap[m.incoming.id] = m.existingId; });
@@ -3262,13 +3302,32 @@ document.getElementById('importPreviewConfirm').addEventListener('click', ()=>{
     }
     persist();
     renderEquiv();
+  } else if(pendingImport.kind === 'portions'){
+    const matchResult = matchPortionsForImport(pendingImport.portions);
+    const doUpdate = document.getElementById('importUpdateExisting').checked;
+    matchResult.newPortions.forEach(p=>{
+      state.portionsDB.push({id:uid(), name_it:p.name_it||p.name_fr||'', name_fr:p.name_fr||p.name_it||'',
+        portion_g:Number(p.portion_g)||0, type: p.type==='fruit' ? 'fruit' : 'vegetable'});
+    });
+    if(doUpdate){
+      matchResult.matches.forEach(m=>{
+        const existing = state.portionsDB.find(x=>x.id===m.existingId);
+        if(!existing) return;
+        existing.portion_g = Number(m.incoming.portion_g)||0;
+        if(m.incoming.type) existing.type = m.incoming.type==='fruit' ? 'fruit' : 'vegetable';
+      });
+    }
+    persist();
+    renderEquiv();
   }
   closeImportPreview();
 });
 
-function showImportPreview(kind, incomingRecipes, incomingFoods){
-  const matchResult = matchFoodsForImport(incomingFoods);
-  pendingImport = {kind, recipes: incomingRecipes||[], foods: incomingFoods||[]};
+function showImportPreview(kind, incomingRecipes, incomingFoods, incomingPortions){
+  incomingPortions = incomingPortions || [];
+  const matchResult = kind==='portions' ? {matches:[], newFoods:[]} : matchFoodsForImport(incomingFoods);
+  const portionMatchResult = kind==='portions' ? matchPortionsForImport(incomingPortions) : {matches:[], newPortions:[]};
+  pendingImport = {kind, recipes: incomingRecipes||[], foods: incomingFoods||[], portions: incomingPortions};
   const body = document.getElementById('importPreviewBody');
   let html = '';
   if(kind === 'recipes'){
@@ -3289,12 +3348,23 @@ function showImportPreview(kind, incomingRecipes, incomingFoods){
     html += `<div class="import-preview-section"><div class="import-preview-label">${t('preview_matched_foods_label')} (${matchResult.matches.length})</div>
       <div class="import-preview-list">${matchResult.matches.map(m=>`<span class="matched">${escapeHtml(m.existingName)}</span>`).join('<br>')}</div></div>`;
   }
+  if(kind==='portions'){
+    if(portionMatchResult.newPortions.length){
+      html += `<div class="import-preview-section"><div class="import-preview-label">${t('preview_new_foods_label')} (${portionMatchResult.newPortions.length})</div>
+        <div class="import-preview-list">${portionMatchResult.newPortions.map(p=>`<span class="new-item">+ ${escapeHtml(p.name_it||p.name_fr||'')}</span>`).join('<br>')}</div></div>`;
+    }
+    if(portionMatchResult.matches.length){
+      html += `<div class="import-preview-section"><div class="import-preview-label">${t('preview_matched_foods_label')} (${portionMatchResult.matches.length})</div>
+        <div class="import-preview-list">${portionMatchResult.matches.map(m=>`<span class="matched">${escapeHtml(m.existingName)}</span>`).join('<br>')}</div></div>`;
+    }
+  }
   if(!html) html = `<p style="font-size:13px;color:var(--ink-soft);">${t('alert_import_invalid')}</p>`;
   body.innerHTML = html;
-  document.getElementById('importPreviewTitle').textContent = kind==='recipes' ? t('import_preview_title_recipes') : t('import_preview_title_foods');
+  document.getElementById('importPreviewTitle').textContent = kind==='recipes' ? t('import_preview_title_recipes') : (kind==='portions' ? t('import_preview_title_portions') : t('import_preview_title_foods'));
   const updateWrap = document.getElementById('importUpdateExistingWrap');
   const updateCheckbox = document.getElementById('importUpdateExisting');
-  if(kind==='foods' && matchResult.matches.length){
+  const hasMatches = kind==='portions' ? portionMatchResult.matches.length : matchResult.matches.length;
+  if((kind==='foods' || kind==='portions') && hasMatches){
     updateWrap.style.display = 'flex';
     updateCheckbox.checked = false;
   } else {
@@ -3443,6 +3513,37 @@ document.getElementById('importFoodsFile').addEventListener('change', (e)=>{
       alert(t('alert_import_invalid'));
     }
     document.getElementById('importFoodsFile').value = '';
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('exportPortionsBtn').addEventListener('click', ()=>{
+  if(!state.portionsDB.length){ alert(t('alert_nothing_to_export')); return; }
+  downloadJSON({type:'zenplicite-portions', version:1, portions: state.portionsDB}, 'zenplicite-porzioni.json');
+});
+document.getElementById('importPortionsBtn').addEventListener('click', ()=>{
+  document.getElementById('importPortionsFile').click();
+});
+document.getElementById('importPortionsFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const raw = reader.result.trim();
+    try{
+      let incoming;
+      if(raw.startsWith('{') || raw.startsWith('[')){
+        const data = JSON.parse(raw);
+        incoming = Array.isArray(data.portions) ? data.portions : (Array.isArray(data) ? data : []);
+      } else {
+        incoming = parsePortionsPlainText(raw);
+      }
+      if(!incoming.length){ alert(t('alert_import_invalid')); return; }
+      showImportPreview('portions', [], [], incoming);
+    }catch(err){
+      alert(t('alert_import_invalid'));
+    }
+    document.getElementById('importPortionsFile').value = '';
   };
   reader.readAsText(file);
 });
