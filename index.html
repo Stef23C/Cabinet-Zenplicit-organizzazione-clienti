@@ -239,6 +239,7 @@
     border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13.5px;background:var(--white);font-family:var(--font-body);
   }
   .dish-row input.food-qty-input{font-family:var(--font-body);}
+  .food-not-found{border-color:#B65B4F !important;background:#FBEDEB !important;}
 
   .macro-summary{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;}
   .macro-chip{
@@ -486,7 +487,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v5.7</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v5.9</span>
       <div class="lang-switch no-print">
         <button id="langIt" class="active">IT</button>
         <button id="langFr">FR</button>
@@ -2428,10 +2429,18 @@ function renderMeals(){
     });
     const foodSel = row.querySelector('.food-select');
     if(foodSel){
+      const markValidity = ()=>{
+        const typed = foodSel.value.trim().toLowerCase();
+        const isMatch = !typed || state.foodsDB.some(f=>foodName(f).toLowerCase()===typed);
+        foodSel.classList.toggle('food-not-found', !isMatch);
+      };
+      markValidity();
+      foodSel.addEventListener('blur', markValidity);
       foodSel.addEventListener('change', (e)=>{
         const typed = e.target.value.trim().toLowerCase();
         const match = state.foodsDB.find(f=>foodName(f).toLowerCase()===typed);
         dishObj.foodRef = match ? match.id : null;
+        markValidity();
         persist();
         renderShoppingList();
         updateMealSummary();
