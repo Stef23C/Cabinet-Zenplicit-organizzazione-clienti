@@ -514,7 +514,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v6.4</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v6.5</span>
       <button class="btn btn-ghost btn-sm no-print" id="backupExportBtn" data-i18n="btn_backup_export" title="Scarica un backup completo di tutti i tuoi dati">⬇ Backup</button>
       <button class="btn btn-ghost btn-sm no-print" id="backupImportBtn" data-i18n="btn_backup_import" title="Ripristina i dati da un file di backup">⬆ Ripristina</button>
       <input type="file" id="backupImportFile" accept=".json,application/json" style="display:none;">
@@ -613,6 +613,39 @@
       <div id="mealRows"></div>
       <div class="macro-summary" id="dayMacroSummary"></div>
       <p id="fvWeekTotal" style="font-size:11.5px;color:var(--ink-soft);margin-top:8px;"></p>
+      <details class="no-print" style="margin-top:12px;">
+        <summary style="cursor:pointer;font-size:12px;color:var(--sage-dark);font-weight:600;" data-i18n="calc_toggle">📊 Calcola il tuo fabbisogno personalizzato</summary>
+        <div class="goals-grid">
+          <label><span data-i18n="calc_age_label">Età (anni)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="calcAge"></label>
+          <label><span data-i18n="calc_sex_label">Sesso</span>
+            <select id="calcSex"><option value="F" data-i18n="calc_sex_f">Femmina</option><option value="M" data-i18n="calc_sex_m">Maschio</option></select>
+          </label>
+          <label><span data-i18n="calc_weight_label">Peso (kg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="calcWeight"></label>
+          <label><span data-i18n="calc_height_label">Altezza (cm)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="calcHeight"></label>
+          <label><span data-i18n="calc_activity_label">Livello di attività</span>
+            <select id="calcActivity">
+              <option value="sedentario" data-i18n="activity_sedentario">Sedentario</option>
+              <option value="leggero" data-i18n="activity_leggero">Leggero (1-3 giorni/sett.)</option>
+              <option value="moderato" data-i18n="activity_moderato">Moderato (3-5 giorni/sett.)</option>
+              <option value="attivo" data-i18n="activity_attivo">Attivo (6-7 giorni/sett.)</option>
+              <option value="moltoattivo" data-i18n="activity_moltoattivo">Molto attivo (lavoro fisico)</option>
+            </select>
+          </label>
+          <label><span data-i18n="calc_diet_label">Tipo di dieta</span>
+            <select id="calcDietType">
+              <option value="onnivora" data-i18n="diet_onnivora_name">Onnivora bilanciata</option>
+              <option value="mediterranea" data-i18n="diet_mediterranea_name">Mediterranea</option>
+              <option value="vegetariana" data-i18n="diet_vegetariana_name">Vegetariana</option>
+              <option value="vegana" data-i18n="diet_vegana_name">Vegana</option>
+              <option value="antinfiammatoria" data-i18n="diet_antinfiammatoria_name">Anti-infiammatoria</option>
+              <option value="chetogenica" data-i18n="diet_chetogenica_name">Chetogenica</option>
+              <option value="paleo" data-i18n="diet_paleo_name">Paleo</option>
+            </select>
+          </label>
+        </div>
+        <p id="dietDescriptionText" style="font-size:12px;color:var(--ink-soft);margin:10px 0;line-height:1.6;"></p>
+        <button type="button" class="btn btn-accent btn-sm" id="calcApplyBtn" data-i18n="btn_calc_apply">Calcola e applica agli obiettivi</button>
+      </details>
       <details class="no-print" style="margin-top:12px;">
         <summary style="cursor:pointer;font-size:12px;color:var(--sage-dark);font-weight:600;" data-i18n="goals_toggle">🎯 Modifica obiettivi giornalieri</summary>
         <div class="goals-grid">
@@ -945,6 +978,39 @@
     <div id="clientMealRows"></div>
     <div class="macro-summary" id="clientMacroSummary"></div>
     <details class="no-print" style="margin-top:12px;">
+      <summary style="cursor:pointer;font-size:12px;color:var(--sage-dark);font-weight:600;" data-i18n="calc_toggle">📊 Calcola il tuo fabbisogno personalizzato</summary>
+      <div class="goals-grid">
+        <label><span data-i18n="calc_age_label">Età (anni)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cCalcAge"></label>
+        <label><span data-i18n="calc_sex_label">Sesso</span>
+          <select id="cCalcSex"><option value="F" data-i18n="calc_sex_f">Femmina</option><option value="M" data-i18n="calc_sex_m">Maschio</option></select>
+        </label>
+        <label><span data-i18n="calc_weight_label">Peso (kg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cCalcWeight"></label>
+        <label><span data-i18n="calc_height_label">Altezza (cm)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cCalcHeight"></label>
+        <label><span data-i18n="calc_activity_label">Livello di attività</span>
+          <select id="cCalcActivity">
+            <option value="sedentario" data-i18n="activity_sedentario">Sedentario</option>
+            <option value="leggero" data-i18n="activity_leggero">Leggero (1-3 giorni/sett.)</option>
+            <option value="moderato" data-i18n="activity_moderato">Moderato (3-5 giorni/sett.)</option>
+            <option value="attivo" data-i18n="activity_attivo">Attivo (6-7 giorni/sett.)</option>
+            <option value="moltoattivo" data-i18n="activity_moltoattivo">Molto attivo (lavoro fisico)</option>
+          </select>
+        </label>
+        <label><span data-i18n="calc_diet_label">Tipo di dieta</span>
+          <select id="cCalcDietType">
+            <option value="onnivora" data-i18n="diet_onnivora_name">Onnivora bilanciata</option>
+            <option value="mediterranea" data-i18n="diet_mediterranea_name">Mediterranea</option>
+            <option value="vegetariana" data-i18n="diet_vegetariana_name">Vegetariana</option>
+            <option value="vegana" data-i18n="diet_vegana_name">Vegana</option>
+            <option value="antinfiammatoria" data-i18n="diet_antinfiammatoria_name">Anti-infiammatoria</option>
+            <option value="chetogenica" data-i18n="diet_chetogenica_name">Chetogenica</option>
+            <option value="paleo" data-i18n="diet_paleo_name">Paleo</option>
+          </select>
+        </label>
+      </div>
+      <p id="cDietDescriptionText" style="font-size:12px;color:var(--ink-soft);margin:10px 0;line-height:1.6;"></p>
+      <button type="button" class="btn btn-accent btn-sm" id="cCalcApplyBtn" data-i18n="btn_calc_apply">Calcola e applica agli obiettivi</button>
+    </details>
+    <details class="no-print" style="margin-top:12px;">
       <summary style="cursor:pointer;font-size:12px;color:var(--sage-dark);font-weight:600;" data-i18n="goals_toggle">🎯 Modifica obiettivi giornalieri</summary>
       <div class="goals-grid">
         <label><span data-i18n="goal_kcal_label">Kcal obiettivo (al giorno)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalKcalTarget"></label>
@@ -1145,6 +1211,19 @@ const DAY_LABELS = {
 const MEAL_TYPES = [["colazione","meal_colazione"],["pranzo","meal_pranzo"],["spuntino","meal_spuntino"],["cena","meal_cena"]];
 const COURSE_TYPES = ['','antipasto','primo','secondo','contorno','dolce','bevanda'];
 const MICRO_FIELDS = ['calcium','iron','phosphorus','potassium','vitaminD','vitaminB1','vitaminB2','vitaminB3','vitaminB6','vitaminB9','vitaminB12'];
+
+const DIET_TYPES = {
+  onnivora: {carbPct:50, proteinPct:20, fatPct:30, proteinGKg:0.9},
+  mediterranea: {carbPct:50, proteinPct:15, fatPct:35, proteinGKg:0.9},
+  vegetariana: {carbPct:50, proteinPct:18, fatPct:32, proteinGKg:1.0},
+  vegana: {carbPct:55, proteinPct:15, fatPct:30, proteinGKg:1.1},
+  antinfiammatoria: {carbPct:40, proteinPct:20, fatPct:40, proteinGKg:1.0},
+  chetogenica: {carbPct:5, proteinPct:25, fatPct:70, proteinGKg:1.2},
+  paleo: {carbPct:30, proteinPct:30, fatPct:40, proteinGKg:1.2},
+};
+const DIET_ORDER = ['onnivora','mediterranea','vegetariana','vegana','antinfiammatoria','chetogenica','paleo'];
+const ACTIVITY_FACTORS = {sedentario:1.2, leggero:1.375, moderato:1.55, attivo:1.725, moltoattivo:1.9};
+const ACTIVITY_ORDER = ['sedentario','leggero','moderato','attivo','moltoattivo'];
 const MICRO_LABELS_KEYS = ['micro_calcium_label','micro_iron_label','micro_phosphorus_label','micro_potassium_label','micro_vitd_label','micro_b1_label','micro_b2_label','micro_b3_label','micro_b6_label','micro_b9_label','micro_b12_label'];
 
 function ensureClientStructures(client){
@@ -1245,6 +1324,27 @@ const I18N = {
     fv_week_text:(fruit,veg)=>`Questa settimana: ${fruit} porzioni di frutta, ${veg} di verdura.`,
     salt_max_suffix:"max",
     goals_toggle:"🎯 Modifica obiettivi giornalieri",
+    calc_toggle:"📊 Calcola il tuo fabbisogno personalizzato",
+    calc_age_label:"Età (anni)", calc_sex_label:"Sesso", calc_sex_f:"Femmina", calc_sex_m:"Maschio",
+    calc_weight_label:"Peso (kg)", calc_height_label:"Altezza (cm)", calc_activity_label:"Livello di attività",
+    activity_sedentario:"Sedentario", activity_leggero:"Leggero (1-3 giorni/sett.)", activity_moderato:"Moderato (3-5 giorni/sett.)",
+    activity_attivo:"Attivo (6-7 giorni/sett.)", activity_moltoattivo:"Molto attivo (lavoro fisico)",
+    calc_diet_label:"Tipo di dieta", btn_calc_apply:"Calcola e applica agli obiettivi",
+    alert_calc_invalid:"Inserisci età, peso e altezza per calcolare il fabbisogno.",
+    diet_onnivora_name:"Onnivora bilanciata",
+    diet_onnivora_desc:"Include tutti i gruppi alimentari in proporzioni equilibrate: cereali, proteine animali e vegetali, verdura, frutta e grassi buoni. Nessuna esclusione, varietà come principio guida.",
+    diet_mediterranea_name:"Mediterranea",
+    diet_mediterranea_desc:"Ricca di verdura, legumi, cereali integrali, pesce e olio extravergine d'oliva come grasso principale; carne rossa e dolci limitati. Considerata tra i modelli alimentari più equilibrati.",
+    diet_vegetariana_name:"Vegetariana",
+    diet_vegetariana_desc:"Esclude carne e pesce, mantiene uova e latticini. Le proteine derivano soprattutto da legumi, uova, latticini e cereali; attenzione a ferro e vitamina B12.",
+    diet_vegana_name:"Vegana",
+    diet_vegana_desc:"Esclude ogni alimento di origine animale. Le proteine vengono da legumi, cereali, frutta secca e semi; richiede attenzione a vitamina B12, ferro, calcio, vitamina D e omega-3.",
+    diet_antinfiammatoria_name:"Anti-infiammatoria",
+    diet_antinfiammatoria_desc:"Privilegia pesce grasso, verdura colorata, frutta, olio d'oliva, frutta secca e spezie come curcuma e zenzero; limita zuccheri raffinati, cibi processati e grassi saturi.",
+    diet_chetogenica_name:"Chetogenica",
+    diet_chetogenica_desc:"Carboidrati molto ridotti (circa 5% delle calorie) e grassi elevati, per indurre la chetosi. Da seguire con supervisione, non adatta a tutti; verdure a foglia sì, cereali e zuccheri esclusi.",
+    diet_paleo_name:"Paleo",
+    diet_paleo_desc:"Ispirata all'alimentazione preagricola: carne, pesce, uova, verdura, frutta, frutta secca. Esclude cereali, legumi, latticini e zuccheri raffinati.",
     goal_kcal_label:"Kcal obiettivo (al giorno)", goal_protein_label:"Proteine obiettivo (g/giorno)",
     goal_carbs_label:"Carboidrati obiettivo (g/giorno)", goal_fat_label:"Grassi obiettivo (g/giorno)",
     goal_fiber_label:"Fibre minime (g/giorno)", goal_salt_label:"Sale massimo (g/giorno)",
@@ -1397,6 +1497,27 @@ const I18N = {
     fv_week_text:(fruit,veg)=>`Cette semaine : ${fruit} portions de fruits, ${veg} de légumes.`,
     salt_max_suffix:"max",
     goals_toggle:"🎯 Modifier les objectifs quotidiens",
+    calc_toggle:"📊 Calcule tes besoins personnalisés",
+    calc_age_label:"Âge (ans)", calc_sex_label:"Sexe", calc_sex_f:"Femme", calc_sex_m:"Homme",
+    calc_weight_label:"Poids (kg)", calc_height_label:"Taille (cm)", calc_activity_label:"Niveau d'activité",
+    activity_sedentario:"Sédentaire", activity_leggero:"Léger (1-3 jours/sem.)", activity_moderato:"Modéré (3-5 jours/sem.)",
+    activity_attivo:"Actif (6-7 jours/sem.)", activity_moltoattivo:"Très actif (travail physique)",
+    calc_diet_label:"Type de régime", btn_calc_apply:"Calculer et appliquer aux objectifs",
+    alert_calc_invalid:"Indique âge, poids et taille pour calculer les besoins.",
+    diet_onnivora_name:"Omnivore équilibré",
+    diet_onnivora_desc:"Inclut tous les groupes alimentaires en proportions équilibrées : céréales, protéines animales et végétales, légumes, fruits et bonnes graisses. Aucune exclusion, la variété comme principe directeur.",
+    diet_mediterranea_name:"Méditerranéen",
+    diet_mediterranea_desc:"Riche en légumes, légumineuses, céréales complètes, poisson et huile d'olive extra vierge comme graisse principale ; viande rouge et sucreries limitées. Considéré comme l'un des modèles alimentaires les plus équilibrés.",
+    diet_vegetariana_name:"Végétarien",
+    diet_vegetariana_desc:"Exclut viande et poisson, conserve œufs et produits laitiers. Les protéines viennent surtout des légumineuses, œufs, produits laitiers et céréales ; attention au fer et à la vitamine B12.",
+    diet_vegana_name:"Végane",
+    diet_vegana_desc:"Exclut tout aliment d'origine animale. Les protéines viennent des légumineuses, céréales, fruits à coque et graines ; nécessite une attention particulière à la vitamine B12, au fer, au calcium, à la vitamine D et aux oméga-3.",
+    diet_antinfiammatoria_name:"Anti-inflammatoire",
+    diet_antinfiammatoria_desc:"Privilégie le poisson gras, les légumes colorés, les fruits, l'huile d'olive, les fruits à coque et les épices comme le curcuma et le gingembre ; limite les sucres raffinés, les aliments transformés et les graisses saturées.",
+    diet_chetogenica_name:"Cétogène",
+    diet_chetogenica_desc:"Glucides très réduits (environ 5% des calories) et graisses élevées, pour induire la cétose. À suivre sous supervision, ne convient pas à tout le monde ; légumes verts oui, céréales et sucres exclus.",
+    diet_paleo_name:"Paléo",
+    diet_paleo_desc:"Inspirée de l'alimentation préagricole : viande, poisson, œufs, légumes, fruits, fruits à coque. Exclut céréales, légumineuses, produits laitiers et sucres raffinés.",
     goal_kcal_label:"Kcal objectif (par jour)", goal_protein_label:"Protéines objectif (g/jour)",
     goal_carbs_label:"Glucides objectif (g/jour)", goal_fat_label:"Lipides objectif (g/jour)",
     goal_fiber_label:"Fibres minimales (g/jour)", goal_salt_label:"Sel maximum (g/jour)",
@@ -1517,6 +1638,7 @@ function setLanguage(lang){
   renderJournal();
   renderMealDayTabs();
   renderGoalsInputs();
+  renderCalcProfileInputs();
   renderMeals();
   renderShoppingList();
   renderRecipes();
@@ -2102,6 +2224,7 @@ function goToWeek(weekKey){
   renderJournal();
   renderMealDayTabs();
   renderGoalsInputs();
+  renderCalcProfileInputs();
   renderMeals();
   renderShoppingList();
 }
@@ -2160,6 +2283,7 @@ async function loadState(){
   if(!state.nutritionGoals) state.nutritionGoals = {...DEFAULT_STATE.nutritionGoals};
   else state.nutritionGoals = {...DEFAULT_STATE.nutritionGoals, ...state.nutritionGoals};
   if(!state.clients) state.clients = [];
+  if(!state.personalProfile) state.personalProfile = null;
   state.clients.forEach(ensureClientStructures);
   if(!state.foodsDB) state.foodsDB = DEFAULT_STATE.foodsDB.slice();
 
@@ -2528,6 +2652,108 @@ document.getElementById('journalTextarea').addEventListener('input', (e)=>{
 });
 
 /* ---------- MEALS ---------- */
+/* ---------- PERSONALIZED NEEDS CALCULATOR ---------- */
+function computeGoalsFromProfile(profile){
+  const age = parseNum(profile.age), weight = parseNum(profile.weight), height = parseNum(profile.height);
+  if(age<=0 || weight<=0 || height<=0) return null;
+  const bmr = profile.sex==='F'
+    ? (10*weight) + (6.25*height) - (5*age) - 161
+    : (10*weight) + (6.25*height) - (5*age) + 5;
+  const factor = ACTIVITY_FACTORS[profile.activityLevel] || 1.55;
+  const tdee = bmr * factor;
+  const diet = DIET_TYPES[profile.dietType] || DIET_TYPES.onnivora;
+  const kcalTarget = Math.round(tdee);
+  const proteinFromPct = tdee*diet.proteinPct/100/4;
+  const proteinFromWeight = weight*diet.proteinGKg;
+  const proteinTarget = Math.round(Math.max(proteinFromPct, proteinFromWeight));
+  const carbsTarget = Math.round(tdee*diet.carbPct/100/4);
+  const fatTarget = Math.round(tdee*diet.fatPct/100/9);
+  return {kcalTarget, proteinTarget, carbsTarget, fatTarget};
+}
+
+function updateDietDescription(selectEl, textEl){
+  const dietType = selectEl.value;
+  textEl.textContent = t('diet_'+dietType+'_desc');
+}
+
+document.getElementById('calcDietType').addEventListener('change', ()=>{
+  updateDietDescription(document.getElementById('calcDietType'), document.getElementById('dietDescriptionText'));
+});
+updateDietDescription(document.getElementById('calcDietType'), document.getElementById('dietDescriptionText'));
+
+document.getElementById('calcApplyBtn').addEventListener('click', ()=>{
+  const profile = {
+    age: document.getElementById('calcAge').value,
+    sex: document.getElementById('calcSex').value,
+    weight: document.getElementById('calcWeight').value,
+    height: document.getElementById('calcHeight').value,
+    activityLevel: document.getElementById('calcActivity').value,
+    dietType: document.getElementById('calcDietType').value
+  };
+  const result = computeGoalsFromProfile(profile);
+  if(!result){ alert(t('alert_calc_invalid')); return; }
+  state.nutritionGoals.kcalTarget = result.kcalTarget;
+  state.nutritionGoals.proteinTarget = result.proteinTarget;
+  state.nutritionGoals.carbsTarget = result.carbsTarget;
+  state.nutritionGoals.fatTarget = result.fatTarget;
+  state.personalProfile = profile;
+  persist();
+  renderGoalsInputs();
+  renderCalcProfileInputs();
+  updateMealSummary();
+});
+
+document.getElementById('cCalcDietType').addEventListener('change', ()=>{
+  updateDietDescription(document.getElementById('cCalcDietType'), document.getElementById('cDietDescriptionText'));
+});
+updateDietDescription(document.getElementById('cCalcDietType'), document.getElementById('cDietDescriptionText'));
+
+document.getElementById('cCalcApplyBtn').addEventListener('click', ()=>{
+  const client = getEditingClient();
+  if(!client) return;
+  const profile = {
+    age: document.getElementById('cCalcAge').value,
+    sex: document.getElementById('cCalcSex').value,
+    weight: document.getElementById('cCalcWeight').value,
+    height: document.getElementById('cCalcHeight').value,
+    activityLevel: document.getElementById('cCalcActivity').value,
+    dietType: document.getElementById('cCalcDietType').value
+  };
+  const result = computeGoalsFromProfile(profile);
+  if(!result){ alert(t('alert_calc_invalid')); return; }
+  client.goals.kcalTarget = result.kcalTarget;
+  client.goals.proteinTarget = result.proteinTarget;
+  client.goals.carbsTarget = result.carbsTarget;
+  client.goals.fatTarget = result.fatTarget;
+  client.profile = profile;
+  persist();
+  renderClientGoalsInputs();
+  updateClientMealSummary();
+});
+
+function renderCalcProfileInputs(){
+  const p = state.personalProfile;
+  if(!p) return;
+  if(p.age) document.getElementById('calcAge').value = p.age;
+  if(p.sex) document.getElementById('calcSex').value = p.sex;
+  if(p.weight) document.getElementById('calcWeight').value = p.weight;
+  if(p.height) document.getElementById('calcHeight').value = p.height;
+  if(p.activityLevel) document.getElementById('calcActivity').value = p.activityLevel;
+  if(p.dietType){ document.getElementById('calcDietType').value = p.dietType; updateDietDescription(document.getElementById('calcDietType'), document.getElementById('dietDescriptionText')); }
+}
+
+function renderClientCalcProfileInputs(){
+  const client = getEditingClient();
+  if(!client || !client.profile) return;
+  const p = client.profile;
+  if(p.age) document.getElementById('cCalcAge').value = p.age;
+  if(p.sex) document.getElementById('cCalcSex').value = p.sex;
+  if(p.weight) document.getElementById('cCalcWeight').value = p.weight;
+  if(p.height) document.getElementById('cCalcHeight').value = p.height;
+  if(p.activityLevel) document.getElementById('cCalcActivity').value = p.activityLevel;
+  if(p.dietType){ document.getElementById('cCalcDietType').value = p.dietType; updateDietDescription(document.getElementById('cCalcDietType'), document.getElementById('cDietDescriptionText')); }
+}
+
 function renderGoalsInputs(){
   document.getElementById('goalKcalTarget').value = state.nutritionGoals.kcalTarget;
   document.getElementById('goalProteinTarget').value = state.nutritionGoals.proteinTarget;
@@ -4275,6 +4501,7 @@ function openClientModal(id){
   renderClientMealDayTabs();
   renderClientMeals();
   renderClientGoalsInputs();
+  renderClientCalcProfileInputs();
   document.getElementById('clientModalOverlay').classList.add('show');
 }
 
@@ -5452,6 +5679,7 @@ async function init(){
   renderJournal();
   renderMealDayTabs();
   renderGoalsInputs();
+  renderCalcProfileInputs();
   renderMeals();
   renderShoppingList();
   renderRecipes();
