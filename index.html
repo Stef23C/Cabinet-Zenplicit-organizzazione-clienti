@@ -514,7 +514,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v6.3</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v6.4</span>
       <button class="btn btn-ghost btn-sm no-print" id="backupExportBtn" data-i18n="btn_backup_export" title="Scarica un backup completo di tutti i tuoi dati">⬇ Backup</button>
       <button class="btn btn-ghost btn-sm no-print" id="backupImportBtn" data-i18n="btn_backup_import" title="Ripristina i dati da un file di backup">⬆ Ripristina</button>
       <input type="file" id="backupImportFile" accept=".json,application/json" style="display:none;">
@@ -624,6 +624,17 @@
           <label><span data-i18n="goal_salt_label">Sale massimo (g/giorno)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalSaltMax"></label>
           <label><span data-i18n="goal_fruit_label">Porzioni di frutta</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalFruitTarget"></label>
           <label><span data-i18n="goal_veg_label">Porzioni di verdura</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalVegTarget"></label>
+          <label><span data-i18n="micro_calcium_label">Calcio (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalCalciumMin"></label>
+          <label><span data-i18n="micro_iron_label">Ferro (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalIronMin"></label>
+          <label><span data-i18n="micro_phosphorus_label">Fosforo (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalPhosphorusMin"></label>
+          <label><span data-i18n="micro_potassium_label">Potassio (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalPotassiumMin"></label>
+          <label><span data-i18n="micro_vitd_label">Vit. D (µg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalVitaminDMin"></label>
+          <label><span data-i18n="micro_b1_label">Vit. B1 (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalVitaminB1Min"></label>
+          <label><span data-i18n="micro_b2_label">Vit. B2 (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalVitaminB2Min"></label>
+          <label><span data-i18n="micro_b3_label">Vit. B3 (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalVitaminB3Min"></label>
+          <label><span data-i18n="micro_b6_label">Vit. B6 (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalVitaminB6Min"></label>
+          <label><span data-i18n="micro_b9_label">Vit. B9 (µg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalVitaminB9Min"></label>
+          <label><span data-i18n="micro_b12_label">Vit. B12 (µg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="goalVitaminB12Min"></label>
         </div>
       </details>
     </div>
@@ -944,6 +955,17 @@
         <label><span data-i18n="goal_salt_label">Sale massimo (g/giorno)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalSaltMax"></label>
         <label><span data-i18n="goal_fruit_label">Porzioni di frutta</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalFruitTarget"></label>
         <label><span data-i18n="goal_veg_label">Porzioni di verdura</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalVegTarget"></label>
+        <label><span data-i18n="micro_calcium_label">Calcio (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalCalciumMin"></label>
+        <label><span data-i18n="micro_iron_label">Ferro (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalIronMin"></label>
+        <label><span data-i18n="micro_phosphorus_label">Fosforo (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalPhosphorusMin"></label>
+        <label><span data-i18n="micro_potassium_label">Potassio (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalPotassiumMin"></label>
+        <label><span data-i18n="micro_vitd_label">Vit. D (µg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalVitaminDMin"></label>
+        <label><span data-i18n="micro_b1_label">Vit. B1 (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalVitaminB1Min"></label>
+        <label><span data-i18n="micro_b2_label">Vit. B2 (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalVitaminB2Min"></label>
+        <label><span data-i18n="micro_b3_label">Vit. B3 (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalVitaminB3Min"></label>
+        <label><span data-i18n="micro_b6_label">Vit. B6 (mg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalVitaminB6Min"></label>
+        <label><span data-i18n="micro_b9_label">Vit. B9 (µg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalVitaminB9Min"></label>
+        <label><span data-i18n="micro_b12_label">Vit. B12 (µg)</span><input autocomplete="off" type="text" inputmode="decimal" class="numeric-clean" id="cGoalVitaminB12Min"></label>
       </div>
     </details>
 
@@ -1122,6 +1144,8 @@ const DAY_LABELS = {
 };
 const MEAL_TYPES = [["colazione","meal_colazione"],["pranzo","meal_pranzo"],["spuntino","meal_spuntino"],["cena","meal_cena"]];
 const COURSE_TYPES = ['','antipasto','primo','secondo','contorno','dolce','bevanda'];
+const MICRO_FIELDS = ['calcium','iron','phosphorus','potassium','vitaminD','vitaminB1','vitaminB2','vitaminB3','vitaminB6','vitaminB9','vitaminB12'];
+const MICRO_LABELS_KEYS = ['micro_calcium_label','micro_iron_label','micro_phosphorus_label','micro_potassium_label','micro_vitd_label','micro_b1_label','micro_b2_label','micro_b3_label','micro_b6_label','micro_b9_label','micro_b12_label'];
 
 function ensureClientStructures(client){
   if(!client.phone) client.phone = '';
@@ -1648,7 +1672,8 @@ const DEFAULT_STATE = {
     {id:"p108", name_it:"Germogli di soia", name_fr:"Pousses de soja", portion_g:100, type:"vegetable"},
     {id:"p109", name_it:"Pomodori ciliegino", name_fr:"Tomates cerises", portion_g:150, type:"vegetable"}
   ],
-  nutritionGoals: {fiberMin:25, saltMax:5, fruitTarget:2, vegTarget:3, kcalTarget:2000, proteinTarget:60, carbsTarget:250, fatTarget:70},
+  nutritionGoals: {fiberMin:25, saltMax:5, fruitTarget:2, vegTarget:3, kcalTarget:2000, proteinTarget:60, carbsTarget:250, fatTarget:70,
+    calciumMin:1000, ironMin:14, phosphorusMin:550, potassiumMin:3500, vitaminDMin:15, vitaminB1Min:1.1, vitaminB2Min:1.6, vitaminB3Min:16, vitaminB6Min:1.5, vitaminB9Min:330, vitaminB12Min:4},
   clients: [],
   lang: 'it',
   foodsDB: [
@@ -2512,9 +2537,23 @@ function renderGoalsInputs(){
   document.getElementById('goalSaltMax').value = state.nutritionGoals.saltMax;
   document.getElementById('goalFruitTarget').value = state.nutritionGoals.fruitTarget;
   document.getElementById('goalVegTarget').value = state.nutritionGoals.vegTarget;
+  document.getElementById('goalCalciumMin').value = state.nutritionGoals.calciumMin;
+  document.getElementById('goalIronMin').value = state.nutritionGoals.ironMin;
+  document.getElementById('goalPhosphorusMin').value = state.nutritionGoals.phosphorusMin;
+  document.getElementById('goalPotassiumMin').value = state.nutritionGoals.potassiumMin;
+  document.getElementById('goalVitaminDMin').value = state.nutritionGoals.vitaminDMin;
+  document.getElementById('goalVitaminB1Min').value = state.nutritionGoals.vitaminB1Min;
+  document.getElementById('goalVitaminB2Min').value = state.nutritionGoals.vitaminB2Min;
+  document.getElementById('goalVitaminB3Min').value = state.nutritionGoals.vitaminB3Min;
+  document.getElementById('goalVitaminB6Min').value = state.nutritionGoals.vitaminB6Min;
+  document.getElementById('goalVitaminB9Min').value = state.nutritionGoals.vitaminB9Min;
+  document.getElementById('goalVitaminB12Min').value = state.nutritionGoals.vitaminB12Min;
 }
 [['goalKcalTarget','kcalTarget'],['goalProteinTarget','proteinTarget'],['goalCarbsTarget','carbsTarget'],['goalFatTarget','fatTarget'],
- ['goalFiberMin','fiberMin'],['goalSaltMax','saltMax'],['goalFruitTarget','fruitTarget'],['goalVegTarget','vegTarget']].forEach(([elId,key])=>{
+ ['goalFiberMin','fiberMin'],['goalSaltMax','saltMax'],['goalFruitTarget','fruitTarget'],['goalVegTarget','vegTarget'],
+ ['goalCalciumMin','calciumMin'],['goalIronMin','ironMin'],['goalPhosphorusMin','phosphorusMin'],['goalPotassiumMin','potassiumMin'],
+ ['goalVitaminDMin','vitaminDMin'],['goalVitaminB1Min','vitaminB1Min'],['goalVitaminB2Min','vitaminB2Min'],['goalVitaminB3Min','vitaminB3Min'],
+ ['goalVitaminB6Min','vitaminB6Min'],['goalVitaminB9Min','vitaminB9Min'],['goalVitaminB12Min','vitaminB12Min']].forEach(([elId,key])=>{
   const el = document.getElementById(elId);
   attachNumericClean(el);
   el.addEventListener('change', ()=>{
@@ -2698,9 +2737,26 @@ function computeFruitVegPortionsForDay(day){
   return result;
 }
 
+function computeRecipeMicronutrients(r, scale){
+  const totals = {};
+  MICRO_FIELDS.forEach(f=> totals[f]=0);
+  (r.ingredients||[]).forEach(ing=>{
+    if(!ing.foodRef) return;
+    const f = state.foodsDB.find(x=>x.id===ing.foodRef);
+    if(!f) return;
+    const grams = (Number(ing.qty)||0) * scale;
+    if(grams<=0) return;
+    MICRO_FIELDS.forEach(field=>{
+      totals[field] += (Number(f[field])||0)/100*grams;
+    });
+  });
+  return totals;
+}
+
 function updateMealSummary(){
   const summary = document.getElementById('dayMacroSummary');
   let totals = {kcal:0, protein:0, carbs:0, fat:0, fiber:0, salt:0};
+  MICRO_FIELDS.forEach(f=> totals[f]=0);
   MEAL_TYPES.forEach(([key])=>{
     (W().meals[currentMealDay][key]||[]).forEach(dish=>{
       if((dish.itemType||'recipe')==='recipe' && dish.recipeId){
@@ -2713,6 +2769,8 @@ function updateMealSummary(){
           totals.fat += (Number(r.macros.fat)||0) * scale;
           totals.fiber += (Number(r.macros.fiber)||0) * scale;
           totals.salt += (Number(r.macros.salt)||0) * scale;
+          const micro = computeRecipeMicronutrients(r, scale);
+          MICRO_FIELDS.forEach(f=> totals[f] += micro[f]);
         }
       } else if(dish.itemType==='food' && dish.foodRef){
         const f = state.foodsDB.find(x=>x.id===dish.foodRef);
@@ -2724,6 +2782,7 @@ function updateMealSummary(){
           totals.fat += (Number(f.fat)||0)/100*grams;
           totals.fiber += (Number(f.fiber)||0)/100*grams;
           totals.salt += (Number(f.salt)||0)/100*grams;
+          MICRO_FIELDS.forEach(field=> totals[field] += (Number(f[field])||0)/100*grams);
         }
       }
     });
@@ -2737,6 +2796,14 @@ function updateMealSummary(){
   const fiberMet = totals.fiber >= goals.fiberMin;
   const saltOk = totals.salt <= goals.saltMax;
   const chip = (label, val, ok)=> `<span class="macro-chip" style="background:${ok===undefined?'var(--beige)':(ok?'var(--sage-pale)':'var(--beige-deep)')};color:${ok===undefined?'var(--ink-soft)':(ok?'var(--sage-dark)':'var(--accent)')};">${label} ${val}</span>`;
+  const microGoalKeys = ['calciumMin','ironMin','phosphorusMin','potassiumMin','vitaminDMin','vitaminB1Min','vitaminB2Min','vitaminB3Min','vitaminB6Min','vitaminB9Min','vitaminB12Min'];
+  const microChips = MICRO_FIELDS.map((field,i)=>{
+    const goalKey = microGoalKeys[i];
+    const goalVal = goals[goalKey];
+    const met = totals[field] >= goalVal;
+    const decimals = ['vitaminD','vitaminB1','vitaminB2','vitaminB3','vitaminB6'].includes(field) ? 1 : 0;
+    return chip(t(MICRO_LABELS_KEYS[i]), `${(Math.round(totals[field]*Math.pow(10,decimals))/Math.pow(10,decimals))}/${goalVal}`, met);
+  }).join('');
   summary.innerHTML = `
     ${chip(t('macro_kcal_label'), `${Math.round(totals.kcal)}/${goals.kcalTarget}`)}
     ${chip(t('macro_protein_label'), `${Math.round(totals.protein)}/${goals.proteinTarget} g`)}
@@ -2745,7 +2812,8 @@ function updateMealSummary(){
     ${chip(t('macro_fiber_label'), `${(Math.round(totals.fiber*10)/10)}/${goals.fiberMin} g`, fiberMet)}
     ${chip(t('macro_salt_label'), `${(Math.round(totals.salt*100)/100)}/${goals.saltMax} g ${t('salt_max_suffix')}`, saltOk)}
     ${chip('🍎', `${fvToday.fruit.toFixed(1)}/${goals.fruitTarget} ${t('fv_fruit_label')}`, fruitMet)}
-    ${chip('🥦', `${fvToday.vegetable.toFixed(1)}/${goals.vegTarget} ${t('fv_veg_label')}`, vegMet)}`;
+    ${chip('🥦', `${fvToday.vegetable.toFixed(1)}/${goals.vegTarget} ${t('fv_veg_label')}`, vegMet)}
+    ${microChips}`;
   const weekEl = document.getElementById('fvWeekTotal');
   if(weekEl) weekEl.textContent = t('fv_week_text')(fvWeekFruit.toFixed(1), fvWeekVeg.toFixed(1));
 }
@@ -4469,6 +4537,7 @@ function updateClientMealSummary(){
   if(!client) return;
   const summary = document.getElementById('clientMacroSummary');
   let totals = {kcal:0, protein:0, carbs:0, fat:0, fiber:0, salt:0};
+  MICRO_FIELDS.forEach(f=> totals[f]=0);
   MEAL_TYPES.forEach(([key])=>{
     (client.mealPlan[currentClientMealDay][key]||[]).forEach(dish=>{
       if((dish.itemType||'recipe')==='recipe' && dish.recipeId){
@@ -4481,6 +4550,8 @@ function updateClientMealSummary(){
           totals.fat += (Number(r.macros.fat)||0) * scale;
           totals.fiber += (Number(r.macros.fiber)||0) * scale;
           totals.salt += (Number(r.macros.salt)||0) * scale;
+          const micro = computeRecipeMicronutrients(r, scale);
+          MICRO_FIELDS.forEach(f=> totals[f] += micro[f]);
         }
       } else if(dish.itemType==='food' && dish.foodRef){
         const f = state.foodsDB.find(x=>x.id===dish.foodRef);
@@ -4492,6 +4563,7 @@ function updateClientMealSummary(){
           totals.fat += (Number(f.fat)||0)/100*grams;
           totals.fiber += (Number(f.fiber)||0)/100*grams;
           totals.salt += (Number(f.salt)||0)/100*grams;
+          MICRO_FIELDS.forEach(field=> totals[field] += (Number(f[field])||0)/100*grams);
         }
       }
     });
@@ -4503,6 +4575,14 @@ function updateClientMealSummary(){
   const fiberMet = totals.fiber >= goals.fiberMin;
   const saltOk = totals.salt <= goals.saltMax;
   const chip = (label, val, ok)=> `<span class="macro-chip" style="background:${ok===undefined?'var(--beige)':(ok?'var(--sage-pale)':'var(--beige-deep)')};color:${ok===undefined?'var(--ink-soft)':(ok?'var(--sage-dark)':'var(--accent)')};">${label} ${val}</span>`;
+  const microGoalKeys = ['calciumMin','ironMin','phosphorusMin','potassiumMin','vitaminDMin','vitaminB1Min','vitaminB2Min','vitaminB3Min','vitaminB6Min','vitaminB9Min','vitaminB12Min'];
+  const microChips = MICRO_FIELDS.map((field,i)=>{
+    const goalKey = microGoalKeys[i];
+    const goalVal = goals[goalKey];
+    const met = totals[field] >= goalVal;
+    const decimals = ['vitaminD','vitaminB1','vitaminB2','vitaminB3','vitaminB6'].includes(field) ? 1 : 0;
+    return chip(t(MICRO_LABELS_KEYS[i]), `${(Math.round(totals[field]*Math.pow(10,decimals))/Math.pow(10,decimals))}/${goalVal}`, met);
+  }).join('');
   summary.innerHTML = `
     <span class="macro-chip">${t('macro_kcal_label')} ${Math.round(totals.kcal)}/${goals.kcalTarget}</span>
     <span class="macro-chip">${t('macro_protein_label')} ${Math.round(totals.protein)}/${goals.proteinTarget} g</span>
@@ -4511,7 +4591,8 @@ function updateClientMealSummary(){
     ${chip(t('macro_fiber_label'), `${(Math.round(totals.fiber*10)/10)}/${goals.fiberMin} g`, fiberMet)}
     ${chip(t('macro_salt_label'), `${(Math.round(totals.salt*100)/100)}/${goals.saltMax} g ${t('salt_max_suffix')}`, saltOk)}
     ${chip('🍎', `${fvToday.fruit.toFixed(1)}/${goals.fruitTarget} ${t('fv_fruit_label')}`, fruitMet)}
-    ${chip('🥦', `${fvToday.vegetable.toFixed(1)}/${goals.vegTarget} ${t('fv_veg_label')}`, vegMet)}`;
+    ${chip('🥦', `${fvToday.vegetable.toFixed(1)}/${goals.vegTarget} ${t('fv_veg_label')}`, vegMet)}
+    ${microChips}`;
 }
 
 function renderClientGoalsInputs(){
@@ -4524,9 +4605,23 @@ function renderClientGoalsInputs(){
   document.getElementById('cGoalSaltMax').value = client.goals.saltMax;
   document.getElementById('cGoalFruitTarget').value = client.goals.fruitTarget;
   document.getElementById('cGoalVegTarget').value = client.goals.vegTarget;
+  document.getElementById('cGoalCalciumMin').value = client.goals.calciumMin;
+  document.getElementById('cGoalIronMin').value = client.goals.ironMin;
+  document.getElementById('cGoalPhosphorusMin').value = client.goals.phosphorusMin;
+  document.getElementById('cGoalPotassiumMin').value = client.goals.potassiumMin;
+  document.getElementById('cGoalVitaminDMin').value = client.goals.vitaminDMin;
+  document.getElementById('cGoalVitaminB1Min').value = client.goals.vitaminB1Min;
+  document.getElementById('cGoalVitaminB2Min').value = client.goals.vitaminB2Min;
+  document.getElementById('cGoalVitaminB3Min').value = client.goals.vitaminB3Min;
+  document.getElementById('cGoalVitaminB6Min').value = client.goals.vitaminB6Min;
+  document.getElementById('cGoalVitaminB9Min').value = client.goals.vitaminB9Min;
+  document.getElementById('cGoalVitaminB12Min').value = client.goals.vitaminB12Min;
 }
 [['cGoalKcalTarget','kcalTarget'],['cGoalProteinTarget','proteinTarget'],['cGoalCarbsTarget','carbsTarget'],['cGoalFatTarget','fatTarget'],
- ['cGoalFiberMin','fiberMin'],['cGoalSaltMax','saltMax'],['cGoalFruitTarget','fruitTarget'],['cGoalVegTarget','vegTarget']].forEach(([elId,key])=>{
+ ['cGoalFiberMin','fiberMin'],['cGoalSaltMax','saltMax'],['cGoalFruitTarget','fruitTarget'],['cGoalVegTarget','vegTarget'],
+ ['cGoalCalciumMin','calciumMin'],['cGoalIronMin','ironMin'],['cGoalPhosphorusMin','phosphorusMin'],['cGoalPotassiumMin','potassiumMin'],
+ ['cGoalVitaminDMin','vitaminDMin'],['cGoalVitaminB1Min','vitaminB1Min'],['cGoalVitaminB2Min','vitaminB2Min'],['cGoalVitaminB3Min','vitaminB3Min'],
+ ['cGoalVitaminB6Min','vitaminB6Min'],['cGoalVitaminB9Min','vitaminB9Min'],['cGoalVitaminB12Min','vitaminB12Min']].forEach(([elId,key])=>{
   const el = document.getElementById(elId);
   attachNumericClean(el);
   el.addEventListener('change', ()=>{
