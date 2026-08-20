@@ -517,7 +517,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v7.2</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v7.3</span>
       <button class="btn btn-ghost btn-sm no-print" id="backupExportBtn" data-i18n="btn_backup_export" title="Scarica un backup completo di tutti i tuoi dati">⬇ Backup</button>
       <button class="btn btn-ghost btn-sm no-print" id="backupImportBtn" data-i18n="btn_backup_import" title="Ripristina i dati da un file di backup">⬆ Ripristina</button>
       <input type="file" id="backupImportFile" accept=".json,application/json" style="display:none;">
@@ -972,8 +972,84 @@
       <input autocomplete="off" type="text" id="cEmail" data-i18n-ph="client_email_ph" placeholder="Email">
     </div>
     <input autocomplete="off" type="text" id="cAddress" data-i18n-ph="client_address_ph" placeholder="Indirizzo">
-    <input autocomplete="off" type="text" id="cBirthDate" data-i18n-ph="client_birthdate_ph" placeholder="Data di nascita (facoltativa)">
+    <div class="two-col">
+      <label style="font-size:11px;color:var(--ink-soft);font-weight:600;display:flex;flex-direction:column;gap:4px;">
+        <span data-i18n="client_birthdate_label">Data di nascita</span>
+        <input type="date" id="cBirthDate">
+      </label>
+      <label style="font-size:11px;color:var(--ink-soft);font-weight:600;display:flex;flex-direction:column;gap:4px;">
+        <span data-i18n="client_age_label">Età</span>
+        <div id="cAgeDisplay" style="padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--beige);font-size:13.5px;color:var(--ink);">—</div>
+      </label>
+    </div>
     <textarea id="cNotes" rows="3" data-i18n-ph="client_notes_ph" placeholder="Note generali (obiettivi, storia, preferenze...)"></textarea>
+
+    <h3 class="client-section-title" data-i18n="client_section_questionnaire">Questionario generale</h3>
+    <div class="goals-grid">
+      <label><span data-i18n="q_goal_label">Obiettivo principale</span>
+        <select id="qGoal">
+          <option value="" data-i18n="q_goal_opt_none">— seleziona —</option>
+          <option value="peso" data-i18n="q_goal_opt_peso">Gestione del peso</option>
+          <option value="energia" data-i18n="q_goal_opt_energia">Più energia</option>
+          <option value="digestione" data-i18n="q_goal_opt_digestione">Digestione</option>
+          <option value="sonno" data-i18n="q_goal_opt_sonno">Qualità del sonno</option>
+          <option value="stress" data-i18n="q_goal_opt_stress">Gestione dello stress</option>
+          <option value="performance" data-i18n="q_goal_opt_performance">Performance sportiva</option>
+          <option value="benessere" data-i18n="q_goal_opt_benessere">Benessere generale</option>
+        </select>
+      </label>
+      <label><span data-i18n="q_activity_label">Attività fisica attuale</span>
+        <select id="qActivity">
+          <option value="" data-i18n="q_activity_opt_none">— seleziona —</option>
+          <option value="sedentario" data-i18n="activity_sedentario">Sedentario</option>
+          <option value="leggero" data-i18n="activity_leggero">Leggero (1-3 giorni/sett.)</option>
+          <option value="moderato" data-i18n="activity_moderato">Moderato (3-5 giorni/sett.)</option>
+          <option value="attivo" data-i18n="activity_attivo">Attivo (6-7 giorni/sett.)</option>
+        </select>
+      </label>
+      <label><span data-i18n="q_sleep_label">Qualità del sonno</span>
+        <select id="qSleep">
+          <option value="" data-i18n="q_sleep_opt_none">— seleziona —</option>
+          <option value="buona" data-i18n="q_sleep_opt_buona">Buona</option>
+          <option value="irregolare" data-i18n="q_sleep_opt_irregolare">Irregolare</option>
+          <option value="scarsa" data-i18n="q_sleep_opt_scarsa">Scarsa / insonnia</option>
+        </select>
+      </label>
+      <label><span data-i18n="q_stress_label">Livello di stress percepito</span>
+        <select id="qStress">
+          <option value="" data-i18n="q_stress_opt_none">— seleziona —</option>
+          <option value="basso" data-i18n="q_stress_opt_basso">Basso</option>
+          <option value="medio" data-i18n="q_stress_opt_medio">Medio</option>
+          <option value="alto" data-i18n="q_stress_opt_alto">Alto</option>
+        </select>
+      </label>
+      <label><span data-i18n="q_digestion_label">Digestione</span>
+        <select id="qDigestion">
+          <option value="" data-i18n="q_digestion_opt_none">— seleziona —</option>
+          <option value="regolare" data-i18n="q_digestion_opt_regolare">Regolare</option>
+          <option value="gonfiore" data-i18n="q_digestion_opt_gonfiore">Gonfiore / gas</option>
+          <option value="stitichezza" data-i18n="q_digestion_opt_stitichezza">Stitichezza</option>
+          <option value="acidita" data-i18n="q_digestion_opt_acidita">Acidità / bruciore</option>
+        </select>
+      </label>
+      <label><span data-i18n="q_water_label">Consumo di acqua giornaliero</span>
+        <select id="qWater">
+          <option value="" data-i18n="q_water_opt_none">— seleziona —</option>
+          <option value="basso" data-i18n="q_water_opt_basso">Meno di 1L</option>
+          <option value="medio" data-i18n="q_water_opt_medio">1-1,5L</option>
+          <option value="buono" data-i18n="q_water_opt_buono">Più di 1,5L</option>
+        </select>
+      </label>
+    </div>
+    <textarea id="qAllergies" rows="2" data-i18n-ph="q_allergies_ph" placeholder="Allergie e intolleranze note" style="margin-top:8px;"></textarea>
+    <textarea id="qMedications" rows="2" data-i18n-ph="q_medications_ph" placeholder="Farmaci e integratori attualmente in uso" style="margin-top:8px;"></textarea>
+    <textarea id="qNotes" rows="2" data-i18n-ph="q_notes_ph" placeholder="Altre osservazioni dal colloquio iniziale" style="margin-top:8px;"></textarea>
+
+    <h3 class="client-section-title" data-i18n="client_section_dosha">Test dei dosha (Ayurveda)</h3>
+    <p style="font-size:12px;color:var(--ink-soft);margin:-4px 0 10px;" data-i18n="dosha_intro">Per ogni domanda scegli la risposta che ti descrive meglio in generale (non solo in questo periodo).</p>
+    <div id="doshaQuestions"></div>
+    <button type="button" class="btn btn-accent btn-sm" id="doshaCalcBtn" style="margin-top:8px;" data-i18n="btn_dosha_calc">Calcola il mio dosha</button>
+    <div id="doshaResult" style="margin-top:12px;"></div>
 
     <h3 class="client-section-title" data-i18n="client_section_sessions">Diario sedute</h3>
     <div class="add-item-row no-print">
@@ -1418,6 +1494,8 @@ function ensureClientStructures(client){
   if(!client.notes) client.notes = '';
   if(!client.sessions) client.sessions = [];
   if(!client.assignedRecipeIds) client.assignedRecipeIds = [];
+  if(!client.questionnaire) client.questionnaire = {};
+  if(!client.doshaAnswers) client.doshaAnswers = {};
   client.goals = {...DEFAULT_STATE.nutritionGoals, ...(client.goals||{})};
   if(!client.mealPlan) client.mealPlan = {};
   DAYS.forEach(day=>{
@@ -1440,6 +1518,31 @@ const I18N = {
     btn_new_client:"+ Nuovo cliente", clients_empty:"Nessun cliente ancora. Clicca \"+ Nuovo cliente\" per iniziare.", client_unnamed:"Cliente senza nome",
     client_modal_new:"Nuovo cliente", client_name_ph:"Nome e cognome", client_phone_ph:"Telefono", client_email_ph:"Email", client_address_ph:"Indirizzo", client_birthdate_ph:"Data di nascita (facoltativa)", client_notes_ph:"Note generali (obiettivi, storia, preferenze...)",
     client_section_contact:"Dati di contatto", client_section_sessions:"Diario sedute", client_section_recipes:"Ricette assegnate", client_section_plan:"Piano pasti e obiettivi", client_section_notes:"Note", client_section_goals:"Obiettivi",
+    client_birthdate_label:"Data di nascita", client_age_label:"Età", years_word:"anni",
+    client_section_questionnaire:"Questionario generale",
+    q_goal_label:"Obiettivo principale", q_goal_opt_none:"— seleziona —", q_goal_opt_peso:"Gestione del peso", q_goal_opt_energia:"Più energia", q_goal_opt_digestione:"Digestione", q_goal_opt_sonno:"Qualità del sonno", q_goal_opt_stress:"Gestione dello stress", q_goal_opt_performance:"Performance sportiva", q_goal_opt_benessere:"Benessere generale",
+    q_activity_label:"Attività fisica attuale", q_activity_opt_none:"— seleziona —",
+    q_sleep_label:"Qualità del sonno", q_sleep_opt_none:"— seleziona —", q_sleep_opt_buona:"Buona", q_sleep_opt_irregolare:"Irregolare", q_sleep_opt_scarsa:"Scarsa / insonnia",
+    q_stress_label:"Livello di stress percepito", q_stress_opt_none:"— seleziona —", q_stress_opt_basso:"Basso", q_stress_opt_medio:"Medio", q_stress_opt_alto:"Alto",
+    q_digestion_label:"Digestione", q_digestion_opt_none:"— seleziona —", q_digestion_opt_regolare:"Regolare", q_digestion_opt_gonfiore:"Gonfiore / gas", q_digestion_opt_stitichezza:"Stitichezza", q_digestion_opt_acidita:"Acidità / bruciore",
+    q_water_label:"Consumo di acqua giornaliero", q_water_opt_none:"— seleziona —", q_water_opt_basso:"Meno di 1L", q_water_opt_medio:"1-1,5L", q_water_opt_buono:"Più di 1,5L",
+    q_allergies_ph:"Allergie e intolleranze note", q_medications_ph:"Farmaci e integratori attualmente in uso", q_notes_ph:"Altre osservazioni dal colloquio iniziale",
+    client_section_dosha:"Test dei dosha (Ayurveda)", dosha_intro:"Per ogni domanda scegli la risposta che ti descrive meglio in generale (non solo in questo periodo).",
+    btn_dosha_calc:"Calcola il mio dosha", dosha_result_prefix:"Il tuo dosha prevalente:", dosha_v_label:"Vata", dosha_p_label:"Pitta", dosha_k_label:"Kapha",
+    dosha_vata:"Vata", dosha_pitta:"Pitta", dosha_kapha:"Kapha",
+    dosha_vata_desc:"Energico, creativo e dinamico quando in equilibrio; tende a manifestare ansia, secchezza e irregolarità quando sbilanciato. Beneficia di routine regolari, cibi caldi e nutrienti, e pratiche calmanti.",
+    dosha_pitta_desc:"Determinato, intelligente e con buone capacità di leadership quando in equilibrio; tende a irritabilità, infiammazione ed eccesso di calore quando sbilanciato. Beneficia di cibi rinfrescanti, moderazione e attività che favoriscono la calma.",
+    dosha_kapha_desc:"Stabile, calmo e resistente quando in equilibrio; tende a pigrizia, ristagno e aumento di peso quando sbilanciato. Beneficia di movimento regolare, cibi leggeri e speziati, e stimoli che favoriscono la vitalità.",
+    dosha_q1:"Corporatura e peso", dosha_q1_v:"Sono magra/o, con ossa sottili, faccio fatica a mettere peso", dosha_q1_p:"Corporatura media e muscolosa, mantengo il peso con facilità", dosha_q1_k:"Corporatura robusta e solida, tendo facilmente ad aumentare di peso",
+    dosha_q2:"Pelle", dosha_q2_v:"Secca, sottile, fredda al tatto", dosha_q2_p:"Calda, sensibile, arrossisce facilmente, tendente a irritazioni", dosha_q2_k:"Grassa, spessa, morbida e fresca al tatto",
+    dosha_q3:"Capelli", dosha_q3_v:"Secchi, sottili, crespi o ricci", dosha_q3_p:"Sottili, tendenza a calvizie precoce o capelli chiari/rossastri", dosha_q3_k:"Spessi, oleosi, ondulati e lucidi",
+    dosha_q4:"Appetito", dosha_q4_v:"Irregolare e variabile, a volte dimentico di mangiare", dosha_q4_p:"Forte e regolare, divento irritabile se salto un pasto", dosha_q4_k:"Costante, ma posso saltare un pasto senza problemi",
+    dosha_q5:"Digestione", dosha_q5_v:"Irregolare, tendenza a gonfiore e gas", dosha_q5_p:"Veloce ed efficiente, a volte acidità o bruciore", dosha_q5_k:"Lenta, sensazione di pesantezza dopo i pasti",
+    dosha_q6:"Sonno", dosha_q6_v:"Leggero, mi sveglio facilmente, poche ore", dosha_q6_p:"Moderato ma profondo, dormo bene se non sono stressata/o", dosha_q6_k:"Pesante e prolungato, faccio fatica ad alzarmi",
+    dosha_q7:"Temperamento", dosha_q7_v:"Vivace, entusiasta, mente sempre attiva, tendo all'ansia", dosha_q7_p:"Determinata/o, focalizzata/o, a volte impaziente o irritabile", dosha_q7_k:"Calma/o, paziente, tendo alla pigrizia se non stimolata/o",
+    dosha_q8:"Reazione allo stress", dosha_q8_v:"Ansia e preoccupazione", dosha_q8_p:"Irritabilità e frustrazione", dosha_q8_k:"Mi ritiro ed evito la situazione",
+    dosha_q9:"Rapporto con il clima", dosha_q9_v:"Soffro il freddo, preferisco il caldo", dosha_q9_p:"Soffro il caldo, preferisco il fresco", dosha_q9_k:"Mi adatto bene, ma preferisco un clima caldo e secco",
+    dosha_q10:"Memoria e apprendimento", dosha_q10_v:"Apprendo in fretta ma dimentico altrettanto velocemente", dosha_q10_p:"Memoria acuta, apprendimento nella media", dosha_q10_k:"Apprendo lentamente ma ricordo a lungo",
     client_session_date_ph:"Data (es. 12/03/2026)", client_session_note_ph:"Nota della seduta", btn_add_session:"+ Aggiungi",
     client_sessions_empty:"Nessuna seduta registrata ancora.", client_no_recipes_yet:"Non hai ancora nessuna ricetta da assegnare — creane una nella scheda Ricette.",
     btn_print_client:"🖨️ Vedi e stampa la scheda cliente", btn_delete_client:"Elimina cliente", confirm_delete_client:"Eliminare definitivamente questo cliente e tutti i suoi dati?",
@@ -1618,6 +1721,31 @@ const I18N = {
     btn_new_client:"+ Nouveau client", clients_empty:"Aucun client pour l'instant. Clique sur \"+ Nouveau client\" pour commencer.", client_unnamed:"Client sans nom",
     client_modal_new:"Nouveau client", client_name_ph:"Nom et prénom", client_phone_ph:"Téléphone", client_email_ph:"Email", client_address_ph:"Adresse", client_birthdate_ph:"Date de naissance (facultative)", client_notes_ph:"Notes générales (objectifs, historique, préférences...)",
     client_section_contact:"Coordonnées", client_section_sessions:"Journal des séances", client_section_recipes:"Recettes assignées", client_section_plan:"Plan de repas et objectifs", client_section_notes:"Notes", client_section_goals:"Objectifs",
+    client_birthdate_label:"Date de naissance", client_age_label:"Âge", years_word:"ans",
+    client_section_questionnaire:"Questionnaire général",
+    q_goal_label:"Objectif principal", q_goal_opt_none:"— sélectionner —", q_goal_opt_peso:"Gestion du poids", q_goal_opt_energia:"Plus d'énergie", q_goal_opt_digestione:"Digestion", q_goal_opt_sonno:"Qualité du sommeil", q_goal_opt_stress:"Gestion du stress", q_goal_opt_performance:"Performance sportive", q_goal_opt_benessere:"Bien-être général",
+    q_activity_label:"Activité physique actuelle", q_activity_opt_none:"— sélectionner —",
+    q_sleep_label:"Qualité du sommeil", q_sleep_opt_none:"— sélectionner —", q_sleep_opt_buona:"Bonne", q_sleep_opt_irregolare:"Irrégulière", q_sleep_opt_scarsa:"Mauvaise / insomnie",
+    q_stress_label:"Niveau de stress perçu", q_stress_opt_none:"— sélectionner —", q_stress_opt_basso:"Faible", q_stress_opt_medio:"Moyen", q_stress_opt_alto:"Élevé",
+    q_digestion_label:"Digestion", q_digestion_opt_none:"— sélectionner —", q_digestion_opt_regolare:"Régulière", q_digestion_opt_gonfiore:"Ballonnements / gaz", q_digestion_opt_stitichezza:"Constipation", q_digestion_opt_acidita:"Acidité / brûlures",
+    q_water_label:"Consommation d'eau quotidienne", q_water_opt_none:"— sélectionner —", q_water_opt_basso:"Moins de 1L", q_water_opt_medio:"1-1,5L", q_water_opt_buono:"Plus de 1,5L",
+    q_allergies_ph:"Allergies et intolérances connues", q_medications_ph:"Médicaments et compléments actuellement utilisés", q_notes_ph:"Autres observations de l'entretien initial",
+    client_section_dosha:"Test des doshas (Ayurveda)", dosha_intro:"Pour chaque question, choisis la réponse qui te décrit le mieux en général (pas seulement en ce moment).",
+    btn_dosha_calc:"Calculer mon dosha", dosha_result_prefix:"Ton dosha prédominant :", dosha_v_label:"Vata", dosha_p_label:"Pitta", dosha_k_label:"Kapha",
+    dosha_vata:"Vata", dosha_pitta:"Pitta", dosha_kapha:"Kapha",
+    dosha_vata_desc:"Énergique, créatif et dynamique en équilibre ; tend à manifester anxiété, sécheresse et irrégularité en déséquilibre. Bénéficie de routines régulières, d'aliments chauds et nourrissants, et de pratiques apaisantes.",
+    dosha_pitta_desc:"Déterminé, intelligent et avec de bonnes capacités de leadership en équilibre ; tend à l'irritabilité, l'inflammation et l'excès de chaleur en déséquilibre. Bénéficie d'aliments rafraîchissants, de modération et d'activités favorisant le calme.",
+    dosha_kapha_desc:"Stable, calme et résistant en équilibre ; tend à la paresse, la stagnation et la prise de poids en déséquilibre. Bénéficie d'un mouvement régulier, d'aliments légers et épicés, et de stimuli favorisant la vitalité.",
+    dosha_q1:"Corpulence et poids", dosha_q1_v:"Je suis mince, avec des os fins, j'ai du mal à prendre du poids", dosha_q1_p:"Corpulence moyenne et musclée, je maintiens mon poids facilement", dosha_q1_k:"Corpulence robuste et solide, je prends facilement du poids",
+    dosha_q2:"Peau", dosha_q2_v:"Sèche, fine, froide au toucher", dosha_q2_p:"Chaude, sensible, rougit facilement, sujette aux irritations", dosha_q2_k:"Grasse, épaisse, douce et fraîche au toucher",
+    dosha_q3:"Cheveux", dosha_q3_v:"Secs, fins, frisés ou bouclés", dosha_q3_p:"Fins, tendance à la calvitie précoce ou cheveux clairs/roux", dosha_q3_k:"Épais, gras, ondulés et brillants",
+    dosha_q4:"Appétit", dosha_q4_v:"Irrégulier et variable, j'oublie parfois de manger", dosha_q4_p:"Fort et régulier, je deviens irritable si je saute un repas", dosha_q4_k:"Constant, mais je peux sauter un repas sans problème",
+    dosha_q5:"Digestion", dosha_q5_v:"Irrégulière, tendance aux ballonnements et gaz", dosha_q5_p:"Rapide et efficace, parfois acidité ou brûlures", dosha_q5_k:"Lente, sensation de lourdeur après les repas",
+    dosha_q6:"Sommeil", dosha_q6_v:"Léger, je me réveille facilement, peu d'heures", dosha_q6_p:"Modéré mais profond, je dors bien si je ne suis pas stressé(e)", dosha_q6_k:"Lourd et prolongé, j'ai du mal à me lever",
+    dosha_q7:"Tempérament", dosha_q7_v:"Vif, enthousiaste, esprit toujours actif, tendance à l'anxiété", dosha_q7_p:"Déterminé(e), concentré(e), parfois impatient(e) ou irritable", dosha_q7_k:"Calme, patient(e), tendance à la paresse si pas stimulé(e)",
+    dosha_q8:"Réaction au stress", dosha_q8_v:"Anxiété et inquiétude", dosha_q8_p:"Irritabilité et frustration", dosha_q8_k:"Je me retire et j'évite la situation",
+    dosha_q9:"Rapport au climat", dosha_q9_v:"Je souffre du froid, je préfère la chaleur", dosha_q9_p:"Je souffre de la chaleur, je préfère la fraîcheur", dosha_q9_k:"Je m'adapte bien, mais je préfère un climat chaud et sec",
+    dosha_q10:"Mémoire et apprentissage", dosha_q10_v:"J'apprends vite mais j'oublie tout aussi vite", dosha_q10_p:"Mémoire vive, apprentissage dans la moyenne", dosha_q10_k:"J'apprends lentement mais je me souviens longtemps",
     client_session_date_ph:"Date (ex. 12/03/2026)", client_session_note_ph:"Note de la séance", btn_add_session:"+ Ajouter",
     client_sessions_empty:"Aucune séance enregistrée pour l'instant.", client_no_recipes_yet:"Tu n'as pas encore de recette à assigner — crées-en une dans l'onglet Recettes.",
     btn_print_client:"🖨️ Voir et imprimer la fiche client", btn_delete_client:"Supprimer le client", confirm_delete_client:"Supprimer définitivement ce client et toutes ses données ?",
@@ -4750,7 +4878,11 @@ function openClientModal(id){
   document.getElementById('cEmail').value = client.email || '';
   document.getElementById('cAddress').value = client.address || '';
   document.getElementById('cBirthDate').value = client.birthDate || '';
+  updateAgeDisplay();
   document.getElementById('cNotes').value = client.notes || '';
+  renderQuestionnaireInputs();
+  renderDoshaQuestions();
+  renderDoshaResult();
   currentClientMealDay = DAYS[0];
   renderSessions();
   renderAssignedRecipes();
@@ -4780,6 +4912,7 @@ function closeClientModal(cleanupIfEmpty){
     client[field] = e.target.value.trim();
     persist();
     if(field==='name') document.getElementById('clientModalTitle').textContent = client.name || t('client_modal_new');
+    if(field==='birthDate') updateAgeDisplay();
   });
 });
 document.getElementById('cNotes').addEventListener('change', (e)=>{
@@ -4787,6 +4920,108 @@ document.getElementById('cNotes').addEventListener('change', (e)=>{
   if(!client) return;
   client.notes = e.target.value.trim();
   persist();
+});
+
+function updateAgeDisplay(){
+  const val = document.getElementById('cBirthDate').value;
+  const el = document.getElementById('cAgeDisplay');
+  if(!val){ el.textContent = '—'; return; }
+  const birth = new Date(val);
+  if(isNaN(birth.getTime())){ el.textContent = '—'; return; }
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if(m < 0 || (m===0 && today.getDate() < birth.getDate())) age--;
+  el.textContent = `${age} ${t('years_word')}`;
+}
+
+/* ---------- QUESTIONNAIRE ---------- */
+const QUESTIONNAIRE_FIELDS = ['qGoal','qActivity','qSleep','qStress','qDigestion','qWater','qAllergies','qMedications','qNotes'];
+function renderQuestionnaireInputs(){
+  const client = getEditingClient();
+  const q = client.questionnaire || {};
+  QUESTIONNAIRE_FIELDS.forEach(id=>{
+    const el = document.getElementById(id);
+    el.value = q[id] || '';
+  });
+}
+QUESTIONNAIRE_FIELDS.forEach(id=>{
+  document.getElementById(id).addEventListener('change', (e)=>{
+    const client = getEditingClient();
+    if(!client) return;
+    if(!client.questionnaire) client.questionnaire = {};
+    client.questionnaire[id] = e.target.value.trim();
+    persist();
+  });
+});
+
+/* ---------- AYURVEDIC DOSHA TEST ---------- */
+const DOSHA_QUESTIONS = [
+  {key:'q1', labelKey:'dosha_q1', options:[['V','dosha_q1_v'],['P','dosha_q1_p'],['K','dosha_q1_k']]},
+  {key:'q2', labelKey:'dosha_q2', options:[['V','dosha_q2_v'],['P','dosha_q2_p'],['K','dosha_q2_k']]},
+  {key:'q3', labelKey:'dosha_q3', options:[['V','dosha_q3_v'],['P','dosha_q3_p'],['K','dosha_q3_k']]},
+  {key:'q4', labelKey:'dosha_q4', options:[['V','dosha_q4_v'],['P','dosha_q4_p'],['K','dosha_q4_k']]},
+  {key:'q5', labelKey:'dosha_q5', options:[['V','dosha_q5_v'],['P','dosha_q5_p'],['K','dosha_q5_k']]},
+  {key:'q6', labelKey:'dosha_q6', options:[['V','dosha_q6_v'],['P','dosha_q6_p'],['K','dosha_q6_k']]},
+  {key:'q7', labelKey:'dosha_q7', options:[['V','dosha_q7_v'],['P','dosha_q7_p'],['K','dosha_q7_k']]},
+  {key:'q8', labelKey:'dosha_q8', options:[['V','dosha_q8_v'],['P','dosha_q8_p'],['K','dosha_q8_k']]},
+  {key:'q9', labelKey:'dosha_q9', options:[['V','dosha_q9_v'],['P','dosha_q9_p'],['K','dosha_q9_k']]},
+  {key:'q10', labelKey:'dosha_q10', options:[['V','dosha_q10_v'],['P','dosha_q10_p'],['K','dosha_q10_k']]},
+];
+function renderDoshaQuestions(){
+  const client = getEditingClient();
+  const answers = client.doshaAnswers || {};
+  const wrap = document.getElementById('doshaQuestions');
+  wrap.innerHTML = DOSHA_QUESTIONS.map((q,i)=>{
+    const optsHtml = q.options.map(([val,labelKey])=>`
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;margin:4px 0;cursor:pointer;">
+        <input type="radio" name="dosha_${q.key}" value="${val}" ${answers[q.key]===val?'checked':''} style="width:auto;margin:3px 0 0;">
+        <span>${t(labelKey)}</span>
+      </label>`).join('');
+    return `<div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line);">
+      <div style="font-size:13px;font-weight:600;color:var(--sage-dark);margin-bottom:6px;">${i+1}. ${t(q.labelKey)}</div>
+      ${optsHtml}
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('input[type="radio"]').forEach(radio=>{
+    radio.addEventListener('change', (e)=>{
+      const client = getEditingClient();
+      if(!client) return;
+      if(!client.doshaAnswers) client.doshaAnswers = {};
+      const key = e.target.name.replace('dosha_','');
+      client.doshaAnswers[key] = e.target.value;
+      persist();
+    });
+  });
+}
+function computeDoshaResult(answers){
+  const counts = {V:0, P:0, K:0};
+  DOSHA_QUESTIONS.forEach(q=>{
+    const a = answers[q.key];
+    if(a && counts[a]!==undefined) counts[a]++;
+  });
+  const answered = counts.V + counts.P + counts.K;
+  if(answered < DOSHA_QUESTIONS.length) return null;
+  const max = Math.max(counts.V, counts.P, counts.K);
+  const dominant = ['V','P','K'].filter(k=>counts[k]===max);
+  return {counts, dominant};
+}
+function renderDoshaResult(){
+  const client = getEditingClient();
+  const wrap = document.getElementById('doshaResult');
+  const result = computeDoshaResult(client.doshaAnswers || {});
+  if(!result){ wrap.innerHTML = ''; return; }
+  const doshaNames = {V:t('dosha_vata'), P:t('dosha_pitta'), K:t('dosha_kapha')};
+  const doshaDescKeys = {V:'dosha_vata_desc', P:'dosha_pitta_desc', K:'dosha_kapha_desc'};
+  const resultLabel = result.dominant.map(d=>doshaNames[d]).join('-');
+  wrap.innerHTML = `<div style="background:var(--sage-pale);border-radius:12px;padding:14px 16px;">
+    <div style="font-family:var(--font-display);font-size:16px;color:var(--sage-dark);margin-bottom:6px;">${t('dosha_result_prefix')} ${resultLabel}</div>
+    ${result.dominant.map(d=>`<p style="font-size:12.5px;color:var(--ink);margin:4px 0;line-height:1.6;"><strong>${doshaNames[d]}:</strong> ${t(doshaDescKeys[d])}</p>`).join('')}
+    <p style="font-size:11px;color:var(--ink-soft);margin-top:8px;">${t('dosha_v_label')} ${result.counts.V} · ${t('dosha_p_label')} ${result.counts.P} · ${t('dosha_k_label')} ${result.counts.K}</p>
+  </div>`;
+}
+document.getElementById('doshaCalcBtn').addEventListener('click', ()=>{
+  renderDoshaResult();
 });
 
 document.getElementById('clientSaveBtn').addEventListener('click', ()=> closeClientModal(true));
