@@ -521,7 +521,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v8.9</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v9.2</span>
       <button class="btn btn-ghost btn-sm no-print" id="backupExportBtn" data-i18n="btn_backup_export" title="Scarica un backup completo di tutti i tuoi dati">⬇ Backup</button>
       <button class="btn btn-ghost btn-sm no-print" id="backupImportBtn" data-i18n="btn_backup_import" title="Ripristina i dati da un file di backup">⬆ Ripristina</button>
       <input type="file" id="backupImportFile" accept=".json,application/json" style="display:none;">
@@ -1339,6 +1339,23 @@
   <div class="modal" style="max-width:560px;">
     <h3 data-i18n="new_food_modal_title">Nuovo alimento</h3>
     <p style="font-size:12px;color:var(--ink-soft);margin:-6px 0 12px;" data-i18n="new_food_modal_note">Tutti i valori si intendono per 100g dell'alimento. Puoi lasciare vuoti quelli che non conosci.</p>
+    <div style="background:var(--beige);border-radius:12px;padding:12px 14px;margin-bottom:16px;">
+      <label class="field-label" style="margin-top:0;" data-i18n="barcode_label">Cerca da codice a barre (facoltativo)</label>
+      <div style="display:flex;gap:8px;">
+        <input autocomplete="off" type="text" inputmode="numeric" id="nfBarcode" data-i18n-ph="barcode_ph" placeholder="Es. 3017624010701" style="flex:1;margin:0;">
+        <button type="button" class="btn btn-primary btn-sm" id="nfBarcodeSearchBtn" data-i18n="btn_barcode_search">Cerca</button>
+      </div>
+      <p id="nfBarcodeStatus" style="font-size:11.5px;color:var(--ink-soft);margin:8px 0 0;"></p>
+    </div>
+    <div style="background:var(--beige);border-radius:12px;padding:12px 14px;margin-bottom:16px;">
+      <label class="field-label" style="margin-top:0;" data-i18n="offname_label">Oppure cerca per nome prodotto (facoltativo)</label>
+      <div style="display:flex;gap:8px;">
+        <input autocomplete="off" type="text" id="nfNameSearch" data-i18n-ph="offname_ph" placeholder="Es. Nutella, yaourt Danone…" style="flex:1;margin:0;">
+        <button type="button" class="btn btn-primary btn-sm" id="nfNameSearchBtn" data-i18n="btn_barcode_search">Cerca</button>
+      </div>
+      <p id="nfNameSearchStatus" style="font-size:11.5px;color:var(--ink-soft);margin:8px 0 0;"></p>
+      <div id="nfNameSearchResults" style="margin-top:6px;display:flex;flex-direction:column;gap:4px;"></div>
+    </div>
     <div class="goals-grid">
       <label><span data-i18n="food_name_it_ph">Nome (IT)</span><input autocomplete="off" type="text" id="nfNameIt"></label>
       <label><span data-i18n="food_name_fr_ph">Nom (FR)</span><input autocomplete="off" type="text" id="nfNameFr"></label>
@@ -1786,6 +1803,13 @@ const I18N = {
     btn_add_food_full:"+ Aggiungi alimento (con vitamine e minerali)",
     new_food_modal_title:"Nuovo alimento", new_food_modal_note:"Tutti i valori si intendono per 100g dell'alimento. Puoi lasciare vuoti quelli che non conosci.",
     new_food_section_macro:"Macronutrienti", new_food_section_micro:"Vitamine e minerali",
+    barcode_label:"Cerca da codice a barre (facoltativo)", barcode_ph:"Es. 3017624010701", btn_barcode_search:"Cerca",
+    barcode_status_empty:"Inserisci un codice a barre.", barcode_status_searching:"Ricerca in corso…",
+    barcode_status_found:"Trovato! Controlla i valori qui sotto — le vitamine potrebbero mancare, completale se serve.",
+    barcode_status_notfound:"Nessun prodotto trovato con questo codice — inserisci i valori a mano.",
+    barcode_status_error:"Errore di connessione — riprova, o inserisci i valori a mano.",
+    offname_label:"Oppure cerca per nome prodotto (facoltativo)", offname_ph:"Es. Nutella, yaourt Danone…",
+    offname_status_empty:"Scrivi il nome del prodotto da cercare.", offname_status_pick:"Scegli il prodotto giusto dall'elenco qui sotto.",
     note_modal_title:"Nota", note_placeholder:"Scrivi una nota…", btn_cancel:"Annulla", btn_save:"Salva",
     recipe_modal_new:"Nuova ricetta", recipe_modal_edit:"Modifica ricetta",
     recipe_name_ph:"Nome della ricetta", recipe_cat_ph:"Categoria (es. Colazione, Primo, Dolce…)",
@@ -2012,6 +2036,13 @@ const I18N = {
     btn_add_food_full:"+ Ajouter un aliment (avec vitamines et minéraux)",
     new_food_modal_title:"Nouvel aliment", new_food_modal_note:"Toutes les valeurs s'entendent pour 100g de l'aliment. Tu peux laisser vides celles que tu ne connais pas.",
     new_food_section_macro:"Macronutriments", new_food_section_micro:"Vitamines et minéraux",
+    barcode_label:"Rechercher par code-barres (facultatif)", barcode_ph:"Ex. 3017624010701", btn_barcode_search:"Rechercher",
+    barcode_status_empty:"Indique un code-barres.", barcode_status_searching:"Recherche en cours…",
+    barcode_status_found:"Trouvé ! Vérifie les valeurs ci-dessous — les vitamines peuvent manquer, complète-les si besoin.",
+    barcode_status_notfound:"Aucun produit trouvé avec ce code — indique les valeurs à la main.",
+    barcode_status_error:"Erreur de connexion — réessaie, ou indique les valeurs à la main.",
+    offname_label:"Ou cherche par nom de produit (facultatif)", offname_ph:"Ex. Nutella, yaourt Danone…",
+    offname_status_empty:"Écris le nom du produit à chercher.", offname_status_pick:"Choisis le bon produit dans la liste ci-dessous.",
     note_modal_title:"Note", note_placeholder:"Écris une note…", btn_cancel:"Annuler", btn_save:"Enregistrer",
     recipe_modal_new:"Nouvelle recette", recipe_modal_edit:"Modifier la recette",
     recipe_name_ph:"Nom de la recette", recipe_cat_ph:"Catégorie (ex. Petit-déjeuner, Plat, Dessert…)",
@@ -2099,6 +2130,24 @@ function recipeCategory(r){
     if(translated) return translated;
   }
   return r.category;
+}
+const GROUP_IT_TO_FR = {
+  'dolce':'Dessert', 'dolci':'Desserts', 'colazione':'Petit-déjeuner', 'pranzo':'Déjeuner', 'cena':'Dîner', 'spuntino':'Collation',
+  'onnivora':'Omnivore', 'onnivora bilanciata':'Omnivore équilibré',
+  'mediterranea':'Méditerranéenne', 'vegetariana':'Végétarienne', 'vegana':'Végane',
+  'anti-infiammatoria':'Anti-inflammatoire', 'antinfiammatoria':'Anti-inflammatoire',
+  'chetogenica':'Cétogène', 'paleo':'Paléo',
+  'senza glutine':'Sans gluten', 'senza zucchero':'Sans sucre', 'senza lattosio':'Sans lactose',
+  'senza latte':'Sans lait', 'senza uova':'Sans œufs', 'senza frutta a guscio':'Sans fruits à coque',
+  'senza zucchero, latte e glutine':'Sans sucre, lait et gluten'
+};
+function recipeGroup(r){
+  if(!r || !r.group) return '';
+  if(currentLang==='fr'){
+    const translated = GROUP_IT_TO_FR[r.group.trim().toLowerCase()];
+    if(translated) return translated;
+  }
+  return r.group;
 }
 function ingredientDisplayName(ing){
   if(!ing) return '';
@@ -4889,12 +4938,16 @@ function renderRecipeGroupFilter(){
   const sel = document.getElementById('recipeGroupFilter');
   const groups = [...new Set(state.recipes.map(r=>r.group).filter(g=>g && g.trim()))].sort();
   const current = sel.value;
-  sel.innerHTML = `<option value="">${t('recipe_group_all')}</option>` + groups.map(g=>`<option value="${escapeAttr(g)}">${escapeHtml(g)}</option>`).join('');
+  sel.innerHTML = `<option value="">${t('recipe_group_all')}</option>` + groups.map(g=>`<option value="${escapeAttr(g)}">${escapeHtml(recipeGroup({group:g}))}</option>`).join('');
   sel.value = groups.includes(current) ? current : '';
   recipeGroupFilter = sel.value;
   const datalist = document.getElementById('recipeGroupsDatalist');
   if(datalist) datalist.innerHTML = groups.map(g=>`<option value="${escapeAttr(g)}">`).join('');
 }
+document.getElementById('rCategory').addEventListener('input', (e)=>{
+  const groupField = document.getElementById('rGroup');
+  if(!groupField.value.trim()) groupField.value = e.target.value;
+});
 document.getElementById('foodSearchInput').addEventListener('input', (e)=>{
   foodSearchQuery = e.target.value.trim().toLowerCase();
   renderFoodsTable();
@@ -5038,14 +5091,99 @@ document.querySelectorAll('.numeric-clean').forEach(attachNumericClean);
 
 document.getElementById('openNewFoodModalBtn').addEventListener('click', ()=>{
   ['nfNameIt','nfNameFr','nfKcal','nfProtein','nfCarbs','nfFat','nfFiber','nfSalt',
-   'nfCalcium','nfIron','nfPhosphorus','nfPotassium','nfVitaminD','nfVitaminB1','nfVitaminB2','nfVitaminB3','nfVitaminB6','nfVitaminB9','nfVitaminB12'
+   'nfCalcium','nfIron','nfPhosphorus','nfPotassium','nfVitaminD','nfVitaminB1','nfVitaminB2','nfVitaminB3','nfVitaminB6','nfVitaminB9','nfVitaminB12',
+   'nfBarcode','nfNameSearch'
   ].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('nfBarcodeStatus').textContent = '';
+  document.getElementById('nfNameSearchStatus').textContent = '';
+  document.getElementById('nfNameSearchResults').innerHTML = '';
   document.getElementById('newFoodModalOverlay').classList.add('show');
 });
 document.getElementById('newFoodCancel').addEventListener('click', ()=>{
   document.getElementById('newFoodModalOverlay').classList.remove('show');
 });
 document.querySelectorAll('#newFoodModalOverlay .numeric-clean').forEach(attachNumericClean);
+function applyOffProductToForm(p){
+  const n = p.nutriments || {};
+  if(p.product_name_fr) document.getElementById('nfNameFr').value = p.product_name_fr;
+  if(p.product_name) document.getElementById('nfNameIt').value = p.product_name;
+  else if(p.product_name_fr) document.getElementById('nfNameIt').value = p.product_name_fr;
+  const setIfPresent = (elId, val, factor=1)=>{
+    if(typeof val === 'number' && !isNaN(val)){
+      document.getElementById(elId).value = Math.round(val*factor*100)/100;
+    }
+  };
+  setIfPresent('nfKcal', n['energy-kcal_100g']);
+  setIfPresent('nfProtein', n['proteins_100g']);
+  setIfPresent('nfCarbs', n['carbohydrates_100g']);
+  setIfPresent('nfFat', n['fat_100g']);
+  setIfPresent('nfFiber', n['fiber_100g']);
+  setIfPresent('nfSalt', n['salt_100g']);
+  setIfPresent('nfCalcium', n['calcium_100g'], 1000);
+  setIfPresent('nfIron', n['iron_100g'], 1000);
+  setIfPresent('nfPhosphorus', n['phosphorus_100g'], 1000);
+  setIfPresent('nfPotassium', n['potassium_100g'], 1000);
+  setIfPresent('nfVitaminD', n['vitamin-d_100g'], 1000000);
+  setIfPresent('nfVitaminB1', n['vitamin-b1_100g'], 1000);
+  setIfPresent('nfVitaminB2', n['vitamin-b2_100g'], 1000);
+  setIfPresent('nfVitaminB3', n['vitamin-pp_100g'], 1000);
+  setIfPresent('nfVitaminB6', n['vitamin-b6_100g'], 1000);
+  setIfPresent('nfVitaminB9', n['vitamin-b9_100g'], 1000000);
+  setIfPresent('nfVitaminB12', n['vitamin-b12_100g'], 1000000);
+}
+document.getElementById('nfBarcodeSearchBtn').addEventListener('click', async ()=>{
+  const code = document.getElementById('nfBarcode').value.trim().replace(/\D/g,'');
+  const statusEl = document.getElementById('nfBarcodeStatus');
+  if(!code){ statusEl.textContent = t('barcode_status_empty'); return; }
+  statusEl.textContent = t('barcode_status_searching');
+  try{
+    const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json`);
+    if(!res.ok) throw new Error('network');
+    const data = await res.json();
+    if(!data || data.status !== 1 || !data.product){
+      statusEl.textContent = t('barcode_status_notfound');
+      return;
+    }
+    applyOffProductToForm(data.product);
+    statusEl.textContent = t('barcode_status_found');
+  }catch(e){
+    statusEl.textContent = t('barcode_status_error');
+  }
+});
+document.getElementById('nfNameSearchBtn').addEventListener('click', async ()=>{
+  const query = document.getElementById('nfNameSearch').value.trim();
+  const statusEl = document.getElementById('nfNameSearchStatus');
+  const resultsEl = document.getElementById('nfNameSearchResults');
+  resultsEl.innerHTML = '';
+  if(!query){ statusEl.textContent = t('offname_status_empty'); return; }
+  statusEl.textContent = t('barcode_status_searching');
+  try{
+    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=8`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('network');
+    const data = await res.json();
+    const products = (data && data.products || []).filter(p=>p.product_name);
+    if(products.length === 0){
+      statusEl.textContent = t('barcode_status_notfound');
+      return;
+    }
+    statusEl.textContent = t('offname_status_pick');
+    resultsEl.innerHTML = products.map((p,i)=>{
+      const label = `${escapeHtml(p.product_name)}${p.brands?' — '+escapeHtml(p.brands):''}`;
+      return `<button type="button" class="btn btn-ghost btn-sm" data-offidx="${i}" style="text-align:left;justify-content:flex-start;">${label}</button>`;
+    }).join('');
+    resultsEl.querySelectorAll('[data-offidx]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const p = products[Number(btn.dataset.offidx)];
+        applyOffProductToForm(p);
+        resultsEl.innerHTML = '';
+        statusEl.textContent = t('barcode_status_found');
+      });
+    });
+  }catch(e){
+    statusEl.textContent = t('barcode_status_error');
+  }
+});
 document.getElementById('newFoodSave').addEventListener('click', ()=>{
   const nameIt = document.getElementById('nfNameIt').value.trim();
   const nameFr = document.getElementById('nfNameFr').value.trim();
