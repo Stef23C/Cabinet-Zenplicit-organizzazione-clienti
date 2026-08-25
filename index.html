@@ -521,7 +521,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v8.7</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v8.8</span>
       <button class="btn btn-ghost btn-sm no-print" id="backupExportBtn" data-i18n="btn_backup_export" title="Scarica un backup completo di tutti i tuoi dati">⬇ Backup</button>
       <button class="btn btn-ghost btn-sm no-print" id="backupImportBtn" data-i18n="btn_backup_import" title="Ripristina i dati da un file di backup">⬆ Ripristina</button>
       <input type="file" id="backupImportFile" accept=".json,application/json" style="display:none;">
@@ -739,6 +739,9 @@
       <input type="file" id="importRecipesFile" accept=".txt,.csv,.json,text/plain,text/csv,application/json" style="display:none;">
     </div>
     <input autocomplete="off" type="text" id="recipeSearchInput" class="search-input no-print" data-i18n-ph="search_recipes_ph" placeholder="Cerca ricetta…">
+    <div class="no-print" style="margin:8px 0 14px;">
+      <select id="recipeGroupFilter" style="max-width:260px;"></select>
+    </div>
     <div class="recipe-grid" id="recipeGrid"></div>
   </section>
 
@@ -1253,6 +1256,8 @@
     <input autocomplete="off" type="text" id="rName" data-i18n-ph="recipe_name_ph" placeholder="Nome della ricetta">
     <input autocomplete="off" type="text" id="rNameFr" data-i18n-ph="recipe_name_fr_ph" placeholder="Nom en français (facoltativo)">
     <input autocomplete="off" type="text" id="rCategory" data-i18n-ph="recipe_cat_ph" placeholder="Categoria (es. Colazione, Primo, Dolce…)">
+    <input autocomplete="off" type="text" id="rGroup" list="recipeGroupsDatalist" data-i18n-ph="recipe_group_ph" placeholder="Gruppo/pacchetto (es. Vegana, Senza glutine…) — facoltativo">
+    <datalist id="recipeGroupsDatalist"></datalist>
     <label class="field-label" data-i18n="recipe_photo_label">Foto della ricetta (facoltativa)</label>
     <input type="file" id="rPhotoFile" accept="image/*">
     <div id="rPhotoPreview" style="margin:8px 0;"></div>
@@ -1779,6 +1784,7 @@ const I18N = {
     recipe_servings_label:"Porzioni base della ricetta", ingredients_label:"Ingredienti", btn_add_ingredient:"+ Ingrediente",
     macros_label:"Valori nutrizionali (totali ricetta)", recipe_instructions_ph:"Preparazione…",
     recipe_name_fr_ph:"Nom en français (facoltativo)", recipe_instructions_fr_ph:"Préparation en français (facoltativo)…",
+    recipe_group_ph:"Gruppo/pacchetto (es. Vegana, Senza glutine…) — facoltativo", recipe_group_all:"Tutti i gruppi",
     btn_auto_calc:"🧮 Calcola dai valori degli ingredienti",
     auto_calc_note:"Collega ogni ingrediente a un alimento del database (scheda Equivalenze) e indica la quantità in grammi per includerlo nel calcolo automatico. Puoi comunque correggere i valori a mano.",
     ing_not_linked_note:"Questo ingrediente non è collegato a un alimento del database: non contribuirà al calcolo dei micronutrienti (vitamine e minerali).",
@@ -1997,6 +2003,7 @@ const I18N = {
     recipe_servings_label:"Portions de base de la recette", ingredients_label:"Ingrédients", btn_add_ingredient:"+ Ingrédient",
     macros_label:"Valeurs nutritionnelles (totales de la recette)", recipe_instructions_ph:"Préparation…",
     recipe_name_fr_ph:"Nom en français (facultatif)", recipe_instructions_fr_ph:"Préparation en français (facultatif)…",
+    recipe_group_ph:"Groupe/pack (ex. Végane, Sans gluten…) — facultatif", recipe_group_all:"Tous les groupes",
     btn_auto_calc:"🧮 Calculer à partir des ingrédients",
     auto_calc_note:"Associe chaque ingrédient à un aliment de la base de données (onglet Équivalences) et indique la quantité en grammes pour l'inclure dans le calcul automatique. Tu peux toujours corriger les valeurs à la main.",
     ing_not_linked_note:"Cet ingrédient n'est pas associé à un aliment de la base de données : il ne contribuera pas au calcul des micronutriments (vitamines et minéraux).",
@@ -3741,11 +3748,16 @@ document.getElementById('addItemBtn').addEventListener('click', ()=>{
 });
 
 /* ---------- RECIPES ---------- */
+let recipeGroupFilter = '';
 function renderRecipes(){
   const grid = document.getElementById('recipeGrid');
-  const filtered = recipeSearchQuery
+  renderRecipeGroupFilter();
+  let filtered = recipeSearchQuery
     ? state.recipes.filter(r => (r.name||'').toLowerCase().includes(recipeSearchQuery))
     : state.recipes;
+  if(recipeGroupFilter){
+    filtered = filtered.filter(r => (r.group||'') === recipeGroupFilter);
+  }
   let html = filtered.map(r=>{
     const m = r.macros || {};
     const linkBtn = r.link ? `<a href="${escapeAttr(r.link)}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="display:inline-block;" onclick="event.stopPropagation()">🔗 ${escapeHtml(r.link.length>26?r.link.slice(0,26)+'…':r.link)}</a>` : '';
@@ -4264,6 +4276,7 @@ function openRecipeModal(id){
     document.getElementById('rName').value = r.name||'';
     document.getElementById('rNameFr').value = r.name_fr||'';
     document.getElementById('rCategory').value = r.category||'';
+    document.getElementById('rGroup').value = r.group||'';
     document.getElementById('rServings').value = r.servings||1;
     document.getElementById('rKcal').value = r.macros?.kcal||'';
     document.getElementById('rProtein').value = r.macros?.protein||'';
@@ -4284,6 +4297,7 @@ function openRecipeModal(id){
     document.getElementById('rName').value = '';
     document.getElementById('rNameFr').value = '';
     document.getElementById('rCategory').value = '';
+    document.getElementById('rGroup').value = '';
     document.getElementById('rServings').value = 1;
     document.getElementById('rKcal').value = '';
     document.getElementById('rProtein').value = '';
@@ -4352,6 +4366,7 @@ document.getElementById('recipeSave').addEventListener('click', ()=>{
     name,
     name_fr: document.getElementById('rNameFr').value.trim(),
     category: document.getElementById('rCategory').value.trim(),
+    group: document.getElementById('rGroup').value.trim(),
     servings: parseNum(document.getElementById('rServings').value)||1,
     ingredients: cleanIngredients,
     macros: {
@@ -4528,7 +4543,7 @@ document.getElementById('importPreviewConfirm').addEventListener('click', ()=>{
         foodRef: foodIdMap[i.foodRef] ? foodIdMap[i.foodRef] : (i.foodRef && state.foodsDB.some(f=>f.id===i.foodRef) ? i.foodRef : '')
       }));
       state.recipes.push({
-        id:uid(), name:r.name||t('recipe_modal_new'), name_fr:r.name_fr||'', category:r.category||'', servings:Number(r.servings)||1,
+        id:uid(), name:r.name||t('recipe_modal_new'), name_fr:r.name_fr||'', category:r.category||'', group:r.group||'', servings:Number(r.servings)||1,
         ingredients:newIngredients, macros: r.macros||{}, instructions:r.instructions||'', instructions_fr:r.instructions_fr||'', link:r.link||'', photo:r.photo||''
       });
     });
@@ -4665,6 +4680,7 @@ const RECIPE_FIELD_MAP = {
   'sale':'salt', 'sel':'salt',
   'preparazione':'instructions', 'préparation':'instructions',
   'preparazione fr':'instructions_fr', 'préparation fr':'instructions_fr',
+  'gruppo':'group', 'groupe':'group', 'pacchetto':'group', 'collection':'group',
   'link':'link', 'lien':'link'
 };
 function parseRecipesPlainText(text){
@@ -4704,6 +4720,7 @@ function parseRecipesPlainText(text){
       macros: {kcal:fields.kcal||'', protein:fields.protein||'', carbs:fields.carbs||'', fat:fields.fat||'', fiber:fields.fiber||'', salt:fields.salt||''},
       instructions: fields.instructions||'',
       instructions_fr: fields.instructions_fr||'',
+      group: fields.group||'',
       link: fields.link||''
     });
   });
@@ -4828,6 +4845,20 @@ document.getElementById('recipeSearchInput').addEventListener('input', (e)=>{
   recipeSearchQuery = e.target.value.trim().toLowerCase();
   renderRecipes();
 });
+document.getElementById('recipeGroupFilter').addEventListener('change', (e)=>{
+  recipeGroupFilter = e.target.value;
+  renderRecipes();
+});
+function renderRecipeGroupFilter(){
+  const sel = document.getElementById('recipeGroupFilter');
+  const groups = [...new Set(state.recipes.map(r=>r.group).filter(g=>g && g.trim()))].sort();
+  const current = sel.value;
+  sel.innerHTML = `<option value="">${t('recipe_group_all')}</option>` + groups.map(g=>`<option value="${escapeAttr(g)}">${escapeHtml(g)}</option>`).join('');
+  sel.value = groups.includes(current) ? current : '';
+  recipeGroupFilter = sel.value;
+  const datalist = document.getElementById('recipeGroupsDatalist');
+  if(datalist) datalist.innerHTML = groups.map(g=>`<option value="${escapeAttr(g)}">`).join('');
+}
 document.getElementById('foodSearchInput').addEventListener('input', (e)=>{
   foodSearchQuery = e.target.value.trim().toLowerCase();
   renderFoodsTable();
@@ -5996,6 +6027,7 @@ document.getElementById('viewRecipeBtn').addEventListener('click', ()=>{
     name: document.getElementById('rName').value.trim() || t('recipe_modal_new'),
     name_fr: document.getElementById('rNameFr').value.trim(),
     category: document.getElementById('rCategory').value.trim(),
+    group: document.getElementById('rGroup').value.trim(),
     servings: parseNum(document.getElementById('rServings').value)||1,
     ingredients: ingredientDraft.filter(i=>i.name && i.name.trim()),
     macros: {
