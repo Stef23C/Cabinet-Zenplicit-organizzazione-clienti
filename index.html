@@ -521,7 +521,7 @@
     </div>
     <div class="top-right">
       <div class="today-pill" id="todayPill"></div>
-      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v8.8</span>
+      <span style="font-size:10px;color:var(--ink-soft);opacity:0.6;">v8.9</span>
       <button class="btn btn-ghost btn-sm no-print" id="backupExportBtn" data-i18n="btn_backup_export" title="Scarica un backup completo di tutti i tuoi dati">⬇ Backup</button>
       <button class="btn btn-ghost btn-sm no-print" id="backupImportBtn" data-i18n="btn_backup_import" title="Ripristina i dati da un file di backup">⬆ Ripristina</button>
       <input type="file" id="backupImportFile" accept=".json,application/json" style="display:none;">
@@ -739,9 +739,17 @@
       <input type="file" id="importRecipesFile" accept=".txt,.csv,.json,text/plain,text/csv,application/json" style="display:none;">
     </div>
     <input autocomplete="off" type="text" id="recipeSearchInput" class="search-input no-print" data-i18n-ph="search_recipes_ph" placeholder="Cerca ricetta…">
-    <div class="no-print" style="margin:8px 0 14px;">
+    <div class="no-print" style="margin:8px 0 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       <select id="recipeGroupFilter" style="max-width:260px;"></select>
     </div>
+    <details class="no-print" style="margin-bottom:14px;">
+      <summary style="cursor:pointer;font-size:12px;color:var(--sage-dark);font-weight:600;" data-i18n="bulk_group_toggle">🏷️ Assegna un gruppo a più ricette insieme</summary>
+      <p style="font-size:11.5px;color:var(--ink-soft);margin:8px 0;" data-i18n="bulk_group_note">Usa la ricerca qui sopra per trovare le ricette (es. scrivi "Anti-infiammatoria"), poi scegli o scrivi il nome del gruppo e assegnalo a tutte quelle trovate in un colpo solo.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <input autocomplete="off" type="text" id="bulkGroupInput" list="recipeGroupsDatalist" data-i18n-ph="bulk_group_ph" placeholder="Nome del gruppo da assegnare…" style="flex:1;min-width:200px;">
+        <button class="btn btn-primary btn-sm" id="bulkGroupApplyBtn" data-i18n="btn_bulk_group_apply">Assegna alle ricette trovate</button>
+      </div>
+    </details>
     <div class="recipe-grid" id="recipeGrid"></div>
   </section>
 
@@ -1785,6 +1793,13 @@ const I18N = {
     macros_label:"Valori nutrizionali (totali ricetta)", recipe_instructions_ph:"Preparazione…",
     recipe_name_fr_ph:"Nom en français (facoltativo)", recipe_instructions_fr_ph:"Préparation en français (facoltativo)…",
     recipe_group_ph:"Gruppo/pacchetto (es. Vegana, Senza glutine…) — facoltativo", recipe_group_all:"Tutti i gruppi",
+    bulk_group_toggle:"🏷️ Assegna un gruppo a più ricette insieme",
+    bulk_group_note:"Usa la ricerca qui sopra per trovare le ricette (es. scrivi \"Anti-infiammatoria\"), poi scegli o scrivi il nome del gruppo e assegnalo a tutte quelle trovate in un colpo solo.",
+    bulk_group_ph:"Nome del gruppo da assegnare…", btn_bulk_group_apply:"Assegna alle ricette trovate",
+    alert_bulk_group_name_needed:"Scrivi il nome del gruppo da assegnare.",
+    alert_bulk_group_no_matches:"Nessuna ricetta trovata con questa ricerca — prova a cercare prima qualcosa nella barra sopra.",
+    confirm_bulk_group_apply:(n,g)=>`Assegnare il gruppo "${g}" a ${n} ${n===1?'ricetta trovata':'ricette trovate'}? Sovrascrive il gruppo attuale, se presente.`,
+    alert_bulk_group_done:(n,g)=>`Fatto! ${n} ${n===1?'ricetta assegnata':'ricette assegnate'} al gruppo "${g}".`,
     btn_auto_calc:"🧮 Calcola dai valori degli ingredienti",
     auto_calc_note:"Collega ogni ingrediente a un alimento del database (scheda Equivalenze) e indica la quantità in grammi per includerlo nel calcolo automatico. Puoi comunque correggere i valori a mano.",
     ing_not_linked_note:"Questo ingrediente non è collegato a un alimento del database: non contribuirà al calcolo dei micronutrienti (vitamine e minerali).",
@@ -2004,6 +2019,13 @@ const I18N = {
     macros_label:"Valeurs nutritionnelles (totales de la recette)", recipe_instructions_ph:"Préparation…",
     recipe_name_fr_ph:"Nom en français (facultatif)", recipe_instructions_fr_ph:"Préparation en français (facultatif)…",
     recipe_group_ph:"Groupe/pack (ex. Végane, Sans gluten…) — facultatif", recipe_group_all:"Tous les groupes",
+    bulk_group_toggle:"🏷️ Assigner un groupe à plusieurs recettes à la fois",
+    bulk_group_note:"Utilise la recherche ci-dessus pour trouver les recettes (ex. écris \"Anti-inflammatoire\"), puis choisis ou écris le nom du groupe et assigne-le à toutes celles trouvées en une fois.",
+    bulk_group_ph:"Nom du groupe à assigner…", btn_bulk_group_apply:"Assigner aux recettes trouvées",
+    alert_bulk_group_name_needed:"Écris le nom du groupe à assigner.",
+    alert_bulk_group_no_matches:"Aucune recette trouvée avec cette recherche — essaie de chercher quelque chose dans la barre ci-dessus d'abord.",
+    confirm_bulk_group_apply:(n,g)=>`Assigner le groupe "${g}" à ${n} ${n===1?'recette trouvée':'recettes trouvées'} ? Cela écrase le groupe actuel, s'il y en a un.`,
+    alert_bulk_group_done:(n,g)=>`C'est fait ! ${n} ${n===1?'recette assignée':'recettes assignées'} au groupe "${g}".`,
     btn_auto_calc:"🧮 Calculer à partir des ingrédients",
     auto_calc_note:"Associe chaque ingrédient à un aliment de la base de données (onglet Équivalences) et indique la quantité en grammes pour l'inclure dans le calcul automatique. Tu peux toujours corriger les valeurs à la main.",
     ing_not_linked_note:"Cet ingrédient n'est pas associé à un aliment de la base de données : il ne contribuera pas au calcul des micronutriments (vitamines et minéraux).",
@@ -4848,6 +4870,20 @@ document.getElementById('recipeSearchInput').addEventListener('input', (e)=>{
 document.getElementById('recipeGroupFilter').addEventListener('change', (e)=>{
   recipeGroupFilter = e.target.value;
   renderRecipes();
+});
+document.getElementById('bulkGroupApplyBtn').addEventListener('click', ()=>{
+  const groupName = document.getElementById('bulkGroupInput').value.trim();
+  if(!groupName){ alert(t('alert_bulk_group_name_needed')); return; }
+  const matches = recipeSearchQuery
+    ? state.recipes.filter(r => (r.name||'').toLowerCase().includes(recipeSearchQuery))
+    : state.recipes;
+  if(matches.length === 0){ alert(t('alert_bulk_group_no_matches')); return; }
+  if(!confirm(t('confirm_bulk_group_apply')(matches.length, groupName))) return;
+  matches.forEach(r => r.group = groupName);
+  persist();
+  document.getElementById('bulkGroupInput').value = '';
+  renderRecipes();
+  alert(t('alert_bulk_group_done')(matches.length, groupName));
 });
 function renderRecipeGroupFilter(){
   const sel = document.getElementById('recipeGroupFilter');
